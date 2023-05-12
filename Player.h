@@ -11,6 +11,12 @@ public:
 
 #pragma region Matrix
 
+	// 行列の加法
+	Matrix4x4 Add(const Matrix4x4& m1, const Matrix4x4& m2);
+
+	// 行列の減法
+	Matrix4x4 Subtract(const Matrix4x4& m1, const Matrix4x4& m2);
+
 	// X軸回転行列
 	Matrix4x4 MakeRotateXMatrix(float radius);
 	// Y軸回転行列
@@ -35,6 +41,9 @@ public:
 	    MakeAffineMatrix(const Vector3& scale, const Vector3& rotate, const Vector3& translate);
 
 #pragma endregion
+
+	// playerの回転
+	void Rotate();
 
 	/// <summary>
 	/// 初期化

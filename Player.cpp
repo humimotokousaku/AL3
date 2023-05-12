@@ -5,11 +5,33 @@
 #include "ImGuiManager.h"
 #include <math.h>
 
-    Player::Player() {
-}
+Player::Player() {}
 Player::~Player() {}
 
 #pragma region Matrix4x4
+
+// 行列の加法
+Matrix4x4 Add(const Matrix4x4& m1, const Matrix4x4& m2) {
+	Matrix4x4 result{};
+	for (int row = 0; row < 4; ++row) {
+		for (int column = 0; column < 4; ++column) {
+			result.m[row][column] = m1.m[row][column] + m2.m[row][column];
+		}
+	}
+	return result;
+}
+
+// 行列の減法
+Matrix4x4 Subtract(const Matrix4x4& m1, const Matrix4x4& m2) {
+	Matrix4x4 result;
+	for (int row = 0; row < 4; ++row) {
+		for (int column = 0; column < 4; ++column) {
+			result.m[row][column] = m1.m[row][column] - m2.m[row][column];
+		}
+	}
+	return result;
+}
+
 // X軸回転行列
 Matrix4x4 Player::MakeRotateXMatrix(float radius) {
 	Matrix4x4 result;
@@ -246,6 +268,19 @@ Matrix4x4 Player::MakeAffineMatrix(
 
 #pragma endregion
 
+// playerの回転
+void Player::Rotate(){
+	// 回転速さ[ラジアン/frame]
+	const float kRotSpeed = 0.02f;
+
+	// 押した方向で移動ベクトルを変更
+	if (input_->PushKey(DIK_A)) {
+		worldTransform_.rotation_.y -= kRotSpeed;
+	} else if (input_->PushKey(DIK_D)) {
+		worldTransform_.rotation_.y += kRotSpeed;
+	}
+}
+
 // Initializeの関数定義
 void Player::Initialize(Model* model, uint32_t textureHandle) {
 	// NULLポインタチェック
@@ -287,6 +322,8 @@ void Player::Update() {
 	} else if (input_->PushKey(DIK_DOWN)) {
 		move.y -= kCharacterSpeed;
 	}
+	// 回転処理
+	Rotate();
 
 	// 移動限界座標
 	const Vector2 kMoveLimit = {40 - 10, 30 - 15};
