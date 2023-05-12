@@ -60,9 +60,6 @@ private: // メンバ変数
 	// 自キャラ
 	Player* player_ = nullptr;
 
-	// ImGuiで値を入力する変数
-	float inputFloat[3] = {0, 0, 0};
-
 	// デバッグカメラ有効
 	bool isDebugCameraActive_ = false;
 	// デバッグカメラ

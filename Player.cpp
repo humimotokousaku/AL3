@@ -4,9 +4,9 @@
 #define USE_DEFINES_MATH
 #include "ImGuiManager.h"
 #include <math.h>
+#include "Vector3.h"
 
-    Player::Player() {
-}
+Player::Player() {}
 Player::~Player() {}
 
 #pragma region Matrix4x4
@@ -329,11 +329,12 @@ void Player::Update() {
 	// 行列を定数バッファに転送
 	worldTransform_.TransferMatrix();
 
+
 	// playerの座標表示
-	ImGui::Begin("Player");
-	ImGui::Text(
-	    "Player %f.%f.%f", worldTransform_.translation_.x, worldTransform_.translation_.y,
-	    worldTransform_.translation_.z);
+	ImGui::Begin(" ");
+	ImGui::Text("SPACE:DebugCamera");
+	// float3スライダー
+	ImGui::SliderFloat3("Player", *inputFloat3, -30.0f, 30.0f);
 	ImGui::End();
 }
 
