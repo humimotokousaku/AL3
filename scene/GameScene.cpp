@@ -1,14 +1,19 @@
 #include "GameScene.h"
+#include "AxisIndicator.h"
+#include "ImGuiManager.h"
+#include "PrimitiveDrawer.h"
 #include "TextureManager.h"
 #include <cassert>
 
 GameScene::GameScene() {}
 
-GameScene::~GameScene(){
+GameScene::~GameScene() {
 	// 3Dモデル
 	delete model_;
 	// 自キャラの解放
 	delete player_;
+	// デバッグカメラの解放
+	delete debugCamera_;
 }
 
 void GameScene::Initialize() {
@@ -31,11 +36,40 @@ void GameScene::Initialize() {
 	player_ = new Player();
 	// 自キャラの初期化
 	player_->Initialize(model_, playerTexture_);
+
+	// デバッグカメラの生成
+	debugCamera_ = new DebugCamera(1280, 720);
 }
 
 void GameScene::Update() {
 	// 自キャラの更新
 	player_->Update();
+
+#ifdef _DEBUG
+	if (input_->TriggerKey(DIK_SPACE)) {
+		if (!isDebugCameraActive_) {
+			isDebugCameraActive_ = true;
+		} else {
+			isDebugCameraActive_ = false;
+		}
+	}
+#endif
+	if (isDebugCameraActive_) {
+		// デバッグカメラの更新
+		debugCamera_->Update();
+		viewProjection_.matView = debugCamera_->GetViewProjection().matView;
+		viewProjection_.matProjection = debugCamera_->GetViewProjection().matProjection;
+
+		// ビュープロジェクション行列の転送
+		viewProjection_.TransferMatrix();
+	} else {
+		// ビュープロジェクション行列の更新と転送
+		viewProjection_.UpdateMatrix();
+	}
+	// 軸方向の表示を有効
+	AxisIndicator::GetInstance()->SetVisible(true);
+	// 軸方向表示が参照するビュープロジェクションを指定
+	AxisIndicator::GetInstance()->SetTargetViewProjection(&debugCamera_->GetViewProjection());
 }
 
 void GameScene::Draw() {

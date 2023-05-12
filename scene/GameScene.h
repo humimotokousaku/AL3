@@ -1,14 +1,15 @@
 #pragma once
 
 #include "Audio.h"
+#include "DebugCamera.h"
 #include "DirectXCommon.h"
 #include "Input.h"
 #include "Model.h"
+#include "Player.h"
 #include "SafeDelete.h"
 #include "Sprite.h"
 #include "ViewProjection.h"
 #include "WorldTransform.h"
-#include "Player.h"
 
 /// <summary>
 /// ゲームシーン
@@ -50,7 +51,7 @@ private: // メンバ変数
 	uint32_t playerTexture_ = 0;
 	// 3Dモデルデータ
 	Model* model_ = nullptr;
-	
+
 	// ワールドトランスフォーム
 	WorldTransform worldTransform_;
 	// ビュープロジェクション
@@ -58,6 +59,14 @@ private: // メンバ変数
 
 	// 自キャラ
 	Player* player_ = nullptr;
+
+	// ImGuiで値を入力する変数
+	float inputFloat[3] = {0, 0, 0};
+
+	// デバッグカメラ有効
+	bool isDebugCameraActive_ = false;
+	// デバッグカメラ
+	DebugCamera* debugCamera_ = nullptr;
 
 	/// <summary>
 	/// ゲームシーン用
