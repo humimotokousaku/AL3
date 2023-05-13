@@ -5,7 +5,7 @@
 /// <summary>
 /// 自キャラの弾
 /// </summary>
-class PlayerBullet {
+class PlayerBullet : public WorldTransform{
 
 public: // メンバ関数
 	/// <summary>
@@ -33,6 +33,6 @@ private: // メンバ変数
 	// モデル
 	Model* model_ = nullptr;
 	// テクスチャハンドル
-	uint32_t playerTexture_ = 0u;
+	uint32_t bulletTexture_ = 0u;
 
 };
