@@ -6,6 +6,7 @@
 #include "Input.h"
 #include "Model.h"
 #include "Player.h"
+#include "Enemy.h"
 #include "SafeDelete.h"
 #include "Sprite.h"
 #include "ViewProjection.h"
@@ -59,6 +60,9 @@ private: // メンバ変数
 
 	// 自キャラ
 	Player* player_ = nullptr;
+
+	// enemy
+	Enemy* enemy_ = nullptr;
 
 	// ImGuiで値を入力する変数
 	float inputFloat[3] = {0, 0, 0};

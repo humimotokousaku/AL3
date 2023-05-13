@@ -12,6 +12,8 @@ GameScene::~GameScene() {
 	delete model_;
 	// 自キャラの解放
 	delete player_;
+	// enemyの解放
+	delete enemy_;
 	// デバッグカメラの解放
 	delete debugCamera_;
 }
@@ -37,6 +39,11 @@ void GameScene::Initialize() {
 	// 自キャラの初期化
 	player_->Initialize(model_, playerTexture_);
 
+	// enemyの生成
+	enemy_ = new Enemy();
+	// enemyの初期化
+	enemy_->Initialize(model_, Vector3(0,3,30));
+
 	// デバッグカメラの生成
 	debugCamera_ = new DebugCamera(1280, 720);
 }
@@ -44,6 +51,11 @@ void GameScene::Initialize() {
 void GameScene::Update() {
 	// 自キャラの更新
 	player_->Update();
+
+	// enemyの更新
+	if (enemy_) {
+		enemy_->Update();
+	}
 
 #ifdef _DEBUG
 	if (input_->TriggerKey(DIK_C)) {
@@ -99,6 +111,10 @@ void GameScene::Draw() {
 	/// ここに3Dオブジェクトの描画処理を追加できる
 	/// </summary>
 	player_->Draw(viewProjection_);
+
+	if (enemy_) {
+		enemy_->Draw(viewProjection_);
+	}
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();
 #pragma endregion
