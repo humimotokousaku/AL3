@@ -6,7 +6,12 @@
 #include <math.h>
 
 Player::Player() {}
-Player::~Player() {}
+Player::~Player() {
+	// delete bullets_;
+	for (PlayerBullet* bullet : bullets_) {
+		delete bullet;
+	}
+}
 
 #pragma region Matrix4x4
 
@@ -269,7 +274,7 @@ Matrix4x4 Player::MakeAffineMatrix(
 #pragma endregion
 
 // playerの回転
-void Player::Rotate(){
+void Player::Rotate() {
 	// 回転速さ[ラジアン/frame]
 	const float kRotSpeed = 0.02f;
 
@@ -298,14 +303,21 @@ void Player::Initialize(Model* model, uint32_t textureHandle) {
 }
 
 // 攻撃
-void Player::Attack() { 
+void Player::Attack() {
 	if (input_->TriggerKey(DIK_SPACE)) {
+
+		// 弾があれば解放
+		/*if (bullet_) {
+		    delete bullet_;
+		    bullet_ = nullptr;
+		}*/
+
 		// 弾を生成し、初期化
 		PlayerBullet* newBullet = new PlayerBullet();
 		newBullet->Initialize(model_, worldTransform_.translation_);
 
 		// 弾を登録
-		bullet_ = newBullet;
+		bullets_.push_back(newBullet);
 	}
 }
 
@@ -320,12 +332,12 @@ void Player::Update() {
 	// キャラクターの移動の速さ
 	const float kCharacterSpeed = 0.2f;
 
-	#pragma region Rotate
+#pragma region Rotate
 
 	// 旋回処理
 	Rotate();
 
-		// スケーリング行列の生成
+	// スケーリング行列の生成
 	Matrix4x4 playerScale;
 	playerScale = MakeScaleMatrix(worldTransform_.scale_);
 
@@ -349,9 +361,9 @@ void Player::Update() {
 	worldTransform_.matWorld_ = MakeAffineMatrix(
 	    worldTransform_.scale_, worldTransform_.rotation_, worldTransform_.translation_);
 
-	#pragma endregion
+#pragma endregion
 
-	#pragma region Move
+#pragma region Move
 
 	// 押した方向で移動ベクトルを変更
 
@@ -382,13 +394,14 @@ void Player::Update() {
 	worldTransform_.translation_.y += move.y;
 	worldTransform_.translation_.z += move.z;
 
-	#pragma endregion
+#pragma endregion
 
 	// 弾の処理
 	Attack();
-	// 弾を更新
-	if (bullet_) {
-		bullet_->Update();
+
+	// 弾の更新
+	for (PlayerBullet* bullet : bullets_) {
+		bullet->Update();
 	}
 
 	// 行列を定数バッファに転送
@@ -407,7 +420,7 @@ void Player::Draw(ViewProjection& viewProjection) {
 	// player
 	model_->Draw(worldTransform_, viewProjection, playerTexture_);
 	// 弾
-	if (bullet_) {
-		bullet_->Draw(viewProjection);
+	for (PlayerBullet* bullet : bullets_) {
+		bullet->Draw(viewProjection);
 	}
 }

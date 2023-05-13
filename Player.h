@@ -4,10 +4,15 @@
 #include "Vector4.h"
 #include "WorldTransform.h"
 #include "PlayerBullet.h"
+#include <list>
 
 class Player {
 public:
 	Player();
+
+	/// <summary>
+	/// デストラクタ
+	/// </summary>
 	~Player();
 
 #pragma region Matrix
@@ -86,5 +91,6 @@ public:
 	uint32_t playerTexture_ = 0u;
 
 	// 弾
-	PlayerBullet* bullet_ = nullptr;
+	//PlayerBullet* bullet_ = nullptr;
+	std::list<PlayerBullet*> bullets_;
 };
