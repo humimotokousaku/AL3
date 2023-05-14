@@ -2,17 +2,14 @@
 #include "Model.h"
 #include "WorldTransform.h"
 
-using namespace std;
-
 class Enemy {
 	// 行動フェーズ
 	enum class Phase {
-		Approach,	// 接近フェーズ
-		Leave,		// 離脱フェーズ
+		Approach, // 接近フェーズ
+		Leave,    // 離脱フェーズ
 	};
 
 public:
-	
 	/// <summary>
 	/// 初期化
 	/// </summary>
@@ -49,5 +46,4 @@ public:
 
 	// フェーズ
 	Phase phase_ = Phase::Approach;
-
 };
