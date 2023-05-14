@@ -44,6 +44,9 @@ public:
 	// テクスチャハンドル
 	uint32_t enemyTexture_ = 0u;
 
+	// メンバ関数ポインタのテーブル
+	static void (Enemy::*spFuncTable[])();
+
 	// フェーズ
 	Phase phase_ = Phase::Approach;
 };
