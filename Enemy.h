@@ -1,13 +1,32 @@
 ﻿#pragma once
-#include "WorldTransform.h"
 #include "Model.h"
+#include "WorldTransform.h"
+
+using namespace std;
 
 class Enemy {
+	// 行動フェーズ
+	enum class Phase {
+		Approach,	// 接近フェーズ
+		Leave,		// 離脱フェーズ
+	};
+
 public:
+	
 	/// <summary>
 	/// 初期化
 	/// </summary>
 	void Initialize(Model* model, const Vector3& pos);
+
+	/// <summary>
+	/// 接近フェーズの移動処理
+	/// </summary>
+	void MoveApproach();
+
+	/// <summary>
+	/// 離脱フェーズの移動処理
+	/// </summary>
+	void MoveLeave();
 
 	/// <summary>
 	/// 更新
@@ -27,5 +46,8 @@ public:
 	Model* model_ = nullptr;
 	// テクスチャハンドル
 	uint32_t enemyTexture_ = 0u;
+
+	// フェーズ
+	Phase phase_ = Phase::Approach;
 
 };

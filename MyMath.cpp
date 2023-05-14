@@ -266,8 +266,8 @@ Matrix4x4 MakeAffineMatrix(
 /// <summary>
 /// ベクトルの足し算
 /// </summary>
-/// <param name="vector1"></param>
-/// <param name="vector2"></param>
+/// <param name="pos">座標</param>
+/// <param name="vector">座標に対して足すもの</param>
 /// <returns></returns>
 Vector3 Add(const Vector3& pos, const Vector3& vector) {
 	Vector3 result;
