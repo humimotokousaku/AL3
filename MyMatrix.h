@@ -11,11 +11,11 @@ Matrix4x4 Add(const Matrix4x4& m1, const Matrix4x4& m2);
 Matrix4x4 Subtract(const Matrix4x4& m1, const Matrix4x4& m2);
 
 // X軸回転行列
-Matrix4x4 MakeRotateXMatrix(float radius);
+Matrix4x4 MakeRotateXMatrix(float radian);
 // Y軸回転行列
-Matrix4x4 MakeRotateYMatrix(float radius);
+Matrix4x4 MakeRotateYMatrix(float radian);
 // Z軸回転行列
-Matrix4x4 MakeRotateZMatrix(float radius);
+Matrix4x4 MakeRotateZMatrix(float radian);
 
 // 行列の積
 Matrix4x4 Multiply(const Matrix4x4& m1, const Matrix4x4& m2);
