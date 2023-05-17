@@ -1,6 +1,6 @@
 ﻿#include "PlayerBullet.h"
 #include "WorldTransform.h"
-#include "MyMath.h"
+#include "MyMatrix.h"
 #include <cassert>
 
 void PlayerBullet::Initialize(Model* model, const Vector3& pos, const Vector3& velocity) {

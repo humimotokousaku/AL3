@@ -1,6 +1,6 @@
 ﻿#include "Enemy.h"
 #include "WorldTransform.h"
-#include "MyMath.h"
+#include "MyMatrix.h"
 #include <cassert>
 #include <stdio.h>
 
