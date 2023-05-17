@@ -312,7 +312,7 @@ void Player::Update() {
 
 	// playerの座標表示
 	ImGui::Begin(" ");
-	ImGui::Text("SPACE:DebugCamera");
+	ImGui::Text("SPACE:DebugCamera　Arrow:Move");
 	// float3スライダー
 	ImGui::SliderFloat3("Player", *inputFloat3, -30.0f, 30.0f);
 	ImGui::End();
