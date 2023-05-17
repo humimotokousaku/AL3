@@ -351,26 +351,6 @@ void Player::Update() {
 	// 旋回処理
 	Rotate();
 
-	// スケーリング行列の生成
-	Matrix4x4 playerScale;
-	playerScale = MakeScaleMatrix(worldTransform_.scale_);
-
-	// Z,X,Y軸の回転行列の生成
-	Matrix4x4 zAxis;
-	Matrix4x4 xAxis;
-	Matrix4x4 yAxis;
-	xAxis = MakeRotateXMatrix(worldTransform_.rotation_.x);
-	yAxis = MakeRotateYMatrix(worldTransform_.rotation_.y);
-	zAxis = MakeRotateZMatrix(worldTransform_.rotation_.z);
-
-	// 回転行列の合成
-	Matrix4x4 playerRotate;
-	playerRotate = Multiply(zAxis, Multiply(xAxis, yAxis));
-
-	// 平行移動行列
-	Matrix4x4 playerTranslate;
-	playerTranslate = MakeTranslateMatrix(worldTransform_.translation_);
-
 	// アフィン変換行列をワールド行列に代入
 	worldTransform_.matWorld_ = MakeAffineMatrix(
 	    worldTransform_.scale_, worldTransform_.rotation_, worldTransform_.translation_);
