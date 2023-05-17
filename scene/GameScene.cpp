@@ -54,7 +54,7 @@ void GameScene::Update() {
 
 	// enemyの更新
 	if (enemy_) {
-		enemy_->Update();
+			enemy_->Update();
 	}
 
 #ifdef _DEBUG
