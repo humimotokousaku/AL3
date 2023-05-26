@@ -1,5 +1,5 @@
-﻿#include "Enemy.h"
-#include "MyMatrix.h"
+﻿#include "Object/Enemy/Enemy.h"
+#include "math/MyMatrix.h"
 #include "WorldTransform.h"
 #include <cassert>
 #include <stdio.h>

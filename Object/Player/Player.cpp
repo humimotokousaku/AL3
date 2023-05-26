@@ -1,8 +1,8 @@
-﻿#include "Player.h"
+﻿#include "Object/Player/Player.h"
 #include "WorldTransform.h"
 #include <cassert>
 #include "ImGuiManager.h"
-#include "MyMatrix.h"
+#include "math/MyMatrix.h"
 
 Player::Player() {}
 Player::~Player() {
