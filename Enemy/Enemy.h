@@ -42,10 +42,6 @@ public:
 	/// </summary>
 	void Initialize(Model* model, const Vector3& pos);
 
-	/// <summary>
-	/// enemyの移動処理
-	/// </summary>
-	/// <param name="velocity">移動量</param>
 	void Move(const Vector3 velocity);
 
 	/// <summary>
@@ -65,7 +61,7 @@ public:
 	void Draw(ViewProjection& viewProjection);
 
 private:
-	// 敵の行動パターン
+	
 	BaseEnemyState* state_;
 
 	// ワールド変換データ
