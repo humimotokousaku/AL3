@@ -42,7 +42,7 @@ void GameScene::Initialize() {
 	// enemyの生成
 	enemy_ = new Enemy();
 	// enemyの初期化
-	enemy_->Initialize(model_, Vector3(0,3,30));
+	enemy_->Initialize(model_, Vector3(3,3,30));
 
 	// デバッグカメラの生成
 	debugCamera_ = new DebugCamera(1280, 720);
