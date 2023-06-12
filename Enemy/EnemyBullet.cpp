@@ -1,6 +1,6 @@
-﻿#include "EnemyBullet.h"
+﻿#include "Enemy/EnemyBullet.h"
 #include "WorldTransform.h"
-#include "MyMatrix.h"
+#include "math/MyMatrix.h"
 #include <cassert>
 
 void EnemyBullet::Initialize(Model* model, const Vector3& pos, const Vector3& velocity) {
@@ -26,7 +26,6 @@ void EnemyBullet::Update() {
 
 	// 行列を更新
 	worldTransform_.UpdateMatrix();
-
 }
 
 void EnemyBullet::Draw(const ViewProjection& viewProjection) {
