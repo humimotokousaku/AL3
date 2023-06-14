@@ -2,6 +2,8 @@
 #include "Model.h"
 #include "WorldTransform.h"
 #include "Enemy/EnemyBullet.h"
+#include "TimedCall.h"
+#include <functional>
 
 class Enemy; // 前方宣言
 
@@ -9,20 +11,37 @@ class Enemy; // 前方宣言
 class BaseEnemyState {
 public:
 	// 純粋仮想関数
+	virtual void Initialize(Enemy* enemy) = 0;
 	virtual void Update(Enemy* enemy) = 0;
-
-public:
 };
 
 // 接近フェーズのクラス
 class EnemyStateApproach : public BaseEnemyState {
 public:
+
+	~EnemyStateApproach();
+
+	/// <summary>
+	/// 弾を発射してタイマーをリセット
+	/// </summary>
+	void FireAndResetTimer();
+
+	void Initialize(Enemy* enemy);
+
 	void Update(Enemy* enemy);
+public:
+
+	Enemy* enemy_;
+	// 発射間隔
+	static const int kFireInterval = 60;
+	// 時限発動
+	std::list<TimedCall*> timedCalls_;
 };
 
 // 離脱フェーズのクラス
 class EnemyStateLeave : public BaseEnemyState {
 public:
+	void Initialize(Enemy* enemy);
 	void Update(Enemy* enemy);
 };
 
@@ -41,12 +60,11 @@ public:
 	/// </summary>
 	void Initialize(Model* model, const Vector3& pos);
 
-	void Move(const Vector3 velocity);
-
 	/// <summary>
-	/// 接近フェーズの初期化
+	/// 移動処理
 	/// </summary>
-	void ApproachInitialize();
+	/// <param name="velocity">移動量</param>
+	void Move(const Vector3 velocity);
 
 	/// <summary>
 	/// 発射処理
@@ -81,8 +99,4 @@ private:
 
 	// 弾
 	std::list<EnemyBullet*> bullets_;
-	// 発射間隔
-	static const int kFireInterval = 60;
-	// 発射タイマー
-	int32_t fireTimer_ = 0;
 };

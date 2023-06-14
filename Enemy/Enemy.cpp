@@ -1,13 +1,11 @@
 ﻿#include "Enemy/Enemy.h"
+#include "ImGuiManager.h"
 #include "WorldTransform.h"
 #include "math/MyMatrix.h"
-#include "ImGuiManager.h"
 #include <cassert>
 #include <stdio.h>
 
-Enemy::Enemy() { 
-	state_ = new EnemyStateApproach();
-}
+Enemy::Enemy() { state_ = new EnemyStateApproach(); }
 
 Enemy::~Enemy() {
 	for (EnemyBullet* bullet : bullets_) {
@@ -28,16 +26,12 @@ void Enemy::Initialize(Model* model, const Vector3& pos) {
 	// 引数で受け取った初期座標をセット
 	worldTransform_.translation_ = pos;
 
-	//ApproachInitialize();
+	// 状態遷移
+	state_->Initialize(this);
 }
 
 void Enemy::Move(const Vector3 velocity) {
 	worldTransform_.translation_ = Add(worldTransform_.translation_, velocity);
-}
-
-void Enemy::ApproachInitialize() {
-	// 発射タイマーの初期化
-	fireTimer_ = kFireInterval;
 }
 
 void Enemy::Fire() {
@@ -57,19 +51,10 @@ void Enemy::Fire() {
 }
 
 void Enemy::Update() {
-	// 発射タイマーカウントダウン
-	fireTimer_--;
-	// 指定時間に達した
-	if (fireTimer_ <= 0) {
-		Fire();
-		// 発射タイマーの初期化
-		fireTimer_ = kFireInterval;
-	}
 	// 弾の更新
 	for (EnemyBullet* bullet : bullets_) {
 		bullet->Update();
 	}
-
 	// 行列の更新
 	worldTransform_.UpdateMatrix();
 	// 行列を定数バッファに転送
@@ -93,6 +78,25 @@ void Enemy::Draw(ViewProjection& viewProjection) {
 	}
 }
 
+EnemyStateApproach::~EnemyStateApproach() {
+	for (TimedCall* timedCall : timedCalls_) {
+		delete timedCall;
+	}
+}
+
+void EnemyStateApproach::FireAndResetTimer() {
+	// 弾を発射する
+	enemy_->Fire();
+	// 発射タイマーをセットする
+	timedCalls_.push_back(
+	    new TimedCall(std::bind(&EnemyStateApproach::FireAndResetTimer, this), kFireInterval));
+}
+
+void EnemyStateApproach::Initialize(Enemy* enemy) {
+	enemy_ = enemy;
+	FireAndResetTimer();
+}
+
 void EnemyStateApproach::Update(Enemy* enemy) {
 	// 移動速度
 	const Vector3 kMoveSpeed = {0, 0, -0.25f};
@@ -100,15 +104,41 @@ void EnemyStateApproach::Update(Enemy* enemy) {
 	// 移動処理
 	enemy->Move(kMoveSpeed);
 
+	// 終了したタイマーを削除
+	timedCalls_.remove_if([](TimedCall* timedCall) {
+		if (timedCall->IsFinished()) {
+			delete timedCall;
+			return true;
+		}
+		return false;
+	});
+
+	// 範囲forでリストの全要素について回す
+	for (TimedCall* timedCall : timedCalls_) {
+		timedCall->Update();
+	}
+
 	// 既定の位置に到達したら離脱
-	if (enemy->GetEnemyPos().z < 0.0f) {
+	if (enemy->GetEnemyPos().z < -5.0f) {
+		// 終了したタイマーを削除
+		timedCalls_.remove_if([](TimedCall* timedCall) {
+			if (timedCall->IsFinished()) {
+				delete timedCall;
+				return true;
+			}
+			return false;
+		});
 		enemy->ChangeState(new EnemyStateLeave());
 	}
 }
 
+void EnemyStateLeave::Initialize(Enemy* enemy) {
+
+}
+
 void EnemyStateLeave::Update(Enemy* enemy) {
 	// 移動速度
-	const Vector3 kMoveSpeed = {-0.25f, 0.25f, -0.25f};
+	const Vector3 kMoveSpeed = {-0.05f, 0.05f, -0.05f};
 
 	// 移動処理
 	enemy->Move(kMoveSpeed);

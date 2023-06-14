@@ -1,7 +1,5 @@
 ﻿#pragma once
-#include "Enemy.h"
 #include <functional>
-#include <stdint.h>
 
 class TimedCall {
 public: // メンバ変数
@@ -12,7 +10,7 @@ public: // メンバ変数
 	void Update();
 
 	// 完了ならtrueを返す
-	bool IsFinished() { return isFinished_ = true; }
+	bool IsFinished()const{ return isFinished_; }
 
 private:
 	// コールバック
