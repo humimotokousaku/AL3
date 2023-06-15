@@ -4,6 +4,13 @@
 #include "ImGuiManager.h"
 #include <cassert>
 
+void EnemyBullet::SettingScale() {
+	// Z方向に伸びた形状
+	worldTransform_.scale_.x = 0.5f;
+	worldTransform_.scale_.y = 0.5f;
+	worldTransform_.scale_.z = 3.0f;
+}
+
 void EnemyBullet::Initialize(Model* model, const Vector3& pos, const Vector3& velocity) {
 	// NULLポインタチェック
 	assert(model);
@@ -17,23 +24,23 @@ void EnemyBullet::Initialize(Model* model, const Vector3& pos, const Vector3& ve
 	// 引数で受け取った初期座標をセット
 	worldTransform_.translation_ = pos;
 
-	// Z方向に伸びた形状
-	worldTransform_.scale_.x = 0.5f;
-	worldTransform_.scale_.y = 0.5f;
-	worldTransform_.scale_.z = 3.0f;
+	// 形状を設定
+	SettingScale();
 
 	// 引数で受け取った速度をメンバ変数に代入
 	velocity_ = velocity;
 
+	#pragma region 弾の角度
+
 	// Y軸周り角度(θy)
-	worldTransform_.rotation_.y = std::atan2(velocity_.x,velocity_.z);
-	
+	worldTransform_.rotation_.y = std::atan2(velocity_.x,velocity_.z);	
 	// 横軸方向の長さを求める
 	float velocityXZ;
-	velocityXZ = sqrt(velocity_.x * velocity_.x + velocity_.z * velocity_.z);
-	
+	velocityXZ = sqrt(velocity_.x * velocity_.x + velocity_.z * velocity_.z);	
 	// X軸周りの角度(θx)
 	worldTransform_.rotation_.x = std::atan2(-velocity_.y,velocityXZ);
+
+	#pragma endregion
 }
 
 void EnemyBullet::Update() {

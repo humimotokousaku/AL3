@@ -6,6 +6,11 @@ class EnemyBullet
 {
 public: // メンバ関数
 	/// <summary>
+	/// 形状を設定
+	/// </summary>
+	void SettingScale();
+
+	/// <summary>
 	/// 初期化
 	/// </summary>
 	/// <param name="model">モデル</param>
