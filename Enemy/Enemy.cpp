@@ -53,7 +53,7 @@ void Enemy::Fire() {
 void Enemy::Update() {
 	// 状態遷移
 	state_->Update(this);
-	// 終了したタイマーを削除
+	// 終了した弾を削除
 	bullets_.remove_if([](EnemyBullet* bullet) {
 		if (bullet->isDead()) {
 			delete bullet;
