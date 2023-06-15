@@ -26,6 +26,10 @@ void EnemyBullet::Update() {
 
 	// 行列を更新
 	worldTransform_.UpdateMatrix();
+	// 時間経過で死ぬ
+	if (--deathTimer_ <= 0) {
+		isDead_ = true;
+	}
 }
 
 void EnemyBullet::Draw(const ViewProjection& viewProjection) {

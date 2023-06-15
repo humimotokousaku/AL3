@@ -51,6 +51,16 @@ void Enemy::Fire() {
 }
 
 void Enemy::Update() {
+	// 状態遷移
+	state_->Update(this);
+	// 終了したタイマーを削除
+	bullets_.remove_if([](EnemyBullet* bullet) {
+		if (bullet->isDead()) {
+			delete bullet;
+			return true;
+		}
+		return false;
+	});
 	// 弾の更新
 	for (EnemyBullet* bullet : bullets_) {
 		bullet->Update();
@@ -59,9 +69,6 @@ void Enemy::Update() {
 	worldTransform_.UpdateMatrix();
 	// 行列を定数バッファに転送
 	worldTransform_.TransferMatrix();
-
-	// 状態遷移
-	state_->Update(this);
 }
 
 void Enemy::ChangeState(BaseEnemyState* pState) {
@@ -98,12 +105,6 @@ void EnemyStateApproach::Initialize(Enemy* enemy) {
 }
 
 void EnemyStateApproach::Update(Enemy* enemy) {
-	// 移動速度
-	const Vector3 kMoveSpeed = {0, 0, -0.25f};
-
-	// 移動処理
-	enemy->Move(kMoveSpeed);
-
 	// 終了したタイマーを削除
 	timedCalls_.remove_if([](TimedCall* timedCall) {
 		if (timedCall->IsFinished()) {
@@ -112,22 +113,18 @@ void EnemyStateApproach::Update(Enemy* enemy) {
 		}
 		return false;
 	});
-
 	// 範囲forでリストの全要素について回す
 	for (TimedCall* timedCall : timedCalls_) {
 		timedCall->Update();
 	}
+	// 移動速度
+	const Vector3 kMoveSpeed = {0, 0, -0.25f};
+
+	// 移動処理
+	enemy->Move(kMoveSpeed);
 
 	// 既定の位置に到達したら離脱
 	if (enemy->GetEnemyPos().z < -5.0f) {
-		// 終了したタイマーを削除
-		timedCalls_.remove_if([](TimedCall* timedCall) {
-			if (timedCall->IsFinished()) {
-				delete timedCall;
-				return true;
-			}
-			return false;
-		});
 		enemy->ChangeState(new EnemyStateLeave());
 	}
 }
