@@ -215,6 +215,15 @@ Matrix4x4 Multiply(const Matrix4x4& m1, const Matrix4x4& m2) {
 	return result;
 }
 
+// ベクトルと行列の積
+Vector3 Multiply(Vector3 v, Matrix4x4 m) {
+	Vector3 result{};
+	result.x = v.x * m.m[0][0] + v.y * m.m[1][0] + v.z * m.m[2][0];
+	result.y = v.x * m.m[0][1] + v.y * m.m[1][1] + v.z * m.m[2][1];
+	result.y = v.x * m.m[0][2] + v.y * m.m[1][2] + v.z * m.m[2][2];
+	return result;
+}
+
 // 3次元アフィン変換行列
 Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Vector3& rotate, const Vector3& translate) {
 	// 計算結果
@@ -283,6 +292,15 @@ Vector3 Subtract(const Vector3& pos1, const Vector3& pos2) {
 	result.y = pos1.y - pos2.y;
 	result.z = pos1.z - pos2.z;
 
+	return result;
+}
+
+// スカラー倍
+Vector3 Multiply(const Vector3& v1, const Vector3& v2) {
+	Vector3 result;
+	result.x = v1.x * v2.x;
+	result.y = v1.y * v2.y;
+	result.z = v1.z * v2.z;
 	return result;
 }
 

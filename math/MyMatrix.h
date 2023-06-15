@@ -45,6 +45,12 @@ Vector3 Add(const Vector3& pos, const Vector3& vector);
 
 Vector3 Subtract(const Vector3& pos1, const Vector3& pos2);
 
+// ベクトルと行列の積
+Vector3 Multiply(Vector3 v, Matrix4x4 m);
+
+// スカラー倍
+Vector3 Multiply(const Vector3& v1, const Vector3& v2);
+
 // 内積
 float Dot(const Vector3& v1, const Vector3& v2);
 

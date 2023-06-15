@@ -74,15 +74,6 @@ void Player::Attack() {
 // Updateの関数定義
 void Player::Update() {
 
-	// 死亡フラグの立った球を削除
-	bullets_.remove_if([](PlayerBullet* bullet) {
-		if (bullet->IsDead()) {
-			delete bullet;
-			return true;
-		}
-		return false;
-	});
-
 	// 行列を定数バッファに転送
 	worldTransform_.TransferMatrix();
 
@@ -97,25 +88,25 @@ void Player::Update() {
 	// 旋回処理
 	Rotate();
 
-	// スケーリング行列の生成
-	Matrix4x4 playerScale;
-	playerScale = MakeScaleMatrix(worldTransform_.scale_);
+	//// スケーリング行列の生成
+	//Matrix4x4 playerScale;
+	//playerScale = MakeScaleMatrix(worldTransform_.scale_);
 
-	// Z,X,Y軸の回転行列の生成
-	Matrix4x4 zAxis;
-	Matrix4x4 xAxis;
-	Matrix4x4 yAxis;
-	xAxis = MakeRotateXMatrix(worldTransform_.rotation_.x);
-	yAxis = MakeRotateYMatrix(worldTransform_.rotation_.y);
-	zAxis = MakeRotateZMatrix(worldTransform_.rotation_.z);
+	//// Z,X,Y軸の回転行列の生成
+	//Matrix4x4 zAxis;
+	//Matrix4x4 xAxis;
+	//Matrix4x4 yAxis;
+	//xAxis = MakeRotateXMatrix(worldTransform_.rotation_.x);
+	//yAxis = MakeRotateYMatrix(worldTransform_.rotation_.y);
+	//zAxis = MakeRotateZMatrix(worldTransform_.rotation_.z);
 
-	// 回転行列の合成
-	Matrix4x4 playerRotate;
-	playerRotate = Multiply(zAxis, Multiply(xAxis, yAxis));
+	//// 回転行列の合成
+	//Matrix4x4 playerRotate;
+	//playerRotate = Multiply(zAxis, Multiply(xAxis, yAxis));
 
-	// 平行移動行列
-	Matrix4x4 playerTranslate;
-	playerTranslate = MakeTranslateMatrix(worldTransform_.translation_);
+	//// 平行移動行列
+	//Matrix4x4 playerTranslate;
+	//playerTranslate = MakeTranslateMatrix(worldTransform_.translation_);
 
 	// アフィン変換行列をワールド行列に代入
 	worldTransform_.matWorld_ = MakeAffineMatrix(
@@ -158,6 +149,15 @@ void Player::Update() {
 
 	// 弾の処理
 	Attack();
+
+	// 死亡フラグの立った球を削除
+	bullets_.remove_if([](PlayerBullet* bullet) {
+		if (bullet->IsDead()) {
+			delete bullet;
+			return true;
+		}
+		return false;
+	});
 
 	// 弾の更新
 	for (PlayerBullet* bullet : bullets_) {
