@@ -81,7 +81,9 @@ void Enemy::Fire() {
 }
 
 void Enemy::Update() {
-	// 終了したタイマーを削除
+	// 状態遷移
+	state_->Update(this);
+	// 終了した弾を削除
 	bullets_.remove_if([](EnemyBullet* bullet) {
 		if (bullet->isDead()) {
 			delete bullet;
@@ -97,9 +99,6 @@ void Enemy::Update() {
 	worldTransform_.UpdateMatrix();
 	// 行列を定数バッファに転送
 	worldTransform_.TransferMatrix();
-
-	// 状態遷移
-	state_->Update(this);
 }
 
 void Enemy::ChangeState(BaseEnemyState* pState) {
