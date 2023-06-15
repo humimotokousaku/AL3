@@ -8,6 +8,9 @@
 
 class Player {
 public:
+	// ワールド座標を取得
+	Vector3 GetWorldPosition();
+
 	Player();
 
 	/// <summary>
@@ -15,13 +18,13 @@ public:
 	/// </summary>
 	~Player();
 
-	// playerの回転
-	void Rotate();
-
 	/// <summary>
 	/// 初期化
 	/// <summary>
 	void Initialize(Model* model, uint32_t textureHandle);
+	
+	// playerの回転
+	void Rotate();
 
 	/// <summary>
 	/// 攻撃

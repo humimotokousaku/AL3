@@ -43,5 +43,16 @@ Matrix4x4
 /// <returns></returns>
 Vector3 Add(const Vector3& pos, const Vector3& vector);
 
+Vector3 Subtract(const Vector3& pos1, const Vector3& pos2);
+
+// 内積
+float Dot(const Vector3& v1, const Vector3& v2);
+
+// 長さ(ノルム)
+float Length(const Vector3& v);
+
+// 正規化
+Vector3 Normalize(const Vector3& v);
+
 // ベクトル変換
 Vector3 TransformNormal(const Vector3& v, const Matrix4x4& m);

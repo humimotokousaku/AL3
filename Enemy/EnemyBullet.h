@@ -17,6 +17,8 @@ public: // メンバ関数
 	/// </summary>
 	void Update();
 
+	bool isDead() const { return isDead_; }
+
 	/// <summary>
 	/// 描画
 	/// </summary>
@@ -30,6 +32,13 @@ public: // メンバ変数
 	Model* model_ = nullptr;
 	// テクスチャハンドル
 	uint32_t bulletTexture_ = 0u;
+
+	// 寿命<frm>
+	static const int32_t kLifeTime = 60 * 5;
+	// 死亡タイマー
+	int32_t deathTimer_ = kLifeTime;
+
+	bool isDead_ = false;
 
 	// 速度
 	Vector3 velocity_;

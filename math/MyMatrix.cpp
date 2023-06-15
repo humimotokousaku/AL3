@@ -18,7 +18,7 @@ Matrix4x4 Add(const Matrix4x4& m1, const Matrix4x4& m2) {
 
 // 行列の減法
 Matrix4x4 Subtract(const Matrix4x4& m1, const Matrix4x4& m2) {
-	Matrix4x4 result;
+	Matrix4x4 result{};
 	for (int row = 0; row < 4; ++row) {
 		for (int column = 0; column < 4; ++column) {
 			result.m[row][column] = m1.m[row][column] - m2.m[row][column];
@@ -29,7 +29,7 @@ Matrix4x4 Subtract(const Matrix4x4& m1, const Matrix4x4& m2) {
 
 // X軸回転行列
 Matrix4x4 MakeRotateXMatrix(float radian) {
-	Matrix4x4 result;
+	Matrix4x4 result{};
 	result.m[0][0] = 1;
 	result.m[0][1] = 0;
 	result.m[0][2] = 0;
@@ -157,7 +157,7 @@ Matrix4x4 MakeScaleMatrix(const Vector3& scale) {
 
 // 座標変換
 Vector3 Transform(const Vector3& vector, const Matrix4x4& matrix) {
-	Vector3 result;
+	Vector3 result{};
 	result.x = vector.x * matrix.m[0][0] + vector.y * matrix.m[1][0] + vector.z * matrix.m[2][0] +
 	           1.0f * matrix.m[3][0];
 	result.y = vector.x * matrix.m[0][1] + vector.y * matrix.m[1][1] + vector.z * matrix.m[2][1] +
@@ -216,8 +216,7 @@ Matrix4x4 Multiply(const Matrix4x4& m1, const Matrix4x4& m2) {
 }
 
 // 3次元アフィン変換行列
-Matrix4x4 MakeAffineMatrix(
-    const Vector3& scale, const Vector3& rotate, const Vector3& translate) {
+Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Vector3& rotate, const Vector3& translate) {
 	// 計算結果
 	Matrix4x4 result{};
 
@@ -270,11 +269,46 @@ Matrix4x4 MakeAffineMatrix(
 /// <param name="vector">座標に対して足すもの</param>
 /// <returns></returns>
 Vector3 Add(const Vector3& pos, const Vector3& vector) {
-	Vector3 result;
+	Vector3 result{};
 	result.x = pos.x + vector.x;
 	result.y = pos.y + vector.y;
 	result.z = pos.z + vector.z;
 
+	return result;
+}
+
+Vector3 Subtract(const Vector3& pos1, const Vector3& pos2) {
+	Vector3 result{};
+	result.x = pos1.x - pos2.x;
+	result.y = pos1.y - pos2.y;
+	result.z = pos1.z - pos2.z;
+
+	return result;
+}
+
+// 内積
+float Dot(const Vector3& v1, const Vector3& v2) {
+	float result{};
+	result = v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
+	return result;
+}
+
+// 長さ(ノルム)
+float Length(const Vector3& v) {
+	float result{};
+	result = sqrt(Dot(v, v));
+	return result;
+}
+
+// 正規化
+Vector3 Normalize(const Vector3& v) {
+	Vector3 result{};
+	float length = Length(v);
+	if (length != 0.0f) {
+		result.x = v.x / length;
+		result.y = v.y / length;
+		result.z = v.z / length;
+	}
 	return result;
 }
 
@@ -283,7 +317,6 @@ Vector3 TransformNormal(const Vector3& v, const Matrix4x4& m) {
 	Vector3 result{
 	    v.x * m.m[0][0] + v.y * m.m[1][0] + v.z * m.m[2][0],
 	    v.x * m.m[0][1] + v.y * m.m[1][1] + v.z * m.m[2][1],
-	    v.x * m.m[0][2] + v.y * m.m[1][2] + v.z * m.m[2][2]
-	};
+	    v.x * m.m[0][2] + v.y * m.m[1][2] + v.z * m.m[2][2]};
 	return result;
 }

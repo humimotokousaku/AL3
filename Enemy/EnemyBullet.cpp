@@ -1,6 +1,7 @@
 ﻿#include "Enemy/EnemyBullet.h"
 #include "WorldTransform.h"
 #include "math/MyMatrix.h"
+#include "ImGuiManager.h"
 #include <cassert>
 
 void EnemyBullet::Initialize(Model* model, const Vector3& pos, const Vector3& velocity) {
@@ -26,6 +27,10 @@ void EnemyBullet::Update() {
 
 	// 行列を更新
 	worldTransform_.UpdateMatrix();
+	// 時間経過で死ぬ
+	if (--deathTimer_ <= 0) {
+		isDead_ = true;
+	}
 }
 
 void EnemyBullet::Draw(const ViewProjection& viewProjection) {

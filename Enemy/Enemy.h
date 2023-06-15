@@ -5,8 +5,10 @@
 #include "TimedCall.h"
 #include <functional>
 
+
 class Enemy; // 前方宣言
 
+class Player;
 // 基底クラス
 class BaseEnemyState {
 public:
@@ -43,6 +45,9 @@ class EnemyStateLeave : public BaseEnemyState {
 public:
 	void Initialize(Enemy* enemy);
 	void Update(Enemy* enemy);
+
+	public:
+	Enemy* enemy_;
 };
 
 class Enemy {
@@ -51,9 +56,12 @@ public:
 
 	// Getter
 	Vector3 GetEnemyPos() { return this->worldTransform_.translation_; }
+	Vector3 GetWorldPosition();
 
 	Enemy();
 	~Enemy();
+
+	void SetPlayer(Player* player) { player_ = player; }
 
 	/// <summary>
 	/// 初期化
@@ -99,4 +107,7 @@ private:
 
 	// 弾
 	std::list<EnemyBullet*> bullets_;
+
+	// 自キャラ
+	Player* player_ = nullptr;
 };
