@@ -1,7 +1,8 @@
-﻿#include "MyMatrix.h"
+﻿#include "math/MyMatrix.h"
 #define USE_DEFINES_MATH
-#include "ImGuiManager.h"
 #include <math.h>
+#include "ImGuiManager.h"
+
 
 #pragma region Matrix4x4
 

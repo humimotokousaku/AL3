@@ -1,6 +1,7 @@
 ﻿#include "Enemy/EnemyBullet.h"
 #include "WorldTransform.h"
 #include "math/MyMatrix.h"
+#include "Lerp.h"
 #include "ImGuiManager.h"
 #include <cassert>
 
@@ -14,7 +15,7 @@ void EnemyBullet::SettingScale() {
 void EnemyBullet::Initialize(Model* model, const Vector3& pos, const Vector3& velocity) {
 	// NULLポインタチェック
 	assert(model);
-
+	
 	model_ = model;
 	// テクスチャ読み込み
 	bulletTexture_ = TextureManager::Load("white1x1.png");
@@ -29,6 +30,17 @@ void EnemyBullet::Initialize(Model* model, const Vector3& pos, const Vector3& ve
 
 	// 引数で受け取った速度をメンバ変数に代入
 	velocity_ = velocity;
+}
+
+void EnemyBullet::Update() {
+	Vector3 toPlayer = Subtract(player_->GetWorldPosition(), worldTransform_.translation_);
+	toPlayer = Normalize(toPlayer);
+	velocity_ = Normalize(velocity_);
+	// 球面線形保管により、今の速度と自キャラへのベクトルを内挿し、新たな速度とする
+	velocity_ = Slerp(velocity_,toPlayer,0.1f);
+	velocity_.x *= 0.95f;
+	velocity_.y *= 0.95f;
+	velocity_.z *= 0.95f;
 
 	#pragma region 弾の角度
 
@@ -41,9 +53,7 @@ void EnemyBullet::Initialize(Model* model, const Vector3& pos, const Vector3& ve
 	worldTransform_.rotation_.x = std::atan2(-velocity_.y,velocityXZ);
 
 	#pragma endregion
-}
 
-void EnemyBullet::Update() {
 	// 座標を移動させる
 	worldTransform_.translation_ = Add(worldTransform_.translation_, velocity_);
 
@@ -53,6 +63,9 @@ void EnemyBullet::Update() {
 	if (--deathTimer_ <= 0) {
 		isDead_ = true;
 	}
+	ImGui::Begin(" ");
+	ImGui::Text("posx%f", worldTransform_.translation_.x);
+	ImGui::End();
 }
 
 void EnemyBullet::Draw(const ViewProjection& viewProjection) {

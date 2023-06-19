@@ -1,10 +1,13 @@
 ﻿#pragma once
 #include "Model.h"
 #include "WorldTransform.h"
+#include "Player/Player.h"
 
 class EnemyBullet
 {
 public: // メンバ関数
+	void SetPlayer(Player* player) { player_ = player; }
+
 	/// <summary>
 	/// 形状を設定
 	/// </summary>
@@ -38,11 +41,14 @@ public: // メンバ変数
 	// テクスチャハンドル
 	uint32_t bulletTexture_ = 0u;
 
+	// プレイヤーの情報
+	Player* player_ = nullptr;
+
 	// 寿命<frm>
 	static const int32_t kLifeTime = 60 * 5;
 	// 死亡タイマー
 	int32_t deathTimer_ = kLifeTime;
-
+	// 弾の有無
 	bool isDead_ = false;
 
 	// 速度

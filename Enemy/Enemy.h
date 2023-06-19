@@ -1,10 +1,9 @@
 ﻿#pragma once
-#include "Model.h"
-#include "WorldTransform.h"
 #include "Enemy/EnemyBullet.h"
+#include "Model.h"
 #include "TimedCall.h"
+#include "WorldTransform.h"
 #include <functional>
-
 
 class Enemy; // 前方宣言
 
@@ -20,7 +19,6 @@ public:
 // 接近フェーズのクラス
 class EnemyStateApproach : public BaseEnemyState {
 public:
-
 	~EnemyStateApproach();
 
 	/// <summary>
@@ -28,11 +26,13 @@ public:
 	/// </summary>
 	void FireAndResetTimer();
 
+	// 初期化
 	void Initialize(Enemy* enemy);
 
+	// 更新処理
 	void Update(Enemy* enemy);
-public:
 
+public:
 	Enemy* enemy_;
 	// 発射間隔
 	static const int kFireInterval = 60;
@@ -43,10 +43,13 @@ public:
 // 離脱フェーズのクラス
 class EnemyStateLeave : public BaseEnemyState {
 public:
+	// 初期化
 	void Initialize(Enemy* enemy);
+
+	// 更新処理
 	void Update(Enemy* enemy);
 
-	public:
+public:
 	Enemy* enemy_;
 };
 
@@ -96,6 +99,7 @@ public:
 	void Draw(ViewProjection& viewProjection);
 
 private:
+	// 状態遷移
 	BaseEnemyState* state_;
 
 	// ワールド変換データ

@@ -5,14 +5,15 @@
 #include "ImGuiManager.h"
 #include <cassert>
 #include <stdio.h>
+#include "Lerp.h"
 
 Vector3 Enemy::GetWorldPosition() {
 	// ワールド座標を入れる変数
 	Vector3 worldPos{};
 	// ワールド行列の平行移動成分を取得
-	worldPos.x = worldTransform_.translation_.x;
-	worldPos.y = worldTransform_.translation_.y;
-	worldPos.z = worldTransform_.translation_.z;
+	worldPos.x = worldTransform_.matWorld_.m[3][0];
+	worldPos.y = worldTransform_.matWorld_.m[3][1];
+	worldPos.z = worldTransform_.matWorld_.m[3][2];
 
 	return worldPos;
 }
@@ -50,31 +51,16 @@ void Enemy::Fire() {
 	assert(player_);
 
 	// 弾の速度
-	const float kBulletSpeed = 0.5f;
-	Vector3 velocity {1,1,kBulletSpeed};
+	const float kBulletSpeed = -1.5f;
+	Vector3 velocity {0,0,kBulletSpeed};
 
 	// 自キャラのワールド座標を取得する
 	player_->GetWorldPosition();
-	// 敵キャラのワールド座標を取得する
-	//GetWorldPosition();
-	// 敵キャラ→自キャラのベクトル差分を求める
-	velocity = Subtract(player_->GetWorldPosition(),GetWorldPosition());
-
-	// ベクトルの正規化
-	velocity = Normalize(velocity);
-
-	// ベクトルの長さを、速さに合わせる
-	velocity.x *= kBulletSpeed;
-	velocity.y *= kBulletSpeed;
-	velocity.z *= kBulletSpeed;
-
-	// 速度ベクトルを自機の向きに合わせて回転させる
-	//velocity = TransformNormal(velocity, worldTransform_.matWorld_);
-
 
 	// 弾を生成し、初期化
 	EnemyBullet* newBullet = new EnemyBullet();
 	newBullet->Initialize(model_, GetWorldPosition(), velocity);
+	newBullet->SetPlayer(player_);
 
 	// 弾を登録
 	bullets_.push_back(newBullet);
@@ -83,6 +69,7 @@ void Enemy::Fire() {
 void Enemy::Update() {
 	// 状態遷移
 	state_->Update(this);
+
 	// 終了した弾を削除
 	bullets_.remove_if([](EnemyBullet* bullet) {
 		if (bullet->isDead()) {
@@ -95,6 +82,7 @@ void Enemy::Update() {
 	for (EnemyBullet* bullet : bullets_) {
 		bullet->Update();
 	}
+
 	// 行列の更新
 	worldTransform_.UpdateMatrix();
 	// 行列を定数バッファに転送
