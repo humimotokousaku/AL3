@@ -61,6 +61,9 @@ public:
 	Vector3 GetEnemyPos() { return this->worldTransform_.translation_; }
 	Vector3 GetWorldPosition();
 
+	// 弾リストを取得
+	const std::list<EnemyBullet*>& GetBullets() const { return bullets_; }
+
 	Enemy();
 	~Enemy();
 
@@ -81,6 +84,9 @@ public:
 	/// 発射処理
 	/// </summary>
 	void Fire();
+
+	// 衝突を検出したら呼び出されるコールバック関数
+	void OnCollision();
 
 	/// <summary>
 	/// 更新処理

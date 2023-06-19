@@ -7,12 +7,18 @@
 /// </summary>
 class PlayerBullet{
 public: // メンバ関数
+
+	Vector3 GetWorldPosition();
+
 	/// <summary>
 	/// 初期化
 	/// </summary>
 	/// <param name="model">モデル</param>
 	/// <param name="pos">初期座標</param>
 	void Initialize(Model* model, const Vector3& pos, const Vector3& velocity);
+
+	// 衝突を検出したら呼び出されるコールバック関数
+	void OnCollision();
 
 	/// <summary>
 	/// 更新

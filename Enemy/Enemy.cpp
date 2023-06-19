@@ -50,8 +50,8 @@ void Enemy::Move(const Vector3 velocity) {
 void Enemy::Fire() {
 	assert(player_);
 
-	// 弾の速度
-	const float kBulletSpeed = -1.5f;
+	// 弾の速度(正の数だと敵の後ろから弾が飛ぶ)
+	const float kBulletSpeed = 0.5f;
 	Vector3 velocity {0,0,kBulletSpeed};
 
 	// 自キャラのワールド座標を取得する
@@ -64,6 +64,10 @@ void Enemy::Fire() {
 
 	// 弾を登録
 	bullets_.push_back(newBullet);
+}
+
+void Enemy::OnCollision() {
+
 }
 
 void Enemy::Update() {

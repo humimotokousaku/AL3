@@ -43,13 +43,104 @@ void GameScene::Initialize() {
 	enemy_ = new Enemy();
 	enemy_->SetPlayer(player_);
 	// enemyの初期化
-	enemy_->Initialize(model_, Vector3(3,3,30));
+	enemy_->Initialize(model_, Vector3(3,3,50));
 
 	// デバッグカメラの生成
 	debugCamera_ = new DebugCamera(1280, 720);
 }
 
+void GameScene::CheckAllCollisions() {
+	// 自弾リストの取得
+	const std::list<PlayerBullet*>& playerBullets = player_->GetBullets();
+	// 敵弾リストの取得
+	const std::list<EnemyBullet*>& enemyBullets = enemy_->GetBullets();
+
+	#pragma region 自キャラと敵弾の当たり判定
+
+	// 判定対象AとBの座標
+	Vector3 playerPos{};
+	Vector3 enemyBulletPos{};
+
+	// 自キャラの座標
+	playerPos = player_->GetWorldPosition();
+
+	for (EnemyBullet* bullet : enemyBullets) {
+		// 敵弾の座標
+		enemyBulletPos = bullet->GetWorldPosition();
+
+		// 座標AとBの距離を求める
+		Vector3 p2eB = {
+			playerPos.x - enemyBulletPos.x,
+			playerPos.y - enemyBulletPos.y,
+			playerPos.z - enemyBulletPos.z
+		};
+		const float kRadius = 2.0f;
+		float p2eR = kRadius + kRadius;
+
+		// 球と球の交差判定
+		if ((p2eB.x * p2eB.x) + (p2eB.y * p2eB.y) + (p2eB.z * p2eB.z) <= p2eR * p2eR) {
+			// 自キャラの衝突時にコールバックを呼び出す
+			player_->OnCollision();
+			// 敵弾の衝突時にコールバックを呼び出す
+			bullet->OnCollision();
+		}
+	}
+
+	#pragma endregion
+
+	#pragma region 自弾と敵キャラの当たり判定
+
+	Vector3 playerBulletPos{};
+	Vector3 enemyPos = enemy_->GetWorldPosition();
+
+	for (PlayerBullet* bullet : playerBullets) {
+		// 自弾の座標
+		playerBulletPos = bullet->GetWorldPosition();
+
+		// 座標AとBの距離を求める
+		Vector3 pB2e = {
+		    playerBulletPos.x - enemyPos.x, playerBulletPos.y - enemyPos.y,
+		    playerBulletPos.z - enemyPos.z};
+		const float kRadius = 2.0f;
+		float pB2eR = kRadius + kRadius;
+
+		// 球と球の交差判定
+		if ((pB2e.x * pB2e.x) + (pB2e.y * pB2e.y) + (pB2e.z * pB2e.z) <= pB2eR * pB2eR) {
+			// 敵キャラの衝突時にコールバックを呼び出す
+			enemy_->OnCollision();
+			// 自弾の衝突時にコールバックを呼び出す
+			bullet->OnCollision();
+		}
+	}
+
+	#pragma endregion
+
+	#pragma region 自弾と敵弾の当たり判定
+
+	for (PlayerBullet* playerBullet : playerBullets) {
+		for (EnemyBullet* enemyBullet : enemyBullets) {
+			playerBulletPos = playerBullet->GetWorldPosition();
+			enemyBulletPos = enemyBullet->GetWorldPosition();
+			Vector3 pB2eB = {
+			    playerBulletPos.x - enemyBulletPos.x, playerBulletPos.y - enemyBulletPos.y,
+			    playerBulletPos.z - enemyBulletPos.z};
+			const float kRadius = 2.0f;
+			float pB2eBR = kRadius + kRadius;
+			if ((pB2eB.x * pB2eB.x) + (pB2eB.y * pB2eB.y) + (pB2eB.z * pB2eB.z) <= pB2eBR * pB2eBR) {
+				// 敵キャラの衝突時にコールバックを呼び出す
+ 				enemyBullet->OnCollision();
+				// 自弾の衝突時にコールバックを呼び出す
+				playerBullet->OnCollision();
+			}
+		}
+	}
+
+	#pragma endregion
+}
+
 void GameScene::Update() {
+	// 当たり判定のチェック
+	CheckAllCollisions();
 	// 自キャラの更新
 	player_->Update();
 

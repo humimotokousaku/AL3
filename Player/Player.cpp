@@ -71,6 +71,10 @@ void Player::Attack() {
 	}
 }
 
+void Player::OnCollision() {
+
+}
+
 // Updateの関数定義
 void Player::Update() {
 

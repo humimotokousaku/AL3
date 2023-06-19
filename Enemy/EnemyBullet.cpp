@@ -5,11 +5,22 @@
 #include "ImGuiManager.h"
 #include <cassert>
 
+Vector3 EnemyBullet::GetWorldPosition() {
+	// ワールド座標を入れる変数
+	Vector3 worldPos{};
+	// ワールド行列の平行移動成分を取得
+	worldPos.x = worldTransform_.matWorld_.m[3][0];
+	worldPos.y = worldTransform_.matWorld_.m[3][1];
+	worldPos.z = worldTransform_.matWorld_.m[3][2];
+
+	return worldPos;
+}
+
 void EnemyBullet::SettingScale() {
 	// Z方向に伸びた形状
-	worldTransform_.scale_.x = 0.5f;
-	worldTransform_.scale_.y = 0.5f;
-	worldTransform_.scale_.z = 3.0f;
+	worldTransform_.scale_.x = 1.0f;
+	worldTransform_.scale_.y = 1.0f;
+	worldTransform_.scale_.z = 1.0f;
 }
 
 void EnemyBullet::Initialize(Model* model, const Vector3& pos, const Vector3& velocity) {
@@ -32,15 +43,19 @@ void EnemyBullet::Initialize(Model* model, const Vector3& pos, const Vector3& ve
 	velocity_ = velocity;
 }
 
+void EnemyBullet::OnCollision() {
+	isDead_ = true;
+}
+
 void EnemyBullet::Update() {
 	Vector3 toPlayer = Subtract(player_->GetWorldPosition(), worldTransform_.translation_);
 	toPlayer = Normalize(toPlayer);
 	velocity_ = Normalize(velocity_);
 	// 球面線形保管により、今の速度と自キャラへのベクトルを内挿し、新たな速度とする
 	velocity_ = Slerp(velocity_,toPlayer,0.1f);
-	velocity_.x *= 0.95f;
-	velocity_.y *= 0.95f;
-	velocity_.z *= 0.95f;
+	velocity_.x *= 0.5f;
+	velocity_.y *= 0.5f;
+	velocity_.z *= 0.5f;
 
 	#pragma region 弾の角度
 

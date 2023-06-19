@@ -8,6 +8,8 @@ class EnemyBullet
 public: // メンバ関数
 	void SetPlayer(Player* player) { player_ = player; }
 
+	Vector3 GetWorldPosition();
+
 	/// <summary>
 	/// 形状を設定
 	/// </summary>
@@ -19,6 +21,9 @@ public: // メンバ関数
 	/// <param name="model">モデル</param>
 	/// <param name="pos">初期座標</param>
 	void Initialize(Model* model, const Vector3& pos, const Vector3& velocity);
+
+	// 衝突を検出したら呼び出されるコールバック関数
+	void OnCollision();
 
 	/// <summary>
 	/// 更新
