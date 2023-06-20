@@ -1,10 +1,10 @@
 ﻿#pragma once
+#include "Collision/Collider.h"
 #include "Enemy/EnemyBullet.h"
 #include "Model.h"
 #include "TimedCall.h"
 #include "WorldTransform.h"
 #include <functional>
-#include "Collision/Collider.h"
 
 class Player;
 
@@ -56,14 +56,16 @@ public:
 };
 
 class Enemy : public Collider {
-public:// メンバ関数
-	// Getter
+public: // メンバ関数
+	// 座標取得
 	Vector3 GetEnemyPos() { return this->worldTransform_.translation_; }
+
+	// ワールド行列の平行移動成分を取得
 	Vector3 GetWorldPosition() override;
+
 	// 弾リストを取得
 	const std::list<EnemyBullet*>& GetBullets() const { return bullets_; }
 
-	// Setter
 	void SetPlayer(Player* player) { player_ = player; }
 
 public:

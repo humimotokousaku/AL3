@@ -43,17 +43,24 @@ void GameScene::Initialize() {
 	enemy_ = new Enemy();
 	enemy_->SetPlayer(player_);
 	// enemyの初期化
-	enemy_->Initialize(model_, Vector3(3,3,50));
+	enemy_->Initialize(model_, Vector3(3, 3, 50));
 
 	// デバッグカメラの生成
 	debugCamera_ = new DebugCamera(1280, 720);
 }
 
-
 void GameScene::CheckCollisionPair(Collider* colliderA, Collider* colliderB) {
+	// 衝突フィルタリング
+	if ((colliderA->GetCollisionAttribute() & colliderB->GetCollisionMask()) == 0 ||
+	    (colliderB->GetCollisionAttribute() & colliderA->GetCollisionMask()) == 0) {
+		return;
+	}
+
+	// コライダーのワールド座標を取得
 	colliderA->GetWorldPosition();
 	colliderB->GetWorldPosition();
 
+	// 座標AとBの距離を求める
 	Vector3 a2b = {
 	    colliderA->GetWorldPosition().x - colliderB->GetWorldPosition().x,
 	    colliderA->GetWorldPosition().y - colliderB->GetWorldPosition().y,
@@ -74,37 +81,42 @@ void GameScene::CheckAllCollisions() {
 	const std::list<PlayerBullet*>& playerBullets = player_->GetBullets();
 	// 敵弾リストの取得
 	const std::list<EnemyBullet*>& enemyBullets = enemy_->GetBullets();
+	// コライダー
+	std::list<Collider*> colliders_;
 
-	#pragma region 自キャラと敵弾の当たり判定
-
-	for (EnemyBullet* bullet : enemyBullets) {
-		CheckCollisionPair(player_, bullet);
-	}
-
-	#pragma endregion
-
-	#pragma region 自弾と敵キャラの当たり判定
-
+	// コライダーをリストに登録
+	colliders_.push_back(player_);
+	colliders_.push_back(enemy_);
+	// 自弾全てについて
 	for (PlayerBullet* bullet : playerBullets) {
-		CheckCollisionPair(bullet, enemy_);
+		colliders_.push_back(bullet);
+	}
+	// 敵弾全てについて
+	for (EnemyBullet* bullet : enemyBullets) {
+		colliders_.push_back(bullet);
 	}
 
-	#pragma endregion
+	// リスト内のペアを総当たり
+	std::list<Collider*>::iterator itrA = colliders_.begin();
+	for (; itrA != colliders_.end(); ++itrA) {
+		Collider* colliderA = *itrA;
 
-	#pragma region 自弾と敵弾の当たり判定
+		// イテレータBはイテレータAの次の要素から回す(重複判定を回避)
+		std::list<Collider*>::iterator itrB = itrA;
+		itrB++;
 
-	for (PlayerBullet* playerBullet : playerBullets) {
-		for (EnemyBullet* enemyBullet : enemyBullets) {
-			CheckCollisionPair(playerBullet, enemyBullet);
+		for (; itrB != colliders_.end(); ++itrB) {
+			Collider* colliderB = *itrB;
+			// 当たり判定と応答(フレンドリーファイアしないように設定)
+			CheckCollisionPair(colliderA, colliderB);
 		}
 	}
-
-	#pragma endregion
 }
 
 void GameScene::Update() {
 	// 当たり判定のチェック
 	CheckAllCollisions();
+
 	// 自キャラの更新
 	player_->Update();
 

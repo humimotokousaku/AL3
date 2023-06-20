@@ -1,12 +1,12 @@
 ﻿#include "Enemy/Enemy.h"
-#include "Player/Player.h"
-#include "math/MyMatrix.h"
-#include "math/Lerp.h"
-#include "WorldTransform.h"
+#include "Collision/CollisionConfig.h"
 #include "ImGuiManager.h"
+#include "Player/Player.h"
+#include "WorldTransform.h"
+#include "math/Lerp.h"
+#include "math/MyMatrix.h"
 #include <cassert>
 #include <stdio.h>
-
 
 Vector3 Enemy::GetWorldPosition() {
 	// ワールド座標を入れる変数
@@ -35,6 +35,11 @@ void Enemy::Initialize(Model* model, const Vector3& pos) {
 	// テクスチャ読み込み
 	enemyTexture_ = TextureManager::Load("black.png");
 
+	// 衝突属性を設定
+	SetCollisionAttribute(kCollisionAttributeEnemy);
+	// 衝突対象を自分の属性以外に設定
+	SetCollisionMask(~kCollisionAttributeEnemy);
+
 	// ワールド変換の初期化
 	worldTransform_.Initialize();
 	// 引数で受け取った初期座標をセット
@@ -53,7 +58,7 @@ void Enemy::Fire() {
 
 	// 弾の速度(正の数だと敵の後ろから弾が飛ぶ)
 	const float kBulletSpeed = -0.5f;
-	Vector3 velocity {0,0,kBulletSpeed};
+	Vector3 velocity{0, 0, kBulletSpeed};
 
 	// 自キャラのワールド座標を取得する
 	player_->GetWorldPosition();
@@ -67,9 +72,7 @@ void Enemy::Fire() {
 	bullets_.push_back(newBullet);
 }
 
-void Enemy::OnCollision() {
-
-}
+void Enemy::OnCollision() {}
 
 void Enemy::Update() {
 	// 状態遷移
@@ -154,9 +157,7 @@ void EnemyStateApproach::Update(Enemy* enemy) {
 	}
 }
 
-void EnemyStateLeave::Initialize(Enemy* enemy) { 
-	enemy_ = enemy;
-}
+void EnemyStateLeave::Initialize(Enemy* enemy) { enemy_ = enemy; }
 
 void EnemyStateLeave::Update(Enemy* enemy) {
 	// 移動速度

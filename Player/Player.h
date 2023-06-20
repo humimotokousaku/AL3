@@ -9,9 +9,9 @@
 
 class Player : public Collider {
 public:
-	// Getter
-	// ワールド座標を取得
+	// ワールド行列の平行移動成分を取得
 	Vector3 GetWorldPosition() override;
+
 	// 弾リストを取得
 	const std::list<PlayerBullet*>& GetBullets() const { return bullets_; }
 

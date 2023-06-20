@@ -1,15 +1,14 @@
 ﻿#pragma once
-#include "Model.h"
-#include "WorldTransform.h"
-#include "Player/Player.h"
 #include "Collision/Collider.h"
+#include "Model.h"
+#include "Player/Player.h"
+#include "WorldTransform.h"
 
 class EnemyBullet : public Collider {
 public: // メンバ関数
-	// Getter
+	// ワールド行列の平行移動成分を取得
 	Vector3 GetWorldPosition() override;
 
-	// Setter
 	void SetPlayer(Player* player) { player_ = player; }
 
 public:

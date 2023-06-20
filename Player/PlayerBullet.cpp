@@ -1,5 +1,6 @@
 ﻿#include "Player/PlayerBullet.h"
 #include "math/MyMatrix.h"
+#include "Collision/CollisionConfig.h"
 #include "WorldTransform.h"
 #include <cassert>
 
@@ -20,7 +21,12 @@ void PlayerBullet::Initialize(Model* model, const Vector3& pos, const Vector3& v
 
 	model_ = model;
 	// テクスチャ読み込み
-	bulletTexture_ = TextureManager::Load("black.png");
+	bulletTexture_ = TextureManager::Load("red.png");
+
+	// 衝突属性を設定
+	SetCollisionAttribute(kCollisionAttributePlayer);
+	// 衝突対象を自分の属性以外に設定
+	SetCollisionMask(~kCollisionAttributePlayer);
 
 	// ワールド変換の初期化
 	worldTransform_.Initialize();

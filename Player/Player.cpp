@@ -1,5 +1,6 @@
 ﻿#include "Player/Player.h"
 #include "math/MyMatrix.h"
+#include "Collision/CollisionConfig.h"
 #include "WorldTransform.h"
 #include <cassert>
 #include "ImGuiManager.h"
@@ -33,6 +34,11 @@ void Player::Initialize(Model* model, uint32_t textureHandle) {
 	// 引数として受け取ったデータをメンバ変数に記録する
 	model_ = model;
 	playerTexture_ = textureHandle;
+
+	// 衝突属性を設定
+	SetCollisionAttribute(kCollisionAttributePlayer);
+	// 衝突対象を自分の属性以外に設定
+	SetCollisionMask(~kCollisionAttributePlayer);
 
 	// ワールド変換の初期化
 	worldTransform_.Initialize();
