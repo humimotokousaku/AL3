@@ -64,6 +64,12 @@
     <Filter Include="ヘッダー ファイル\Enemy">
       <UniqueIdentifier>{f3fc21c6-2a6e-4c7d-90f0-479b538a0ac0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ヘッダー ファイル\Collision">
+      <UniqueIdentifier>{6a8429ca-7fa9-4f4b-9f3a-c8f25a6e93d5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Collision">
+      <UniqueIdentifier>{049cf4ca-b963-4715-8ff9-eb0a382f7932}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -100,6 +106,12 @@
       <Filter>ソース ファイル\Player</Filter>
     </ClCompile>
     <ClCompile Include="math\WorldTransformEx.cpp">
+      <Filter>ソース ファイル\math</Filter>
+    </ClCompile>
+    <ClCompile Include="Collision\Collider.cpp">
+      <Filter>ソース ファイル\Collision</Filter>
+    </ClCompile>
+    <ClCompile Include="math\Lerp.cpp">
       <Filter>ソース ファイル\math</Filter>
     </ClCompile>
   </ItemGroup>
@@ -204,6 +216,12 @@
       <Filter>ヘッダー ファイル\Player</Filter>
     </ClInclude>
     <ClInclude Include="math\MyMatrix.h">
+      <Filter>ヘッダー ファイル\math</Filter>
+    </ClInclude>
+    <ClInclude Include="Collision\Collider.h">
+      <Filter>ヘッダー ファイル\Collision</Filter>
+    </ClInclude>
+    <ClInclude Include="math\Lerp.h">
       <Filter>ヘッダー ファイル\math</Filter>
     </ClInclude>
   </ItemGroup>

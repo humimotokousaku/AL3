@@ -109,10 +109,11 @@
     <ClCompile Include="2d\ImGuiManager.cpp" />
     <ClCompile Include="base\DirectXCommon.cpp" />
     <ClCompile Include="base\WinApp.cpp" />
+    <ClCompile Include="Collision\Collider.cpp" />
     <ClCompile Include="Enemy\Enemy.cpp" />
     <ClCompile Include="Enemy\EnemyBullet.cpp" />
-    <ClCompile Include="Lerp.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="math\Lerp.cpp" />
     <ClCompile Include="math\MyMatrix.cpp" />
     <ClCompile Include="math\WorldTransformEx.cpp" />
     <ClCompile Include="Player\Player.cpp" />
@@ -143,10 +144,11 @@
     <ClInclude Include="base\SafeDelete.h" />
     <ClInclude Include="base\TextureManager.h" />
     <ClInclude Include="base\WinApp.h" />
+    <ClInclude Include="Collision\Collider.h" />
     <ClInclude Include="Enemy\Enemy.h" />
     <ClInclude Include="Enemy\EnemyBullet.h" />
     <ClInclude Include="input\Input.h" />
-    <ClInclude Include="Lerp.h" />
+    <ClInclude Include="math\Lerp.h" />
     <ClInclude Include="math\Matrix4x4.h" />
     <ClInclude Include="math\MyMatrix.h" />
     <ClInclude Include="math\Vector2.h" />

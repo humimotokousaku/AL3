@@ -1,19 +1,21 @@
 ﻿#pragma once
+#include "Player/PlayerBullet.h"
+#include "Collision/Collider.h"
+#include "WorldTransform.h"
+#include "Vector4.h"
 #include "Input.h"
 #include "Model.h"
-#include "Vector4.h"
-#include "WorldTransform.h"
-#include "Player/PlayerBullet.h"
 #include <list>
 
-class Player {
+class Player : public Collider {
 public:
+	// Getter
 	// ワールド座標を取得
-	Vector3 GetWorldPosition();
-
+	Vector3 GetWorldPosition() override;
 	// 弾リストを取得
 	const std::list<PlayerBullet*>& GetBullets() const { return bullets_; }
 
+public:
 	Player();
 
 	/// <summary>
@@ -35,7 +37,7 @@ public:
 	void Attack();
 
 	// 衝突を検出したら呼び出されるコールバック関数
-	void OnCollision();
+	void OnCollision() override;
 
 	/// <summary>
 	/// 更新

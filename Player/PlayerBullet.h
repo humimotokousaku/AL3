@@ -1,14 +1,15 @@
 ﻿#pragma once
 #include "Model.h"
 #include "WorldTransform.h"
+#include "Collision/Collider.h"
 
 /// <summary>
 /// 自キャラの弾
 /// </summary>
-class PlayerBullet{
+class PlayerBullet : public Collider{
 public: // メンバ関数
-
-	Vector3 GetWorldPosition();
+	// Getter
+	Vector3 GetWorldPosition() override;
 
 	/// <summary>
 	/// 初期化
@@ -18,7 +19,7 @@ public: // メンバ関数
 	void Initialize(Model* model, const Vector3& pos, const Vector3& velocity);
 
 	// 衝突を検出したら呼び出されるコールバック関数
-	void OnCollision();
+	void OnCollision() override;
 
 	/// <summary>
 	/// 更新
@@ -30,21 +31,17 @@ public: // メンバ関数
 	/// </summary>
 	/// <param name="viewProjection">ビュープロジェクション</param>
 	void Draw(const ViewProjection& viewProjection);
-
-	// getter
+	
+	// 完了ならtrueを返す
 	bool IsDead() const { return isDead_; }
 
 private: // メンバ変数
-
 	// ワールド変換データ
 	WorldTransform worldTransform_;
 	// モデル
 	Model* model_ = nullptr;
 	// テクスチャハンドル
 	uint32_t bulletTexture_ = 0u;
-
-	// 速度
-	Vector3 velocity_;
 
 	// 寿命<frm>
 	static const int32_t kLifeTime = 60 * 5;
@@ -53,4 +50,6 @@ private: // メンバ変数
 	// 死亡フラグ
 	bool isDead_ = false;
 
+	// 速度
+	Vector3 velocity_;
 };

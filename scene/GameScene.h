@@ -1,21 +1,28 @@
 #pragma once
-
 #include "Audio.h"
-#include "DebugCamera.h"
 #include "DirectXCommon.h"
 #include "Input.h"
 #include "Model.h"
-#include "Player/Player.h"
-#include "Enemy/Enemy.h"
 #include "SafeDelete.h"
 #include "Sprite.h"
+#include "DebugCamera.h"
 #include "ViewProjection.h"
 #include "WorldTransform.h"
+#include "Player/Player.h"
+#include "Enemy/Enemy.h"
+#include "Collision/Collider.h"
 
 /// <summary>
 /// ゲームシーン
 /// </summary>
 class GameScene {
+private:
+	/// <summary>
+	/// コライダー二つの衝突判定と応答
+	/// </summary>
+	/// <param name="colliderA">コライダーA</param>
+	/// <param name="colliderB">コライダーB</param>
+	void CheckCollisionPair(Collider* colliderA, Collider* colliderB);
 
 public: // メンバ関数
 	/// <summary>

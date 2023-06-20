@@ -1,11 +1,12 @@
 ﻿#include "Enemy/Enemy.h"
 #include "Player/Player.h"
 #include "math/MyMatrix.h"
+#include "math/Lerp.h"
 #include "WorldTransform.h"
 #include "ImGuiManager.h"
 #include <cassert>
 #include <stdio.h>
-#include "Lerp.h"
+
 
 Vector3 Enemy::GetWorldPosition() {
 	// ワールド座標を入れる変数
@@ -51,7 +52,7 @@ void Enemy::Fire() {
 	assert(player_);
 
 	// 弾の速度(正の数だと敵の後ろから弾が飛ぶ)
-	const float kBulletSpeed = 0.5f;
+	const float kBulletSpeed = -0.5f;
 	Vector3 velocity {0,0,kBulletSpeed};
 
 	// 自キャラのワールド座標を取得する

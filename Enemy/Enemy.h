@@ -4,10 +4,12 @@
 #include "TimedCall.h"
 #include "WorldTransform.h"
 #include <functional>
+#include "Collision/Collider.h"
+
+class Player;
 
 class Enemy; // 前方宣言
 
-class Player;
 // 基底クラス
 class BaseEnemyState {
 public:
@@ -53,21 +55,20 @@ public:
 	Enemy* enemy_;
 };
 
-class Enemy {
-public:
-	// メンバ関数
-
+class Enemy : public Collider {
+public:// メンバ関数
 	// Getter
 	Vector3 GetEnemyPos() { return this->worldTransform_.translation_; }
-	Vector3 GetWorldPosition();
-
+	Vector3 GetWorldPosition() override;
 	// 弾リストを取得
 	const std::list<EnemyBullet*>& GetBullets() const { return bullets_; }
 
+	// Setter
+	void SetPlayer(Player* player) { player_ = player; }
+
+public:
 	Enemy();
 	~Enemy();
-
-	void SetPlayer(Player* player) { player_ = player; }
 
 	/// <summary>
 	/// 初期化
@@ -86,7 +87,7 @@ public:
 	void Fire();
 
 	// 衝突を検出したら呼び出されるコールバック関数
-	void OnCollision();
+	void OnCollision() override;
 
 	/// <summary>
 	/// 更新処理

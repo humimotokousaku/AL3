@@ -1,7 +1,7 @@
 ﻿#include "Enemy/EnemyBullet.h"
 #include "WorldTransform.h"
 #include "math/MyMatrix.h"
-#include "Lerp.h"
+#include "math/Lerp.h"
 #include "ImGuiManager.h"
 #include <cassert>
 
@@ -74,13 +74,11 @@ void EnemyBullet::Update() {
 
 	// 行列を更新
 	worldTransform_.UpdateMatrix();
+
 	// 時間経過で死ぬ
 	if (--deathTimer_ <= 0) {
 		isDead_ = true;
 	}
-	ImGui::Begin(" ");
-	ImGui::Text("posx%f", worldTransform_.translation_.x);
-	ImGui::End();
 }
 
 void EnemyBullet::Draw(const ViewProjection& viewProjection) {

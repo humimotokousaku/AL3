@@ -2,14 +2,17 @@
 #include "Model.h"
 #include "WorldTransform.h"
 #include "Player/Player.h"
+#include "Collision/Collider.h"
 
-class EnemyBullet
-{
+class EnemyBullet : public Collider {
 public: // メンバ関数
+	// Getter
+	Vector3 GetWorldPosition() override;
+
+	// Setter
 	void SetPlayer(Player* player) { player_ = player; }
 
-	Vector3 GetWorldPosition();
-
+public:
 	/// <summary>
 	/// 形状を設定
 	/// </summary>
@@ -23,13 +26,14 @@ public: // メンバ関数
 	void Initialize(Model* model, const Vector3& pos, const Vector3& velocity);
 
 	// 衝突を検出したら呼び出されるコールバック関数
-	void OnCollision();
+	void OnCollision() override;
 
 	/// <summary>
 	/// 更新
 	/// </summary>
 	void Update();
 
+	// 完了ならtrueを返す
 	bool isDead() const { return isDead_; }
 
 	/// <summary>

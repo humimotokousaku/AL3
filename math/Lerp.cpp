@@ -1,4 +1,4 @@
-﻿#include "Lerp.h"
+﻿#include "math/Lerp.h"
 #define _USE_MATH_DEFINES
 #include <cmath> 
 
