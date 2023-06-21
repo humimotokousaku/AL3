@@ -11,19 +11,12 @@
 #include "Player/Player.h"
 #include "Enemy/Enemy.h"
 #include "Collision/Collider.h"
+#include "Collision/CollisionManager.h"
 
 /// <summary>
 /// ゲームシーン
 /// </summary>
 class GameScene {
-private:
-	/// <summary>
-	/// コライダー二つの衝突判定と応答
-	/// </summary>
-	/// <param name="colliderA">コライダーA</param>
-	/// <param name="colliderB">コライダーB</param>
-	void CheckCollisionPair(Collider* colliderA, Collider* colliderB);
-
 public: // メンバ関数
 	/// <summary>
 	/// コンストクラタ
@@ -43,7 +36,7 @@ public: // メンバ関数
 	/// <summary>
 	/// 衝突判定と応答
 	/// </summary>
-	void CheckAllCollisions();
+	//void CheckAllCollisions();
 
 	/// <summary>
 	/// 毎フレーム処理
@@ -75,6 +68,9 @@ private: // メンバ変数
 
 	// enemy
 	Enemy* enemy_ = nullptr;
+
+	// 衝突マネージャー
+	CollisionManager* collisionManager_ = nullptr;
 
 	// ImGuiで値を入力する変数
 	float inputFloat[3] = {0, 0, 0};

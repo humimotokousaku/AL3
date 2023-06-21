@@ -4,6 +4,7 @@
 #include "PrimitiveDrawer.h"
 #include "TextureManager.h"
 #include <cassert>
+#include "Collision/CollisionManager.h"
 
 GameScene::GameScene() {}
 
@@ -14,6 +15,8 @@ GameScene::~GameScene() {
 	delete player_;
 	// enemyの解放
 	delete enemy_;
+	// 衝突マネージャーの解放
+	delete collisionManager_;
 	// デバッグカメラの解放
 	delete debugCamera_;
 }
@@ -45,78 +48,15 @@ void GameScene::Initialize() {
 	// enemyの初期化
 	enemy_->Initialize(model_, Vector3(3, 3, 50));
 
+	// 衝突マネージャーの生成
+	collisionManager_ = new CollisionManager();
+	collisionManager_->Initialize(player_,enemy_);
+
 	// デバッグカメラの生成
 	debugCamera_ = new DebugCamera(1280, 720);
 }
 
-void GameScene::CheckCollisionPair(Collider* colliderA, Collider* colliderB) {
-	// 衝突フィルタリング
-	if ((colliderA->GetCollisionAttribute() & colliderB->GetCollisionMask()) == 0 ||
-	    (colliderB->GetCollisionAttribute() & colliderA->GetCollisionMask()) == 0) {
-		return;
-	}
-
-	// コライダーのワールド座標を取得
-	colliderA->GetWorldPosition();
-	colliderB->GetWorldPosition();
-
-	// 座標AとBの距離を求める
-	Vector3 a2b = {
-	    colliderA->GetWorldPosition().x - colliderB->GetWorldPosition().x,
-	    colliderA->GetWorldPosition().y - colliderB->GetWorldPosition().y,
-	    colliderA->GetWorldPosition().z - colliderB->GetWorldPosition().z};
-	float a2bR = colliderA->GetRadius() + colliderB->GetRadius();
-
-	// 球と球の交差判定
-	if ((a2b.x * a2b.x) + (a2b.y * a2b.y) + (a2b.z * a2b.z) <= (a2bR * a2bR)) {
-		// コライダーBの衝突時コールバックを呼び出す
-		colliderA->OnCollision();
-		// コライダーBの衝突時コールバックを呼び出す
-		colliderB->OnCollision();
-	}
-}
-
-void GameScene::CheckAllCollisions() {
-	// 自弾リストの取得
-	const std::list<PlayerBullet*>& playerBullets = player_->GetBullets();
-	// 敵弾リストの取得
-	const std::list<EnemyBullet*>& enemyBullets = enemy_->GetBullets();
-	// コライダー
-	std::list<Collider*> colliders_;
-
-	// コライダーをリストに登録
-	colliders_.push_back(player_);
-	colliders_.push_back(enemy_);
-	// 自弾全てについて
-	for (PlayerBullet* bullet : playerBullets) {
-		colliders_.push_back(bullet);
-	}
-	// 敵弾全てについて
-	for (EnemyBullet* bullet : enemyBullets) {
-		colliders_.push_back(bullet);
-	}
-
-	// リスト内のペアを総当たり
-	std::list<Collider*>::iterator itrA = colliders_.begin();
-	for (; itrA != colliders_.end(); ++itrA) {
-		Collider* colliderA = *itrA;
-
-		// イテレータBはイテレータAの次の要素から回す(重複判定を回避)
-		std::list<Collider*>::iterator itrB = itrA;
-		itrB++;
-
-		for (; itrB != colliders_.end(); ++itrB) {
-			Collider* colliderB = *itrB;
-			// 当たり判定と応答(フレンドリーファイアしないように設定)
-			CheckCollisionPair(colliderA, colliderB);
-		}
-	}
-}
-
 void GameScene::Update() {
-	// 当たり判定のチェック
-	CheckAllCollisions();
-
 	// 自キャラの更新
 	player_->Update();
 
@@ -124,6 +64,9 @@ void GameScene::Update() {
 	if (enemy_) {
 		enemy_->Update();
 	}
+
+	// 衝突マネージャー(当たり判定)
+	collisionManager_->CheckAllCollisions();
 
 #ifdef _DEBUG
 	if (input_->TriggerKey(DIK_C)) {

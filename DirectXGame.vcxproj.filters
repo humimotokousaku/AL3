@@ -117,6 +117,9 @@
     <ClCompile Include="Collision\CollisionConfig.cpp">
       <Filter>ソース ファイル\Collision</Filter>
     </ClCompile>
+    <ClCompile Include="Collision\CollisionManager.cpp">
+      <Filter>ソース ファイル\Collision</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3d\ViewProjection.h">
@@ -228,6 +231,9 @@
       <Filter>ヘッダー ファイル\math</Filter>
     </ClInclude>
     <ClInclude Include="Collision\CollisionConfig.h">
+      <Filter>ヘッダー ファイル\Collision</Filter>
+    </ClInclude>
+    <ClInclude Include="Collision\CollisionManager.h">
       <Filter>ヘッダー ファイル\Collision</Filter>
     </ClInclude>
   </ItemGroup>
