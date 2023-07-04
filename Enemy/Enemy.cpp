@@ -153,6 +153,7 @@ void EnemyStateApproach::Update(Enemy* enemy) {
 
 	// 既定の位置に到達したら離脱
 	if (enemy->GetEnemyPos().z < -15.0f) {
+		timedCalls_.clear();
 		enemy->ChangeState(new EnemyStateLeave());
 	}
 }
