@@ -12,6 +12,7 @@
 #include "Enemy/Enemy.h"
 #include "Collision/Collider.h"
 #include "Collision/CollisionManager.h"
+#include "Skydome.h"
 
 /// <summary>
 /// ゲームシーン
@@ -57,6 +58,10 @@ private: // メンバ変数
 	uint32_t playerTexture_ = 0;
 	// 3Dモデルデータ
 	Model* model_ = nullptr;
+
+	// 天球の3Dモデル
+	Model* modelSkydome_ = nullptr;
+	Skydome* skydome_ = nullptr;
 
 	// ワールドトランスフォーム
 	WorldTransform worldTransform_;

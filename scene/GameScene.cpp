@@ -1,10 +1,10 @@
 #include "GameScene.h"
 #include "AxisIndicator.h"
+#include "Collision/CollisionManager.h"
 #include "ImGuiManager.h"
 #include "PrimitiveDrawer.h"
 #include "TextureManager.h"
 #include <cassert>
-#include "Collision/CollisionManager.h"
 
 GameScene::GameScene() {}
 
@@ -19,6 +19,10 @@ GameScene::~GameScene() {
 	delete collisionManager_;
 	// デバッグカメラの解放
 	delete debugCamera_;
+	// 3Dモデル
+	delete modelSkydome_;
+	// 天球
+	delete skydome_;
 }
 
 void GameScene::Initialize() {
@@ -31,10 +35,16 @@ void GameScene::Initialize() {
 	playerTexture_ = TextureManager::Load("sample.png");
 	// 3Dモデルの生成
 	model_ = Model::Create();
+	// 天球の3Dモデルの生成
+	modelSkydome_ = Model::CreateFromOBJ("skydome", true);
+
+	// デバッグカメラの生成
+	debugCamera_ = new DebugCamera(1280, 720);
 
 	// ワールドトランスフォームの初期化
 	worldTransform_.Initialize();
 	// ビュープロジェクションの初期化
+	debugCamera_->SetFarZ(1000); // 今回は天球の大きさ的に大丈夫なので初期値
 	viewProjection_.Initialize();
 
 	// 自キャラの生成
@@ -48,12 +58,13 @@ void GameScene::Initialize() {
 	// enemyの初期化
 	enemy_->Initialize(model_, Vector3(3, 3, 50));
 
+	// 天球
+	skydome_ = new Skydome();
+	skydome_->Initialize(modelSkydome_, {0, 0, 0});
+
 	// 衝突マネージャーの生成
 	collisionManager_ = new CollisionManager();
-	collisionManager_->Initialize(player_,enemy_);
-
-	// デバッグカメラの生成
-	debugCamera_ = new DebugCamera(1280, 720);
+	collisionManager_->Initialize(player_, enemy_);
 }
 
 void GameScene::Update() {
@@ -64,6 +75,9 @@ void GameScene::Update() {
 	if (enemy_) {
 		enemy_->Update();
 	}
+
+	// 天球
+	skydome_->Update();
 
 	// 衝突マネージャー(当たり判定)
 	collisionManager_->CheckAllCollisions();
@@ -121,11 +135,17 @@ void GameScene::Draw() {
 	/// <summary>
 	/// ここに3Dオブジェクトの描画処理を追加できる
 	/// </summary>
+	//自機
 	player_->Draw(viewProjection_);
 
+	// 敵
 	if (enemy_) {
 		enemy_->Draw(viewProjection_);
 	}
+
+	// 天球
+	skydome_->Draw(viewProjection_);
+
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();
 #pragma endregion

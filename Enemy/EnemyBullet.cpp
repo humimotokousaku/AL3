@@ -18,7 +18,6 @@ Vector3 EnemyBullet::GetWorldPosition() {
 }
 
 void EnemyBullet::SettingScale() {
-	// Z方向に伸びた形状
 	worldTransform_.scale_.x = 1.0f;
 	worldTransform_.scale_.y = 1.0f;
 	worldTransform_.scale_.z = 1.0f;
