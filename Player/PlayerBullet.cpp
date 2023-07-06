@@ -32,9 +32,6 @@ void PlayerBullet::Initialize(Model* model, const Vector3& pos, const Vector3& v
 	worldTransform_.Initialize();
 	// 引数で受け取った初期座標をセット
 	worldTransform_.translation_ = pos;
-	//worldTransform_.matWorld_.m[3][0] = pos.x;
-	//worldTransform_.matWorld_.m[3][1] = pos.y;
-	//worldTransform_.matWorld_.m[3][2] = pos.z;
 	
 	// 引数で受け取った速度をメンバ変数に代入
 	velocity_ = velocity;
@@ -45,6 +42,14 @@ void PlayerBullet::OnCollision() {
 }
 
 void PlayerBullet::Update() {
+	// Y軸周り角度(θy)
+	worldTransform_.rotation_.y = std::atan2(velocity_.x, velocity_.z);
+	// 横軸方向の長さを求める
+	float velocityXZ;
+	velocityXZ = sqrt(velocity_.x * velocity_.x + velocity_.z * velocity_.z);
+	// X軸周りの角度(θx)
+	worldTransform_.rotation_.x = std::atan2(-velocity_.y, velocityXZ);
+
 	// 座標を移動させる
 	worldTransform_.translation_ = Add(worldTransform_.translation_, velocity_);
 
