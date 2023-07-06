@@ -12,7 +12,7 @@ Vector3 Lerp(const Vector3& v1, const Vector3& v2, float t) {
 
 Vector3 Slerp(Vector3 start, Vector3 end, float t) {
 	float dot = Dot(start, end);
-	float theta = acos((dot * M_PI) / 180);
+	float theta = acos((dot * (float)M_PI) / 180);
 	float sinTheta = sin(theta);
 	float weightStart = sin((1 - t) * theta) / sinTheta;
 	float weightEnd = sin(t * theta) / sinTheta;

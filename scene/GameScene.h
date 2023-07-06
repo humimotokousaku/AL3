@@ -5,7 +5,6 @@
 #include "Model.h"
 #include "SafeDelete.h"
 #include "Sprite.h"
-#include "DebugCamera.h"
 #include "ViewProjection.h"
 #include "WorldTransform.h"
 #include "Player/Player.h"
@@ -13,6 +12,7 @@
 #include "Collision/Collider.h"
 #include "Collision/CollisionManager.h"
 #include "Skydome.h"
+#include "RailCamera/RailCamera.h"
 
 /// <summary>
 /// ゲームシーン
@@ -61,7 +61,6 @@ private: // メンバ変数
 
 	// 天球の3Dモデル
 	Model* modelSkydome_ = nullptr;
-	Skydome* skydome_ = nullptr;
 
 	// ワールドトランスフォーム
 	WorldTransform worldTransform_;
@@ -70,18 +69,18 @@ private: // メンバ変数
 
 	// 自キャラ
 	Player* player_ = nullptr;
-
 	// enemy
 	Enemy* enemy_ = nullptr;
-
 	// 衝突マネージャー
 	CollisionManager* collisionManager_ = nullptr;
+	// 天球
+	Skydome* skydome_ = nullptr;
+	// カメラレール
+	RailCamera* railCamera_ = nullptr;
 
 	// ImGuiで値を入力する変数
 	float inputFloat[3] = {0, 0, 0};
 
 	// デバッグカメラ有効
-	bool isDebugCameraActive_ = false;
-	// デバッグカメラ
-	DebugCamera* debugCamera_ = nullptr;
+	bool isDebugCameraActive_ = true;
 };

@@ -6,7 +6,7 @@
 
 Vector3 PlayerBullet::GetWorldPosition() {
 	// ワールド座標を入れる変数
-	Vector3 worldPos{};
+	Vector3 worldPos;
 	// ワールド行列の平行移動成分を取得
 	worldPos.x = worldTransform_.matWorld_.m[3][0];
 	worldPos.y = worldTransform_.matWorld_.m[3][1];
@@ -32,6 +32,9 @@ void PlayerBullet::Initialize(Model* model, const Vector3& pos, const Vector3& v
 	worldTransform_.Initialize();
 	// 引数で受け取った初期座標をセット
 	worldTransform_.translation_ = pos;
+	//worldTransform_.matWorld_.m[3][0] = pos.x;
+	//worldTransform_.matWorld_.m[3][1] = pos.y;
+	//worldTransform_.matWorld_.m[3][2] = pos.z;
 	
 	// 引数で受け取った速度をメンバ変数に代入
 	velocity_ = velocity;

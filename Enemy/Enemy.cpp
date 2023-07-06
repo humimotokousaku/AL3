@@ -132,7 +132,7 @@ void EnemyStateApproach::Initialize(Enemy* enemy) {
 
 void EnemyStateApproach::Update(Enemy* enemy) {
 	// 移動速度
-	const Vector3 kMoveSpeed = {0, 0, -0.10f};
+	const Vector3 kMoveSpeed = {0, 0, -0.01f};
 
 	// 移動処理
 	enemy->Move(kMoveSpeed);

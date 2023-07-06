@@ -7,13 +7,18 @@
 
 Vector3 Player::GetWorldPosition() { 
 	// ワールド座標を入れる変数
-	Vector3 worldPos{}; 
+	Vector3 worldPos; 
 	// ワールド行列の平行移動成分を取得
 	worldPos.x = worldTransform_.matWorld_.m[3][0];
 	worldPos.y = worldTransform_.matWorld_.m[3][1];
 	worldPos.z = worldTransform_.matWorld_.m[3][2];
 
 	return worldPos;
+}
+
+void Player::SetParent(const WorldTransform* parent) {
+	// 親子関係を結ぶ
+	worldTransform_.parent_ = parent;
 }
 
 Player::Player() {}
@@ -24,7 +29,7 @@ Player::~Player() {
 }
 
 // Initializeの関数定義
-void Player::Initialize(Model* model, uint32_t textureHandle) {
+void Player::Initialize(Model* model, uint32_t textureHandle, const Vector3& pos) {
 	// NULLポインタチェック
 	assert(model);
 
@@ -39,6 +44,9 @@ void Player::Initialize(Model* model, uint32_t textureHandle) {
 	SetCollisionAttribute(kCollisionAttributePlayer);
 	// 衝突対象を自分の属性以外に設定
 	SetCollisionMask(~kCollisionAttributePlayer);
+
+	// 引数で受け取った初期座標をセット
+	worldTransform_.translation_ = pos;
 
 	// ワールド変換の初期化
 	worldTransform_.Initialize();
@@ -60,17 +68,15 @@ void Player::Rotate() {
 // 攻撃
 void Player::Attack() {
 	if (input_->TriggerKey(DIK_SPACE)) {
-
 		// 弾の速度
 		const float kBulletSpeed = 1.0f;
 		Vector3 velocity(0, 0, kBulletSpeed);
-
 		// 速度ベクトルを自機の向きに合わせて回転させる
+		Vector3 worldPos = GetWorldPosition();
 		velocity = TransformNormal(velocity, worldTransform_.matWorld_);
-
 		// 弾を生成し、初期化
 		PlayerBullet* newBullet = new PlayerBullet();
-		newBullet->Initialize(model_, worldTransform_.translation_,velocity);
+		newBullet->Initialize(model_, worldPos, velocity);
 
 		// 弾を登録
 		bullets_.push_back(newBullet);
@@ -83,26 +89,11 @@ void Player::OnCollision() {
 
 // Updateの関数定義
 void Player::Update() {
-
-	// 行列を定数バッファに転送
-	worldTransform_.TransferMatrix();
-
 	// キャラクターの移動ベクトル
 	Vector3 move = {0, 0, 0};
 
 	// キャラクターの移動の速さ
 	const float kCharacterSpeed = 0.2f;
-
-#pragma region Rotate
-
-	// 旋回処理
-	Rotate();
-
-	// アフィン変換行列をワールド行列に代入
-	worldTransform_.matWorld_ = MakeAffineMatrix(
-	    worldTransform_.scale_, worldTransform_.rotation_, worldTransform_.translation_);
-
-#pragma endregion
 
 #pragma region Move
 
@@ -137,6 +128,19 @@ void Player::Update() {
 
 #pragma endregion
 
+#pragma region Rotate
+
+	// 旋回処理
+	Rotate();
+
+	// アフィン変換行列をワールド行列に代入
+	worldTransform_.matWorld_ = MakeAffineMatrix(
+	    worldTransform_.scale_, worldTransform_.rotation_, worldTransform_.translation_);
+
+#pragma endregion
+
+	worldTransform_.UpdateMatrix();
+
 	// 弾の処理
 	Attack();
 
@@ -148,7 +152,6 @@ void Player::Update() {
 		}
 		return false;
 	});
-
 	// 弾の更新
 	for (PlayerBullet* bullet : bullets_) {
 		bullet->Update();
