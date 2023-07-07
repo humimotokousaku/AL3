@@ -35,7 +35,7 @@ public: // メンバ関数
 	/// </summary>
 	void Initialize();
 
-	Vector3 CatmullRomSpline(std::vector<Vector3> controlPoints, float t);
+	Vector3 CatmullRomSpline(const std::vector<Vector3>& controlPoints, float t);
 
 	/// <summary>
 	/// 毎フレーム処理
@@ -76,10 +76,14 @@ private: // メンバ変数
 	// カメラレール
 	RailCamera* railCamera_ = nullptr;
 
-	PrimitiveDrawer* primitiveDrawer_;
+	PrimitiveDrawer* primitiveDrawer_ = nullptr;
 
 	// スプライン曲線制御点（通過点）
 	std::vector<Vector3> controlPoints_;
+	// 線分で描画する用の頂点リスト
+	std::vector<Vector3> pointsDrawing_;
+	// 線分の数
+	const size_t segmentCount = 100;
 
 	// ImGuiで値を入力する変数
 	float inputFloat[3] = {0, 0, 0};

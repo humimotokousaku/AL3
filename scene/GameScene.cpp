@@ -80,48 +80,33 @@ void GameScene::Initialize() {
         {20, 0,  0},
         {30, 0,  0}
     };
-
-	
 }
 
-Vector3 GameScene::CatmullRomSpline(std::vector<Vector3> controlPoints, float t) {
-	int numPoints = controlPoints.size();
-	int segment = static_cast<int>(std::floor(t * (numPoints - 1))); // 現在のセグメントを決定
-	float segmentT = t * (numPoints - 1) - segment; // セグメント内のパラメータtを計算
+Vector3 GameScene::CatmullRomSpline(const std::vector<Vector3>& controlPoints, float t) {
+	int n = (int)controlPoints.size();
+	int segment = static_cast<int>(t * (n - 1));
+	float tSegment = t * (n - 1) - segment;
 
-	// 制御点のインデックスを計算
-	int p0 = (segment - 1 + numPoints) % numPoints;
-	int p1 = (segment + 0) % numPoints;
-	int p2 = (segment + 1) % numPoints;
-	int p3 = (segment + 2) % numPoints;
+	Vector3 p0 = controlPoints[segment > 0 ? segment - 1 : 0];
+	Vector3 p1 = controlPoints[segment];
+	Vector3 p2 = controlPoints[segment < n - 1 ? segment + 1 : n - 1];
+	Vector3 p3 = controlPoints[segment < n - 2 ? segment + 2 : n - 1];
 
-	Vector3 result{};
-	result.x = 0.5f * ((2 * controlPoints[p1].x) +
-	                   (-controlPoints[p0].x + controlPoints[p2].x) * segmentT +
-	                   (2 * controlPoints[p0].x - 5 * controlPoints[p1].x +
-	                    4 * controlPoints[p2].x - controlPoints[p3].x) *
-	                       segmentT * segmentT +
-	                   (-controlPoints[p0].x + 3 * controlPoints[p1].x - 3 * controlPoints[p2].x +
-	                    controlPoints[p3].x) *
-	                       segmentT * segmentT * segmentT);
-	result.y = 0.5f * ((2 * controlPoints[p1].y) +
-	                   (-controlPoints[p0].y + controlPoints[p2].y) * segmentT +
-	                   (2 * controlPoints[p0].y - 5 * controlPoints[p1].y +
-	                    4 * controlPoints[p2].y - controlPoints[p3].y) *
-	                       segmentT * segmentT +
-	                   (-controlPoints[p0].y + 3 * controlPoints[p1].y - 3 * controlPoints[p2].y +
-	                    controlPoints[p3].y) *
-	                       segmentT * segmentT * segmentT);
-	result.z = 0.5f * ((2 * controlPoints[p1].z) +
-	                   (-controlPoints[p0].z + controlPoints[p2].z) * segmentT +
-	                   (2 * controlPoints[p0].z - 5 * controlPoints[p1].z +
-	                    4 * controlPoints[p2].z - controlPoints[p3].z) *
-	                       segmentT * segmentT +
-	                   (-controlPoints[p0].z + 3 * controlPoints[p1].z - 3 * controlPoints[p2].z +
-	                    controlPoints[p3].z) *
-	                       segmentT * segmentT * segmentT);
+	Vector3 interpolatedPoint;
+	interpolatedPoint.x =
+	    0.5f * ((2.0f * p1.x) + (-p0.x + p2.x) * tSegment +
+	            (2.0f * p0.x - 5.0f * p1.x + 4.0f * p2.x - p3.x) * (tSegment * tSegment) +
+	            (-p0.x + 3.0f * p1.x - 3.0f * p2.x + p3.x) * (tSegment * tSegment * tSegment));
+	interpolatedPoint.y =
+	    0.5f * ((2.0f * p1.y) + (-p0.y + p2.y) * tSegment +
+	            (2.0f * p0.y - 5.0f * p1.y + 4.0f * p2.y - p3.y) * (tSegment * tSegment) +
+	            (-p0.y + 3.0f * p1.y - 3.0f * p2.y + p3.y) * (tSegment * tSegment * tSegment));
+	interpolatedPoint.z =
+	    0.5f * ((2.0f * p1.z) + (-p0.z + p2.z) * tSegment +
+	            (2.0f * p0.z - 5.0f * p1.z + 4.0f * p2.z - p3.z) * (tSegment * tSegment) +
+	            (-p0.z + 3.0f * p1.z - 3.0f * p2.z + p3.z) * (tSegment * tSegment * tSegment));
 
-	return result;
+	return interpolatedPoint;
 }
 
 void GameScene::Update() {
@@ -144,6 +129,14 @@ void GameScene::Update() {
 	railCamera_->Update();
 	viewProjection_.matView = railCamera_->GetViewProjection().matView;
 	viewProjection_.matProjection = railCamera_->GetViewProjection().matProjection;
+
+	// 線分の数+1個分の頂点座標の計算
+	for (size_t i = 0; i < segmentCount + 1; i++) {
+		float t = 1.0f / segmentCount * i;
+		Vector3 pos = CatmullRomSpline(controlPoints_, t);
+		// 描画用頂点リストに追加
+		pointsDrawing_.push_back(pos);
+	}
 
 	// ビュープロジェクション行列の転送
 	viewProjection_.TransferMatrix();
@@ -176,25 +169,12 @@ void GameScene::Draw() {
 #pragma region 3Dオブジェクト描画
 	// 3Dオブジェクト描画前処理
 	Model::PreDraw(commandList);
-
 	/// <summary>
 	/// ここに3Dオブジェクトの描画処理を追加できる
 	/// </summary>
-	// 線分で描画する用の頂点リスト
-	std::vector<Vector3> posintsDrawing;
-	// 線分の数
-	const size_t segmentCount = 100;
-	// 線分の数+1個分の頂点座標の計算
-	for (size_t i = 0; i < segmentCount + 1; i++) {
-		float t = 1.0f / segmentCount * i;
-		Vector3 pos = CatmullRomSpline(controlPoints_, t);
-		// 描画用頂点リストに追加
-		posintsDrawing.push_back(pos);
-	}
-
 	for (size_t i = 0; i < segmentCount; i++) {
 		primitiveDrawer_->DrawLine3d(
-		    posintsDrawing[i], posintsDrawing[i + 1], Vector4{1.0f, 1.0f, 1.0f, 1.0f});
+		    pointsDrawing_.at(i), pointsDrawing_.at(i + 1), Vector4{1.0f, 0.0f, 0.0f, 1.0f});
 	}
 	
 	// 自機
