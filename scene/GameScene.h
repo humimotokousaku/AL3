@@ -3,6 +3,7 @@
 #include "DirectXCommon.h"
 #include "Input.h"
 #include "Model.h"
+#include "PrimitiveDrawer.h"
 #include "SafeDelete.h"
 #include "Sprite.h"
 #include "ViewProjection.h"
@@ -34,10 +35,7 @@ public: // メンバ関数
 	/// </summary>
 	void Initialize();
 
-	/// <summary>
-	/// 衝突判定と応答
-	/// </summary>
-	//void CheckAllCollisions();
+	Vector3 CatmullRomSpline(std::vector<Vector3> controlPoints, float t);
 
 	/// <summary>
 	/// 毎フレーム処理
@@ -78,9 +76,11 @@ private: // メンバ変数
 	// カメラレール
 	RailCamera* railCamera_ = nullptr;
 
+	PrimitiveDrawer* primitiveDrawer_;
+
+	// スプライン曲線制御点（通過点）
+	std::vector<Vector3> controlPoints_;
+
 	// ImGuiで値を入力する変数
 	float inputFloat[3] = {0, 0, 0};
-
-	// デバッグカメラ有効
-	bool isDebugCameraActive_ = true;
 };
