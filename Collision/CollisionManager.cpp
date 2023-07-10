@@ -4,7 +4,7 @@ CollisionManager::~CollisionManager() {
 
 }
 
-void CollisionManager::Initialize(Player* player, Enemy* enemy) {
+void CollisionManager::Initialize(Player* player, std::list<Enemy*>& enemy) {
 	player_ = player;
 	enemy_ = enemy;
 	SetPlayer(player_);
@@ -41,26 +41,27 @@ void CollisionManager::CheckCollisionPair(Collider* colliderA, Collider* collide
 }
 
 void CollisionManager::CheckAllCollisions() {
-
 	// 自弾リストの取得
 	const std::list<PlayerBullet*>& playerBullets = player_->GetBullets();
-	// 敵弾リストの取得
-	const std::list<EnemyBullet*>& enemyBullets = enemy_->GetBullets();
 
 	// リストのクリア
 	colliders_.clear();
 
 	// コライダーをリストに登録
 	colliders_.push_back(player_);
-	colliders_.push_back(enemy_);
 
 	// 自弾全てについて
 	for (PlayerBullet* bullet : playerBullets) {
 		colliders_.push_back(bullet);
 	}
+
 	// 敵弾全てについて
-	for (EnemyBullet* bullet : enemyBullets) {
-		colliders_.push_back(bullet);
+	for (Enemy* enemy : enemy_) {
+		colliders_.push_back(enemy);
+		const std::list<EnemyBullet*>& enemyBullets = enemy->GetBullets();
+		for (EnemyBullet* bullet : enemyBullets) {
+			colliders_.push_back(bullet);
+		}
 	}
 
 	// リスト内のペアを総当たり

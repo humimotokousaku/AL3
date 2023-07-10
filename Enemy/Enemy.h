@@ -1,14 +1,14 @@
 ﻿#pragma once
 #include "Collision/Collider.h"
 #include "Enemy/EnemyBullet.h"
+#include "Player/Player.h"
 #include "Model.h"
 #include "TimedCall.h"
 #include "WorldTransform.h"
 #include <functional>
 
-class Player;
-
 class Enemy; // 前方宣言
+class GameScene;
 
 // 基底クラス
 class BaseEnemyState {
@@ -68,6 +68,8 @@ public: // メンバ関数
 
 	void SetPlayer(Player* player) { player_ = player; }
 
+	void SetGameScene(GameScene* gameScene) { gameScene_ = gameScene; }
+
 public:
 	Enemy();
 	~Enemy();
@@ -90,6 +92,9 @@ public:
 
 	// 衝突を検出したら呼び出されるコールバック関数
 	void OnCollision() override;
+
+	// 完了ならtrueを返す
+	bool isDead() const { return isDead_; }
 
 	/// <summary>
 	/// 更新処理
@@ -123,4 +128,9 @@ private:
 
 	// 自キャラ
 	Player* player_ = nullptr;
+
+	// ゲームシーン
+	GameScene* gameScene_;
+
+	bool isDead_ = false;
 };

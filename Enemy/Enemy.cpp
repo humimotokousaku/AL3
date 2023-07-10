@@ -5,6 +5,7 @@
 #include "WorldTransform.h"
 #include "math/Lerp.h"
 #include "math/MyMatrix.h"
+#include "GameScene.h"
 #include <cassert>
 #include <stdio.h>
 
@@ -62,22 +63,22 @@ void Enemy::Fire() {
 
 	// 自キャラのワールド座標を取得する
 	player_->GetWorldPosition();
-
+	
 	// 弾を生成し、初期化
 	EnemyBullet* newBullet = new EnemyBullet();
 	newBullet->Initialize(model_, GetWorldPosition(), velocity);
 	newBullet->SetPlayer(player_);
 
 	// 弾を登録
-	bullets_.push_back(newBullet);
+	gameScene_->AddEnemeyBullet(newBullet);
 }
 
-void Enemy::OnCollision() {}
+void Enemy::OnCollision() { isDead_ = true; }
 
 void Enemy::Update() {
 	// 状態遷移
 	state_->Update(this);
-
+	
 	// 終了した弾を削除
 	bullets_.remove_if([](EnemyBullet* bullet) {
 		if (bullet->isDead()) {

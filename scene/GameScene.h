@@ -20,6 +20,15 @@
 /// </summary>
 class GameScene {
 public: // メンバ関数
+	// 弾リストを取得
+	const std::list<EnemyBullet*>& GetBullets() const { return enemyBullets_; }
+
+	/// <summary>
+	/// 敵弾を追加する
+	/// </summary>
+	/// <param name="enemyBullet">敵弾</param>
+	void AddEnemeyBullet(EnemyBullet* enemyBullet);
+
 	/// <summary>
 	/// コンストクラタ
 	/// </summary>
@@ -34,8 +43,6 @@ public: // メンバ関数
 	/// 初期化
 	/// </summary>
 	void Initialize();
-
-	Vector3 CatmullRomSpline(const std::vector<Vector3>& controlPoints, float t);
 
 	/// <summary>
 	/// 毎フレーム処理
@@ -68,22 +75,15 @@ private: // メンバ変数
 	// 自キャラ
 	Player* player_ = nullptr;
 	// enemy
-	Enemy* enemy_ = nullptr;
+	std::list<Enemy*> enemy_;
+	// 敵弾
+	std::list<EnemyBullet*> enemyBullets_;
 	// 衝突マネージャー
 	CollisionManager* collisionManager_ = nullptr;
 	// 天球
 	Skydome* skydome_ = nullptr;
 	// カメラレール
 	RailCamera* railCamera_ = nullptr;
-
-	PrimitiveDrawer* primitiveDrawer_ = nullptr;
-
-	// スプライン曲線制御点（通過点）
-	std::vector<Vector3> controlPoints_;
-	// 線分で描画する用の頂点リスト
-	std::vector<Vector3> pointsDrawing_;
-	// 線分の数
-	const size_t segmentCount = 100;
 
 	// ImGuiで値を入力する変数
 	float inputFloat[3] = {0, 0, 0};

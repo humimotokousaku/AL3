@@ -83,9 +83,7 @@ void Player::Attack() {
 	}
 }
 
-void Player::OnCollision() {
-
-}
+void Player::OnCollision() { isDead_ = true; }
 
 // Updateの関数定義
 void Player::Update() {

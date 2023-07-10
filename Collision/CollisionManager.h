@@ -10,9 +10,9 @@ public:
 	~CollisionManager();
 
 	void SetPlayer(Player* player) { player_ = player; }
-	void SetEnemy(Enemy* enemy) { enemy_ = enemy; }
+	void SetEnemy(std::list<Enemy*>& enemy) { enemy_ = enemy; }
 
-	void Initialize(Player* player,Enemy* enemy);
+	void Initialize(Player* player, std::list<Enemy*>& enemy);
 
 	void CheckCollisionPair(Collider* colliderA, Collider* colliderB);
 
@@ -24,5 +24,5 @@ public:
 
 	Player* player_;
 
-	Enemy* enemy_;
+	std::list<Enemy*> enemy_;
 };

@@ -13,7 +13,9 @@ GameScene::~GameScene() {
 	// 自キャラの解放
 	delete player_;
 	// enemyの解放
-	delete enemy_;
+	for (Enemy* enemy : enemy_) {
+		delete enemy;
+	}
 	// 衝突マネージャーの解放
 	delete collisionManager_;
 	// 3Dモデル
@@ -24,12 +26,16 @@ GameScene::~GameScene() {
 	delete railCamera_;
 }
 
+void GameScene::AddEnemeyBullet(EnemyBullet* enemyBullet) {
+	// リストに登録する
+	enemyBullets_.push_back(enemyBullet);
+}
+
 void GameScene::Initialize() {
 
 	dxCommon_ = DirectXCommon::GetInstance();
 	input_ = Input::GetInstance();
 	audio_ = Audio::GetInstance();
-	primitiveDrawer_ = PrimitiveDrawer::GetInstance();
 
 	// ファイル名を指定してテクスチャを読み込む
 	playerTexture_ = TextureManager::Load("sample.png");
@@ -53,15 +59,17 @@ void GameScene::Initialize() {
 	// 初期位置
 	Vector3 playerPosition(0, -2, 10);
 	// 自キャラの初期化
-	player_->Initialize(model_, playerTexture_,playerPosition);
+	player_->Initialize(model_, playerTexture_, playerPosition);
 	// 自キャラとレールカメラの親子関係を結ぶ
 	player_->SetParent(&railCamera_->GetWorldTransform());
 
-	// enemyの生成
-	enemy_ = new Enemy();
-	enemy_->SetPlayer(player_);
-	// enemyの初期化
-	enemy_->Initialize(model_, Vector3(3, 3, 70));
+	for (int i = 0; i < 2; i++) {
+		Enemy* enemy = new Enemy();
+		enemy->SetPlayer(player_);
+		enemy->Initialize(model_, {float(i) * 3, float(i) * 3, 70});
+		enemy->SetGameScene(this);
+		enemy_.push_back(enemy);
+	}
 
 	// 天球
 	skydome_ = new Skydome();
@@ -70,58 +78,27 @@ void GameScene::Initialize() {
 	// 衝突マネージャーの生成
 	collisionManager_ = new CollisionManager();
 	collisionManager_->Initialize(player_, enemy_);
-
-	// スプライン曲線制御点（通過点）の初期化
-	controlPoints_ = {
-	    {0,  0,  0},
-        {10, 10, 0},
-        {10, 15, 0},
-        {20, 15, 0},
-        {20, 0,  0},
-        {30, 0,  0}
-    };
-}
-
-Vector3 GameScene::CatmullRomSpline(const std::vector<Vector3>& controlPoints, float t) {
-	int n = (int)controlPoints.size();
-	int segment = static_cast<int>(t * (n - 1));
-	float tSegment = t * (n - 1) - segment;
-
-	Vector3 p0 = controlPoints[segment > 0 ? segment - 1 : 0];
-	Vector3 p1 = controlPoints[segment];
-	Vector3 p2 = controlPoints[segment < n - 1 ? segment + 1 : n - 1];
-	Vector3 p3 = controlPoints[segment < n - 2 ? segment + 2 : n - 1];
-
-	Vector3 interpolatedPoint;
-	interpolatedPoint.x =
-	    0.5f * ((2.0f * p1.x) + (-p0.x + p2.x) * tSegment +
-	            (2.0f * p0.x - 5.0f * p1.x + 4.0f * p2.x - p3.x) * (tSegment * tSegment) +
-	            (-p0.x + 3.0f * p1.x - 3.0f * p2.x + p3.x) * (tSegment * tSegment * tSegment));
-	interpolatedPoint.y =
-	    0.5f * ((2.0f * p1.y) + (-p0.y + p2.y) * tSegment +
-	            (2.0f * p0.y - 5.0f * p1.y + 4.0f * p2.y - p3.y) * (tSegment * tSegment) +
-	            (-p0.y + 3.0f * p1.y - 3.0f * p2.y + p3.y) * (tSegment * tSegment * tSegment));
-	interpolatedPoint.z =
-	    0.5f * ((2.0f * p1.z) + (-p0.z + p2.z) * tSegment +
-	            (2.0f * p0.z - 5.0f * p1.z + 4.0f * p2.z - p3.z) * (tSegment * tSegment) +
-	            (-p0.z + 3.0f * p1.z - 3.0f * p2.z + p3.z) * (tSegment * tSegment * tSegment));
-
-	return interpolatedPoint;
 }
 
 void GameScene::Update() {
 	viewProjection_.UpdateMatrix();
 	// 自キャラの更新
 	player_->Update();
-
 	// enemyの更新
-	if (enemy_) {
-		enemy_->Update();
+	for (Enemy* enemy : enemy_) {
+		enemy->Update();
 	}
+	// 敵の削除
+	//enemy_.remove_if([](Enemy* enemy) {
+	//	if (enemy->isDead()) {
+	//		delete enemy;
+	//		return true;
+	//	}
+	//	return false;
+	//});
 
 	// 天球
 	skydome_->Update();
-
 	// 衝突マネージャー(当たり判定)
 	collisionManager_->CheckAllCollisions();
 
@@ -129,14 +106,6 @@ void GameScene::Update() {
 	railCamera_->Update();
 	viewProjection_.matView = railCamera_->GetViewProjection().matView;
 	viewProjection_.matProjection = railCamera_->GetViewProjection().matProjection;
-
-	// 線分の数+1個分の頂点座標の計算
-	for (size_t i = 0; i < segmentCount + 1; i++) {
-		float t = 1.0f / segmentCount * i;
-		Vector3 pos = CatmullRomSpline(controlPoints_, t);
-		// 描画用頂点リストに追加
-		pointsDrawing_.push_back(pos);
-	}
 
 	// ビュープロジェクション行列の転送
 	viewProjection_.TransferMatrix();
@@ -172,17 +141,12 @@ void GameScene::Draw() {
 	/// <summary>
 	/// ここに3Dオブジェクトの描画処理を追加できる
 	/// </summary>
-	for (size_t i = 0; i < segmentCount; i++) {
-		primitiveDrawer_->DrawLine3d(
-		    pointsDrawing_.at(i), pointsDrawing_.at(i + 1), Vector4{1.0f, 0.0f, 0.0f, 1.0f});
-	}
-	
 	// 自機
 	player_->Draw(viewProjection_);
 
 	// 敵
-	if (enemy_) {
-		enemy_->Draw(viewProjection_);
+	for (Enemy* enemy : enemy_) {
+		enemy->Draw(viewProjection_);
 	}
 
 	// 天球
