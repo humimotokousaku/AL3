@@ -68,10 +68,6 @@ void Enemy::Fire() {
 	velocity.y *= kBulletSpeed;
 	velocity.z *= kBulletSpeed;
 
-	// 速度ベクトルを自機の向きに合わせて回転させる
-	//velocity = TransformNormal(velocity, worldTransform_.matWorld_);
-
-
 	// 弾を生成し、初期化
 	EnemyBullet* newBullet = new EnemyBullet();
 	newBullet->Initialize(model_, GetWorldPosition(), velocity);
