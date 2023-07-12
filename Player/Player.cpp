@@ -28,30 +28,6 @@ Player::~Player() {
 	}
 }
 
-// Initializeの関数定義
-void Player::Initialize(Model* model, uint32_t textureHandle, const Vector3& pos) {
-	// NULLポインタチェック
-	assert(model);
-
-	// シングルトンインスタンスを取得する
-	input_ = Input::GetInstance();
-
-	// 引数として受け取ったデータをメンバ変数に記録する
-	model_ = model;
-	playerTexture_ = textureHandle;
-
-	// 衝突属性を設定
-	SetCollisionAttribute(kCollisionAttributePlayer);
-	// 衝突対象を自分の属性以外に設定
-	SetCollisionMask(~kCollisionAttributePlayer);
-
-	// 引数で受け取った初期座標をセット
-	worldTransform_.translation_ = pos;
-
-	// ワールド変換の初期化
-	worldTransform_.Initialize();
-}
-
 // playerの回転
 void Player::Rotate() {
 	// 回転速さ[ラジアン/frame]
@@ -85,6 +61,29 @@ void Player::Attack() {
 
 void Player::OnCollision() {
 
+}
+
+void Player::Initialize(Model* model, uint32_t textureHandle, const Vector3& pos) {
+	// NULLポインタチェック
+	assert(model);
+
+	// シングルトンインスタンスを取得する
+	input_ = Input::GetInstance();
+
+	// 引数として受け取ったデータをメンバ変数に記録する
+	model_ = model;
+	playerTexture_ = textureHandle;
+
+	// 衝突属性を設定
+	SetCollisionAttribute(kCollisionAttributePlayer);
+	// 衝突対象を自分の属性以外に設定
+	SetCollisionMask(~kCollisionAttributePlayer);
+
+	// 引数で受け取った初期座標をセット
+	worldTransform_.translation_ = pos;
+
+	// ワールド変換の初期化
+	worldTransform_.Initialize();
 }
 
 // Updateの関数定義

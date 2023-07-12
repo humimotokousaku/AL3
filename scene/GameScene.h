@@ -35,11 +35,6 @@ public: // メンバ関数
 	void Initialize();
 
 	/// <summary>
-	/// 衝突判定と応答
-	/// </summary>
-	//void CheckAllCollisions();
-
-	/// <summary>
 	/// 毎フレーム処理
 	/// </summary>
 	void Update();

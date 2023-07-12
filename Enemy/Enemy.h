@@ -73,11 +73,6 @@ public:
 	~Enemy();
 
 	/// <summary>
-	/// 初期化
-	/// </summary>
-	void Initialize(Model* model, const Vector3& pos);
-
-	/// <summary>
 	/// 移動処理
 	/// </summary>
 	/// <param name="velocity">移動量</param>
@@ -92,15 +87,20 @@ public:
 	void OnCollision() override;
 
 	/// <summary>
-	/// 更新処理
-	/// </summary>
-	void Update();
-
-	/// <summary>
 	/// stateの変更
 	/// </summary>
 	/// <param name="pState">state</param>
 	void ChangeState(BaseEnemyState* pState);
+	
+	/// <summary>
+	/// 初期化
+	/// </summary>
+	void Initialize(Model* model, const Vector3& pos);
+
+	/// <summary>
+	/// 更新処理
+	/// </summary>
+	void Update();
 
 	/// <summary>
 	/// 描画

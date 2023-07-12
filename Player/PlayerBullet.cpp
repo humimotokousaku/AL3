@@ -15,6 +15,10 @@ Vector3 PlayerBullet::GetWorldPosition() {
 	return worldPos;
 }
 
+void PlayerBullet::OnCollision() { 
+	isDead_ = true; 
+}
+
 void PlayerBullet::Initialize(Model* model, const Vector3& pos, const Vector3& velocity) {
 	// NULLポインタチェック
 	assert(model);
@@ -32,13 +36,9 @@ void PlayerBullet::Initialize(Model* model, const Vector3& pos, const Vector3& v
 	worldTransform_.Initialize();
 	// 引数で受け取った初期座標をセット
 	worldTransform_.translation_ = pos;
-	
+
 	// 引数で受け取った速度をメンバ変数に代入
 	velocity_ = velocity;
-}
-
-void PlayerBullet::OnCollision() { 
-	isDead_ = true; 
 }
 
 void PlayerBullet::Update() {

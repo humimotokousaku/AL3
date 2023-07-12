@@ -27,28 +27,6 @@ Enemy::~Enemy() {
 	}
 }
 
-void Enemy::Initialize(Model* model, const Vector3& pos) {
-	// NULLポインタチェック
-	assert(model);
-
-	model_ = model;
-	// テクスチャ読み込み
-	enemyTexture_ = TextureManager::Load("black.png");
-
-	// 衝突属性を設定
-	SetCollisionAttribute(kCollisionAttributeEnemy);
-	// 衝突対象を自分の属性以外に設定
-	SetCollisionMask(~kCollisionAttributeEnemy);
-
-	// ワールド変換の初期化
-	worldTransform_.Initialize();
-	// 引数で受け取った初期座標をセット
-	worldTransform_.translation_ = pos;
-
-	// 状態遷移
-	state_->Initialize(this);
-}
-
 void Enemy::Move(const Vector3 velocity) {
 	worldTransform_.translation_ = Add(worldTransform_.translation_, velocity);
 }
@@ -73,6 +51,28 @@ void Enemy::Fire() {
 }
 
 void Enemy::OnCollision() {}
+
+void Enemy::Initialize(Model* model, const Vector3& pos) {
+	// NULLポインタチェック
+	assert(model);
+
+	model_ = model;
+	// テクスチャ読み込み
+	enemyTexture_ = TextureManager::Load("black.png");
+
+	// 衝突属性を設定
+	SetCollisionAttribute(kCollisionAttributeEnemy);
+	// 衝突対象を自分の属性以外に設定
+	SetCollisionMask(~kCollisionAttributeEnemy);
+
+	// ワールド変換の初期化
+	worldTransform_.Initialize();
+	// 引数で受け取った初期座標をセット
+	worldTransform_.translation_ = pos;
+
+	// 状態遷移
+	state_->Initialize(this);
+}
 
 void Enemy::Update() {
 	// 状態遷移

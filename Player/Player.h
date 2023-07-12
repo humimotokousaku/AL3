@@ -27,11 +27,6 @@ public:
 	/// デストラクタ
 	/// </summary>
 	~Player();
-
-	/// <summary>
-	/// 初期化
-	/// <summary>
-	void Initialize(Model* model, uint32_t textureHandle, const Vector3& pos);
 	
 	// playerの回転
 	void Rotate();
@@ -43,6 +38,11 @@ public:
 
 	// 衝突を検出したら呼び出されるコールバック関数
 	void OnCollision() override;
+
+	/// <summary>
+	/// 初期化
+	/// <summary>
+	void Initialize(Model* model, uint32_t textureHandle, const Vector3& pos);
 
 	/// <summary>
 	/// 更新

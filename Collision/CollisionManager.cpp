@@ -4,13 +4,6 @@ CollisionManager::~CollisionManager() {
 
 }
 
-void CollisionManager::Initialize(Player* player, Enemy* enemy) {
-	player_ = player;
-	enemy_ = enemy;
-	SetPlayer(player_);
-	SetEnemy(enemy_);
-}
-
 void CollisionManager::CheckCollisionPair(Collider* colliderA, Collider* colliderB) {
 	SetPlayer(player_);
 	SetEnemy(enemy_);
@@ -78,4 +71,11 @@ void CollisionManager::CheckAllCollisions() {
 			CheckCollisionPair(colliderA, colliderB);
 		}
 	}
+}
+
+void CollisionManager::Initialize(Player* player, Enemy* enemy) {
+	player_ = player;
+	enemy_ = enemy;
+	SetPlayer(player_);
+	SetEnemy(enemy_);
 }

@@ -18,14 +18,12 @@ void RailCamera::Initialize(WorldTransform worldTransform, const Vector3& radian
 void RailCamera::Update() {
 	Vector3 radian{0.0f, 0.001f, 0.0f};
 	// 回転処理
-	//worldTransform_.rotation_ = Add(worldTransform_.rotation_, radian);
+	worldTransform_.rotation_ = Add(worldTransform_.rotation_, radian);
 
 	// 行列の更新
 	worldTransform_.UpdateMatrix();
 	// カメラオブジェクトのワールド行列からビュー行列を計算する
 	viewProjection_.matView = Inverse(worldTransform_.matWorld_);
-
-	//viewProjection_.TransferMatrix();
 
 	ImGui::Begin("Camera");
 	ImGui::DragFloat3("translation", &worldTransform_.translation_.x, 0.1f);

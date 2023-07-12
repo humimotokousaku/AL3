@@ -17,6 +17,12 @@ public:
 	/// </summary>
 	void SettingScale();
 
+	// 衝突を検出したら呼び出されるコールバック関数
+	void OnCollision() override;
+
+	// 完了ならtrueを返す
+	bool isDead() const { return isDead_; }
+
 	/// <summary>
 	/// 初期化
 	/// </summary>
@@ -24,16 +30,10 @@ public:
 	/// <param name="pos">初期座標</param>
 	void Initialize(Model* model, const Vector3& pos, const Vector3& velocity);
 
-	// 衝突を検出したら呼び出されるコールバック関数
-	void OnCollision() override;
-
 	/// <summary>
 	/// 更新
 	/// </summary>
 	void Update();
-
-	// 完了ならtrueを返す
-	bool isDead() const { return isDead_; }
 
 	/// <summary>
 	/// 描画
