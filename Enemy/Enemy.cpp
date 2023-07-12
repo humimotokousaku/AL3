@@ -9,6 +9,8 @@
 #include <cassert>
 #include <stdio.h>
 
+void Enemy::OnCollision() { isDead_ = true; }
+
 Vector3 Enemy::GetWorldPosition() {
 	// ワールド座標を入れる変数
 	Vector3 worldPos{};
@@ -20,13 +22,37 @@ Vector3 Enemy::GetWorldPosition() {
 	return worldPos;
 }
 
-Enemy::Enemy() { state_ = new EnemyStateApproach(); }
-
-Enemy::~Enemy() {
-	for (EnemyBullet* bullet : bullets_) {
-		delete bullet;
-	}
+void Enemy::ChangeState(BaseEnemyState* pState) {
+	delete state_;
+	state_ = pState;
 }
+
+void Enemy::Move(const Vector3 velocity) {
+	worldTransform_.translation_ = Add(worldTransform_.translation_, velocity);
+}
+
+void Enemy::Fire() {
+	assert(player_);
+
+	// 弾の速度(正の数だと敵の後ろから弾が飛ぶ)
+	const float kBulletSpeed = -0.5f;
+	Vector3 velocity{0, 0, kBulletSpeed};
+
+	// 自キャラのワールド座標を取得する
+	player_->GetWorldPosition();
+	
+	// 弾を生成し、初期化
+	EnemyBullet* newBullet = new EnemyBullet();
+	newBullet->Initialize(model_, GetWorldPosition(), velocity);
+	newBullet->SetPlayer(player_);
+
+	// 弾を登録
+	gameScene_->AddEnemyBullet(newBullet);
+}
+
+Enemy::Enemy() { state_ = new EnemyStateApproach(); }
+Enemy::~Enemy() {}
+
 
 void Enemy::Initialize(Model* model, const Vector3& pos) {
 	// NULLポインタチェック
@@ -50,47 +76,9 @@ void Enemy::Initialize(Model* model, const Vector3& pos) {
 	state_->Initialize(this);
 }
 
-void Enemy::Move(const Vector3 velocity) {
-	worldTransform_.translation_ = Add(worldTransform_.translation_, velocity);
-}
-
-void Enemy::Fire() {
-	assert(player_);
-
-	// 弾の速度(正の数だと敵の後ろから弾が飛ぶ)
-	const float kBulletSpeed = -0.5f;
-	Vector3 velocity{0, 0, kBulletSpeed};
-
-	// 自キャラのワールド座標を取得する
-	player_->GetWorldPosition();
-	
-	// 弾を生成し、初期化
-	EnemyBullet* newBullet = new EnemyBullet();
-	newBullet->Initialize(model_, GetWorldPosition(), velocity);
-	newBullet->SetPlayer(player_);
-
-	// 弾を登録
-	gameScene_->AddEnemeyBullet(newBullet);
-}
-
-void Enemy::OnCollision() { isDead_ = true; }
-
 void Enemy::Update() {
 	// 状態遷移
 	state_->Update(this);
-	
-	// 終了した弾を削除
-	bullets_.remove_if([](EnemyBullet* bullet) {
-		if (bullet->isDead()) {
-			delete bullet;
-			return true;
-		}
-		return false;
-	});
-	// 弾の更新
-	for (EnemyBullet* bullet : bullets_) {
-		bullet->Update();
-	}
 
 	// 行列の更新
 	worldTransform_.UpdateMatrix();
@@ -98,18 +86,9 @@ void Enemy::Update() {
 	worldTransform_.TransferMatrix();
 }
 
-void Enemy::ChangeState(BaseEnemyState* pState) {
-	delete state_;
-	state_ = pState;
-}
-
 void Enemy::Draw(ViewProjection& viewProjection) {
 	// enemy
 	model_->Draw(worldTransform_, viewProjection, enemyTexture_);
-	// 弾
-	for (EnemyBullet* bullet : bullets_) {
-		bullet->Draw(viewProjection);
-	}
 }
 
 EnemyStateApproach::~EnemyStateApproach() {
@@ -128,7 +107,8 @@ void EnemyStateApproach::FireAndResetTimer() {
 
 void EnemyStateApproach::Initialize(Enemy* enemy) {
 	enemy_ = enemy;
-	FireAndResetTimer();
+	// 発射タイマーをセットする
+	timedCalls_.push_back(new TimedCall(std::bind(&EnemyStateApproach::FireAndResetTimer, this), kFireInterval));
 }
 
 void EnemyStateApproach::Update(Enemy* enemy) {

@@ -6,6 +6,8 @@
 #include "math/MyMatrix.h"
 #include <cassert>
 
+void EnemyBullet::OnCollision() { isDead_ = true; }
+
 Vector3 EnemyBullet::GetWorldPosition() {
 	// ワールド座標を入れる変数
 	Vector3 worldPos{};
@@ -47,8 +49,6 @@ void EnemyBullet::Initialize(Model* model, const Vector3& pos, const Vector3& ve
 	// 引数で受け取った速度をメンバ変数に代入
 	velocity_ = velocity;
 }
-
-void EnemyBullet::OnCollision() { isDead_ = true; }
 
 void EnemyBullet::Update() {
 	Vector3 toPlayer = Subtract(player_->GetWorldPosition(), worldTransform_.translation_);

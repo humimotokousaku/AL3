@@ -7,32 +7,24 @@
 #include "Model.h"
 #include <list>
 
+class GameScene;
+
 class Player : public Collider {
 public:
+	// 衝突を検出したら呼び出されるコールバック関数
+	void OnCollision() override;
+
 	// ワールド行列の平行移動成分を取得
 	Vector3 GetWorldPosition() override;
 
-	// 弾リストを取得
-	const std::list<PlayerBullet*>& GetBullets() const { return bullets_; }
-public:	
+	void SetGameScene(GameScene* gameScene) { gameScene_ = gameScene; }
+
 	/// <summary>
 	/// 親となるワールドトランスフォームをセット
 	/// </summary>
 	/// <param name="parent">親となるワールドトランスフォーム</param>
 	void SetParent(const WorldTransform* parent);
-	
-	Player();
 
-	/// <summary>
-	/// デストラクタ
-	/// </summary>
-	~Player();
-
-	/// <summary>
-	/// 初期化
-	/// <summary>
-	void Initialize(Model* model, uint32_t textureHandle, const Vector3& pos);
-	
 	// playerの回転
 	void Rotate();
 
@@ -40,9 +32,14 @@ public:
 	/// 攻撃
 	/// </summary>
 	void Attack();
-
-	// 衝突を検出したら呼び出されるコールバック関数
-	void OnCollision() override;
+	
+	Player();
+	~Player();
+	
+	/// <summary>
+	/// 初期化
+	/// <summary>
+	void Initialize(Model* model, uint32_t textureHandle, const Vector3& pos);
 
 	/// <summary>
 	/// 更新
@@ -73,8 +70,7 @@ public:
 	// テクスチャハンドル
 	uint32_t playerTexture_ = 0u;
 
-	// 弾
-	std::list<PlayerBullet*> bullets_;
+	GameScene* gameScene_;
 
 	bool isDead_ = true;
 };

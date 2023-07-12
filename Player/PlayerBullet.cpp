@@ -3,6 +3,9 @@
 #include "Collision/CollisionConfig.h"
 #include "WorldTransform.h"
 #include <cassert>
+#include "ImGuiManager.h"
+
+void PlayerBullet::OnCollision() { isDead_ = true; }
 
 Vector3 PlayerBullet::GetWorldPosition() {
 	// ワールド座標を入れる変数
@@ -37,10 +40,6 @@ void PlayerBullet::Initialize(Model* model, const Vector3& pos, const Vector3& v
 	velocity_ = velocity;
 }
 
-void PlayerBullet::OnCollision() { 
-	isDead_ = true; 
-}
-
 void PlayerBullet::Update() {
 	// Y軸周り角度(θy)
 	worldTransform_.rotation_.y = std::atan2(velocity_.x, velocity_.z);
@@ -60,6 +59,13 @@ void PlayerBullet::Update() {
 	if (--deathTimer_ <= 0) {
 		isDead_ = true;
 	}
+	// playerの座標表示
+	ImGui::Begin(" ");
+	// float3スライダー
+	ImGui::Text(
+	    "x%f  y%f   z%f", worldTransform_.translation_.x, worldTransform_.translation_.y,
+	    worldTransform_.translation_.z);
+	ImGui::End();
 }
 
 void PlayerBullet::Draw(const ViewProjection& viewProjection) {

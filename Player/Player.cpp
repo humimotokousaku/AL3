@@ -4,6 +4,10 @@
 #include "WorldTransform.h"
 #include <cassert>
 #include "ImGuiManager.h"
+#include "GameScene.h"
+
+
+void Player::OnCollision() {}
 
 Vector3 Player::GetWorldPosition() { 
 	// ワールド座標を入れる変数
@@ -19,37 +23,6 @@ Vector3 Player::GetWorldPosition() {
 void Player::SetParent(const WorldTransform* parent) {
 	// 親子関係を結ぶ
 	worldTransform_.parent_ = parent;
-}
-
-Player::Player() {}
-Player::~Player() {
-	for (PlayerBullet* bullet : bullets_) {
-		delete bullet;
-	}
-}
-
-// Initializeの関数定義
-void Player::Initialize(Model* model, uint32_t textureHandle, const Vector3& pos) {
-	// NULLポインタチェック
-	assert(model);
-
-	// シングルトンインスタンスを取得する
-	input_ = Input::GetInstance();
-
-	// 引数として受け取ったデータをメンバ変数に記録する
-	model_ = model;
-	playerTexture_ = textureHandle;
-
-	// 衝突属性を設定
-	SetCollisionAttribute(kCollisionAttributePlayer);
-	// 衝突対象を自分の属性以外に設定
-	SetCollisionMask(~kCollisionAttributePlayer);
-
-	// 引数で受け取った初期座標をセット
-	worldTransform_.translation_ = pos;
-
-	// ワールド変換の初期化
-	worldTransform_.Initialize();
 }
 
 // playerの回転
@@ -79,11 +52,36 @@ void Player::Attack() {
 		newBullet->Initialize(model_, worldPos, velocity);
 
 		// 弾を登録
-		bullets_.push_back(newBullet);
+		gameScene_->AddPlayerBullet(newBullet);
 	}
 }
 
-void Player::OnCollision() { isDead_ = true; }
+Player::Player() {}
+Player::~Player() {}
+
+// Initializeの関数定義
+void Player::Initialize(Model* model, uint32_t textureHandle, const Vector3& pos) {
+	// NULLポインタチェック
+	assert(model);
+
+	// シングルトンインスタンスを取得する
+	input_ = Input::GetInstance();
+
+	// 引数として受け取ったデータをメンバ変数に記録する
+	model_ = model;
+	playerTexture_ = textureHandle;
+
+	// 衝突属性を設定
+	SetCollisionAttribute(kCollisionAttributePlayer);
+	// 衝突対象を自分の属性以外に設定
+	SetCollisionMask(~kCollisionAttributePlayer);
+
+	// 引数で受け取った初期座標をセット
+	worldTransform_.translation_ = pos;
+
+	// ワールド変換の初期化
+	worldTransform_.Initialize();
+}
 
 // Updateの関数定義
 void Player::Update() {
@@ -142,25 +140,12 @@ void Player::Update() {
 	// 弾の処理
 	Attack();
 
-	// 死亡フラグの立った球を削除
-	bullets_.remove_if([](PlayerBullet* bullet) {
-		if (bullet->IsDead()) {
-			delete bullet;
-			return true;
-		}
-		return false;
-	});
-	// 弾の更新
-	for (PlayerBullet* bullet : bullets_) {
-		bullet->Update();
-	}
-
 	// 行列を定数バッファに転送
 	worldTransform_.TransferMatrix();
 
 	// playerの座標表示
 	ImGui::Begin(" ");
-	ImGui::Text("KeysInfo   SPACE:bullet  A,D:Rotate  C:DebugCamera  ");
+	ImGui::Text("KeysInfo   SPACE:bullet  A,D:Rotate");
 	// float3スライダー
 	ImGui::SliderFloat3("Player", *inputFloat3, -30.0f, 30.0f);
 	ImGui::End();
@@ -170,8 +155,4 @@ void Player::Update() {
 void Player::Draw(ViewProjection& viewProjection) {
 	// player
 	model_->Draw(worldTransform_, viewProjection, playerTexture_);
-	// 弾
-	for (PlayerBullet* bullet : bullets_) {
-		bullet->Draw(viewProjection);
-	}
 }

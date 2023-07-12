@@ -57,27 +57,26 @@ public:
 
 class Enemy : public Collider {
 public: // メンバ関数
-	// 座標取得
-	Vector3 GetEnemyPos() { return this->worldTransform_.translation_; }
+	// 衝突を検出したら呼び出されるコールバック関数
+	void OnCollision() override;
 
 	// ワールド行列の平行移動成分を取得
 	Vector3 GetWorldPosition() override;
+	// 座標取得
+	Vector3 GetEnemyPos() { return this->worldTransform_.translation_; }
 
-	// 弾リストを取得
-	const std::list<EnemyBullet*>& GetBullets() const { return bullets_; }
-
+	// Setter
 	void SetPlayer(Player* player) { player_ = player; }
-
 	void SetGameScene(GameScene* gameScene) { gameScene_ = gameScene; }
 
-public:
-	Enemy();
-	~Enemy();
+	// 完了ならtrueを返す
+	bool isDead() const { return isDead_; }
 
 	/// <summary>
-	/// 初期化
+	/// stateの変更
 	/// </summary>
-	void Initialize(Model* model, const Vector3& pos);
+	/// <param name="pState">state</param>
+	void ChangeState(BaseEnemyState* pState);
 
 	/// <summary>
 	/// 移動処理
@@ -90,22 +89,18 @@ public:
 	/// </summary>
 	void Fire();
 
-	// 衝突を検出したら呼び出されるコールバック関数
-	void OnCollision() override;
+	Enemy();
+	~Enemy();
 
-	// 完了ならtrueを返す
-	bool isDead() const { return isDead_; }
+	/// <summary>
+	/// 初期化
+	/// </summary>
+	void Initialize(Model* model, const Vector3& pos);
 
 	/// <summary>
 	/// 更新処理
 	/// </summary>
 	void Update();
-
-	/// <summary>
-	/// stateの変更
-	/// </summary>
-	/// <param name="pState">state</param>
-	void ChangeState(BaseEnemyState* pState);
 
 	/// <summary>
 	/// 描画
@@ -123,14 +118,11 @@ private:
 	// テクスチャハンドル
 	uint32_t enemyTexture_ = 0u;
 
-	// 弾
-	std::list<EnemyBullet*> bullets_;
-
 	// 自キャラ
 	Player* player_ = nullptr;
 
 	// ゲームシーン
-	GameScene* gameScene_;
+	GameScene* gameScene_ = nullptr;
 
 	bool isDead_ = false;
 };

@@ -8,8 +8,14 @@
 /// </summary>
 class PlayerBullet : public Collider{
 public: // メンバ関数
+	// 衝突を検出したら呼び出されるコールバック関数
+	void OnCollision() override;
+
 	// ワールド行列の平行移動成分を取得
 	Vector3 GetWorldPosition() override;
+
+	// 完了ならtrueを返す
+	bool IsDead() const { return isDead_; }
 
 	/// <summary>
 	/// 初期化
@@ -17,9 +23,6 @@ public: // メンバ関数
 	/// <param name="model">モデル</param>
 	/// <param name="pos">初期座標</param>
 	void Initialize(Model* model, const Vector3& pos, const Vector3& velocity);
-
-	// 衝突を検出したら呼び出されるコールバック関数
-	void OnCollision() override;
 
 	/// <summary>
 	/// 更新
@@ -32,9 +35,6 @@ public: // メンバ関数
 	/// <param name="viewProjection">ビュープロジェクション</param>
 	void Draw(const ViewProjection& viewProjection);
 	
-	// 完了ならtrueを返す
-	bool IsDead() const { return isDead_; }
-
 private: // メンバ変数
 	// ワールド変換データ
 	WorldTransform worldTransform_;
@@ -44,7 +44,7 @@ private: // メンバ変数
 	uint32_t bulletTexture_ = 0u;
 
 	// 寿命<frm>
-	static const int32_t kLifeTime = 60 * 5;
+	static const int32_t kLifeTime = 60 * 4;
 	// 死亡タイマー
 	int32_t deathTimer_ = kLifeTime;
 	// 死亡フラグ
