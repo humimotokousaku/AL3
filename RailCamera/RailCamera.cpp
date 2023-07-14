@@ -18,7 +18,7 @@ void RailCamera::Initialize(WorldTransform worldTransform, const Vector3& radian
 void RailCamera::Update() {
 	const Vector3 kSpeed{0.0f, 0.0f, 0.02f};
 	Vector3 radian{0.0f, 0.001f, 0.0f};
-	worldTransform_.translation_ = Add(worldTransform_.translation_, kSpeed);
+	//worldTransform_.translation_ = Add(worldTransform_.translation_, kSpeed);
 
 	// 回転処理
 	//worldTransform_.rotation_ = Add(worldTransform_.rotation_, radian);

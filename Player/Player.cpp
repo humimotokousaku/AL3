@@ -43,13 +43,13 @@ void Player::DeployReticle() {
 	// 自機から3Dレティクルへのオフセット(Z+向き)
 	Vector3 offset{0, 0, 1.0f};
 	// 自機のワールド行列の回転を反映する
-	offset = Multiply(offset, GetWorldMatrix());
+	offset = Multiply(offset, worldTransform_.matWorld_);
 	// ベクトルの長さを整える
-	offset.x = Normalize(offset).x * kDistancePlayerTo3DReticle;
-	offset.y = Normalize(offset).y * kDistancePlayerTo3DReticle;
+	offset.x = Normalize(offset).x;
+	offset.y = Normalize(offset).y;
 	offset.z = Normalize(offset).z * kDistancePlayerTo3DReticle;
 	// 3Dレティクルの座標を設定
-	worldTransform3DReticle_.translation_ = Add(GetWorldPosition(), offset);
+	worldTransform3DReticle_.translation_ = Add(offset, worldTransform_.translation_);
 	worldTransform3DReticle_.UpdateMatrix();
 }
 
@@ -116,9 +116,6 @@ void Player::Initialize(Model* model, uint32_t textureHandle, const Vector3& pos
 // Updateの関数定義
 void Player::Update() {
 
-	// 3Dレティクルの配置
-	DeployReticle();
-
 	// キャラクターの移動ベクトル
 	Vector3 move = {0, 0, 0};
 
@@ -171,6 +168,8 @@ void Player::Update() {
 
 	worldTransform_.UpdateMatrix();
 
+		// 3Dレティクルの配置
+	DeployReticle();
 
 	// 弾の処理
 	Attack();
