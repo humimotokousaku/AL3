@@ -1,4 +1,7 @@
-﻿#include "Enemy/Enemy.h"
+﻿#include "Enemy.h"
+#include "EnemyStateApproach.h"
+#include "EnemyStateLeave.h"
+
 #include "math/MyMatrix.h"
 #include "WorldTransform.h"
 #include <cassert>
@@ -37,7 +40,7 @@ void Enemy::Update() {
 	state_->Update(this); 
 }
 
-void Enemy::ChangeState(BaseEnemyState* pState) {
+void Enemy::ChangeState(IEnemyState* pState) {
 	delete state_;
 	state_ = pState;
 }
@@ -47,23 +50,23 @@ void Enemy::Draw(ViewProjection& viewProjection) {
 	model_->Draw(worldTransform_, viewProjection, enemyTexture_);
 }
 
-void EnemyStateApproach::Update(Enemy* enemy) { 
-	// 移動速度
-	const Vector3 kMoveSpeed = {0, 0, -0.25f};
+//void EnemyStateApproach::Update(Enemy* enemy) { 
+//	// 移動速度
+//	const Vector3 kMoveSpeed = {0, 0, -0.25f};
+//
+//	// 移動処理
+//	enemy->Move(kMoveSpeed);
+//
+//	// 既定の位置に到達したら離脱
+//	if (enemy->GetEnemyPos().z < 0.0f) {
+//		enemy->ChangeState(new EnemyStateLeave());
+//	}
+//}
 
-	// 移動処理
-	enemy->Move(kMoveSpeed);
-
-	// 既定の位置に到達したら離脱
-	if (enemy->GetEnemyPos().z < 0.0f) {
-		enemy->ChangeState(new EnemyStateLeave());
-	}
-}
-
-void EnemyStateLeave::Update(Enemy* enemy) { 
-	// 移動速度
-	const Vector3 kMoveSpeed = {-0.25f, 0.25f, -0.25f};
-
-	// 移動処理
-	enemy->Move(kMoveSpeed);
-}
+//void EnemyStateLeave::Update(Enemy* enemy) { 
+//	// 移動速度
+//	const Vector3 kMoveSpeed = {-0.25f, 0.25f, -0.25f};
+//
+//	// 移動処理
+//	enemy->Move(kMoveSpeed);
+//}

@@ -1,32 +1,7 @@
 ﻿#pragma once
 #include "Model.h"
 #include "WorldTransform.h"
-
-class Enemy;	// 前方宣言
-
-// 基底クラス
-class BaseEnemyState {
-public:
-	// 純粋仮想関数
-	virtual void Update(Enemy* enemy) = 0;
-
-public:
-
-};
-
-// 接近フェーズのクラス
-class EnemyStateApproach : public BaseEnemyState{
-public:
-
-	void Update(Enemy* enemy);
-};
-
-// 離脱フェーズのクラス
-class EnemyStateLeave : public BaseEnemyState {
-public:
-
-	void Update(Enemy* enemy);
-};
+#include "IEnemyState.h"
 
 class Enemy{
 public:
@@ -53,7 +28,7 @@ public:
 	/// stateの変更
 	/// </summary>
 	/// <param name="pState">state</param>
-	void ChangeState(BaseEnemyState* pState);
+	void ChangeState(IEnemyState* pState);
 
 	/// <summary>
 	/// 描画
@@ -62,7 +37,7 @@ public:
 
 private:
 	
-	BaseEnemyState* state_;
+	IEnemyState* state_;
 
 	// ワールド変換データ
 	WorldTransform worldTransform_;
