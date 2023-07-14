@@ -92,6 +92,8 @@ private: // メンバ変数
 
 	// テクスチャハンドル
 	uint32_t playerTexture_ = 0;
+	// 3Dレティクル
+	uint32_t reticleTexture_ = 0;
 	// 3Dモデルデータ
 	Model* model_ = nullptr;
 	// 天球の3Dモデル

@@ -17,6 +17,8 @@ public:
 	// ワールド行列の平行移動成分を取得
 	Vector3 GetWorldPosition() override;
 
+	Matrix4x4 GetWorldMatrix() { return worldTransform_.matWorld_; }
+
 	void SetGameScene(GameScene* gameScene) { gameScene_ = gameScene; }
 
 	/// <summary>
@@ -29,6 +31,11 @@ public:
 	void Rotate();
 
 	/// <summary>
+	/// レティクルの配置
+	/// </summary>
+	void DeployReticle();
+
+	/// <summary>
 	/// 攻撃
 	/// </summary>
 	void Attack();
@@ -39,7 +46,8 @@ public:
 	/// <summary>
 	/// 初期化
 	/// <summary>
-	void Initialize(Model* model, uint32_t textureHandle, const Vector3& pos);
+	void Initialize(
+	    Model* model, uint32_t textureHandle, const Vector3& pos);
 
 	/// <summary>
 	/// 更新
@@ -64,11 +72,15 @@ public:
 
 	// ワールド変換データ
 	WorldTransform worldTransform_;
+	// 3Dレティクル用ワールドトランスフォーム
+	WorldTransform worldTransform3DReticle_;
 
 	// モデル
 	Model* model_ = nullptr;
 	// テクスチャハンドル
 	uint32_t playerTexture_ = 0u;
+	// レティクルハンドル
+	uint32_t reticleTexture_ = 0u;
 
 	GameScene* gameScene_;
 

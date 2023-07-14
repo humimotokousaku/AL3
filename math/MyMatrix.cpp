@@ -156,7 +156,6 @@ Matrix4x4 MakeScaleMatrix(const Vector3& scale) {
 	return result;
 }
 
-
 // 逆行列
 Matrix4x4 Inverse(const Matrix4x4& m) {
 	Matrix4x4 result{};

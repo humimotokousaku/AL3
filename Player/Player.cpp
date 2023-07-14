@@ -1,17 +1,16 @@
 ﻿#include "Player/Player.h"
-#include "math/MyMatrix.h"
 #include "Collision/CollisionConfig.h"
-#include "WorldTransform.h"
-#include <cassert>
-#include "ImGuiManager.h"
 #include "GameScene.h"
-
+#include "ImGuiManager.h"
+#include "WorldTransform.h"
+#include "math/MyMatrix.h"
+#include <cassert>
 
 void Player::OnCollision() {}
 
-Vector3 Player::GetWorldPosition() { 
+Vector3 Player::GetWorldPosition() {
 	// ワールド座標を入れる変数
-	Vector3 worldPos; 
+	Vector3 worldPos;
 	// ワールド行列の平行移動成分を取得
 	worldPos.x = worldTransform_.matWorld_.m[3][0];
 	worldPos.y = worldTransform_.matWorld_.m[3][1];
@@ -38,6 +37,22 @@ void Player::Rotate() {
 	}
 }
 
+void Player::DeployReticle() {
+	// 自機から3Dレティクルへの距離
+	const float kDistancePlayerTo3DReticle = 50.0f;
+	// 自機から3Dレティクルへのオフセット(Z+向き)
+	Vector3 offset{0, 0, 1.0f};
+	// 自機のワールド行列の回転を反映する
+	offset = Multiply(offset, GetWorldMatrix());
+	// ベクトルの長さを整える
+	offset.x = Normalize(offset).x * kDistancePlayerTo3DReticle;
+	offset.y = Normalize(offset).y * kDistancePlayerTo3DReticle;
+	offset.z = Normalize(offset).z * kDistancePlayerTo3DReticle;
+	// 3Dレティクルの座標を設定
+	worldTransform3DReticle_.translation_ = Add(GetWorldPosition(), offset);
+	worldTransform3DReticle_.UpdateMatrix();
+}
+
 // 攻撃
 void Player::Attack() {
 	if (input_->TriggerKey(DIK_SPACE)) {
@@ -47,6 +62,15 @@ void Player::Attack() {
 		// 速度ベクトルを自機の向きに合わせて回転させる
 		Vector3 worldPos = GetWorldPosition();
 		velocity = TransformNormal(velocity, worldTransform_.matWorld_);
+		// 自機から照準オブジェクトへのベクトル
+		Vector3 worldReticlePos = {
+		    worldTransform3DReticle_.matWorld_.m[3][0], worldTransform3DReticle_.matWorld_.m[3][1],
+		    worldTransform3DReticle_.matWorld_.m[3][2]};
+		velocity = Subtract(worldReticlePos, GetWorldPosition());
+		velocity.x = Normalize(velocity).x * kBulletSpeed;
+		velocity.y = Normalize(velocity).y * kBulletSpeed;
+		velocity.z = Normalize(velocity).z * kBulletSpeed;
+		
 		// 弾を生成し、初期化
 		PlayerBullet* newBullet = new PlayerBullet();
 		newBullet->Initialize(model_, worldPos, velocity);
@@ -67,6 +91,10 @@ void Player::Initialize(Model* model, uint32_t textureHandle, const Vector3& pos
 	// シングルトンインスタンスを取得する
 	input_ = Input::GetInstance();
 
+	// テクスチャ読み込み
+	// レティクル
+	reticleTexture_ = TextureManager::Load("black.png");
+
 	// 引数として受け取ったデータをメンバ変数に記録する
 	model_ = model;
 	playerTexture_ = textureHandle;
@@ -81,10 +109,16 @@ void Player::Initialize(Model* model, uint32_t textureHandle, const Vector3& pos
 
 	// ワールド変換の初期化
 	worldTransform_.Initialize();
+	// 3Dレティクルのワールドトランスフォーム初期化
+	worldTransform3DReticle_.Initialize();
 }
 
 // Updateの関数定義
 void Player::Update() {
+
+	// 3Dレティクルの配置
+	DeployReticle();
+
 	// キャラクターの移動ベクトル
 	Vector3 move = {0, 0, 0};
 
@@ -137,6 +171,7 @@ void Player::Update() {
 
 	worldTransform_.UpdateMatrix();
 
+
 	// 弾の処理
 	Attack();
 
@@ -148,6 +183,10 @@ void Player::Update() {
 	ImGui::Text("KeysInfo   SPACE:bullet  A,D:Rotate");
 	// float3スライダー
 	ImGui::SliderFloat3("Player", *inputFloat3, -30.0f, 30.0f);
+	ImGui::Text(
+	    "Reticle x%f  y%f  z%f", worldTransform3DReticle_.translation_.x,
+	    worldTransform3DReticle_.translation_.y, worldTransform3DReticle_.translation_.z);
+
 	ImGui::End();
 }
 
@@ -155,4 +194,6 @@ void Player::Update() {
 void Player::Draw(ViewProjection& viewProjection) {
 	// player
 	model_->Draw(worldTransform_, viewProjection, playerTexture_);
+	// 3Dレティクルを描画
+	model_->Draw(worldTransform3DReticle_, viewProjection);
 }
