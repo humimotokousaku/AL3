@@ -139,6 +139,7 @@ void GameScene::Initialize() {
 
 	// ファイル名を指定してテクスチャを読み込む
 	playerTexture_ = TextureManager::Load("sample.png");
+	TextureManager::Load("reticle.png");
 	// 3Dモデルの生成
 	model_ = Model::Create();
 	// 天球の3Dモデルの生成
@@ -174,6 +175,12 @@ void GameScene::Initialize() {
 
 void GameScene::Update() {
 	viewProjection_.UpdateMatrix();
+
+	// デバッグカメラの更新
+	railCamera_->Update();
+	viewProjection_.matView = railCamera_->GetViewProjection().matView;
+	viewProjection_.matProjection = railCamera_->GetViewProjection().matProjection;
+
 	// 敵の出現するタイミングと座標
 	UpdateEnemyPopCommands();
 	// 敵の削除
@@ -202,7 +209,7 @@ void GameScene::Update() {
 		return false;
 	});
 	// 自キャラの更新
-	player_->Update();
+	player_->Update(viewProjection_);
 	// 終了した弾を削除
 	playerBullets_.remove_if([](PlayerBullet* bullet) {
 		if (bullet->IsDead()) {
@@ -224,10 +231,10 @@ void GameScene::Update() {
 	// 衝突マネージャー(当たり判定)
 	collisionManager_->CheckAllCollisions(this,player_);
 
-	// デバッグカメラの更新
-	railCamera_->Update();
-	viewProjection_.matView = railCamera_->GetViewProjection().matView;
-	viewProjection_.matProjection = railCamera_->GetViewProjection().matProjection;
+	//// デバッグカメラの更新
+	//railCamera_->Update();
+	//viewProjection_.matView = railCamera_->GetViewProjection().matView;
+	//viewProjection_.matProjection = railCamera_->GetViewProjection().matProjection;
 
 	// ビュープロジェクション行列の転送
 	viewProjection_.TransferMatrix();
@@ -293,6 +300,8 @@ void GameScene::Draw() {
 	/// <summary>
 	/// ここに前景スプライトの描画処理を追加できる
 	/// </summary>
+	// 2Dレティクル
+	player_->DrawUI();
 
 	// スプライト描画後処理
 	Sprite::PostDraw();

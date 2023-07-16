@@ -66,3 +66,7 @@ Vector3 Normalize(const Vector3& v);
 
 // ベクトル変換
 Vector3 TransformNormal(const Vector3& v, const Matrix4x4& m);
+
+
+// ビューポート変換行列
+Matrix4x4 MakeViewportMatrix(float left, float top, float width, float height, float minDepth, float maxDepth);

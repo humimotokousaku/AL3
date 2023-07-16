@@ -7,7 +7,7 @@ class RailCamera {
 public:
 	ViewProjection& GetViewProjection() { return viewProjection_; }
 
-	const WorldTransform& GetWorldTransform() const { return worldTransform_; }
+	const WorldTransform& GetWorldTransform(){ return worldTransform_; }
 
 	/// <summary>
 	/// 初期化

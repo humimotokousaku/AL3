@@ -11,6 +11,7 @@ void RailCamera::Initialize(WorldTransform worldTransform, const Vector3& radian
 
 	// 引数で受け取った初期座標をセット
 	worldTransform_.rotation_ = radian;
+
 	// ビュープロジェクションの初期化
 	viewProjection_.Initialize();
 }

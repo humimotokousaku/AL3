@@ -5,6 +5,7 @@
 #include "Vector4.h"
 #include "Input.h"
 #include "Model.h"
+#include "Sprite.h"
 #include <list>
 
 class GameScene;
@@ -17,7 +18,7 @@ public:
 	// ワールド行列の平行移動成分を取得
 	Vector3 GetWorldPosition() override;
 
-	Matrix4x4 GetWorldMatrix() { return worldTransform_.matWorld_; }
+	Vector3 GetWorld3DReticlePosition();
 
 	void SetGameScene(GameScene* gameScene) { gameScene_ = gameScene; }
 
@@ -52,7 +53,12 @@ public:
 	/// <summary>
 	/// 更新
 	/// <summary>
-	void Update();
+	void Update(const ViewProjection& viewProjection);
+
+	/// <summary>
+	/// UI描画
+	/// </summary>
+	void DrawUI();
 
 	/// <summary>
 	/// 描画
@@ -81,6 +87,10 @@ public:
 	uint32_t playerTexture_ = 0u;
 	// レティクルハンドル
 	uint32_t reticleTexture_ = 0u;
+
+	// 2Dレティクル用のスプライト
+	Sprite* sprite2DReticle_ = nullptr;
+
 
 	GameScene* gameScene_;
 
