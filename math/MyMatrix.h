@@ -52,6 +52,8 @@ Vector3 Subtract(const Vector3& pos1, const Vector3& pos2);
 // ベクトルと行列の積
 Vector3 Multiply(Vector3 v, Matrix4x4 m);
 
+Vector3 Multiply(const float& scalar, const Vector3& v);
+
 // スカラー倍
 Vector3 Multiply(const Vector3& v1, const Vector3& v2);
 
@@ -66,7 +68,6 @@ Vector3 Normalize(const Vector3& v);
 
 // ベクトル変換
 Vector3 TransformNormal(const Vector3& v, const Matrix4x4& m);
-
 
 // ビューポート変換行列
 Matrix4x4 MakeViewportMatrix(float left, float top, float width, float height, float minDepth, float maxDepth);

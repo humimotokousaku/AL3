@@ -48,7 +48,7 @@ void Player::Rotate() {
 	}
 }
 
-void Player::DeployReticle() {
+void Player::Deploy3DReticle() {
 	// 自機から3Dレティクルへの距離
 	const float kDistancePlayerTo3DReticle = 50.0f;
 	// 自機から3Dレティクルへのオフセット(Z+向き)
@@ -69,7 +69,22 @@ void Player::DeployReticle() {
 	worldTransform3DReticle_.UpdateMatrix();
 }
 
-// 攻撃
+void Player::Deploy2DReticle(const ViewProjection& viewProjection) {
+	// 3Dレティクルのワールド座標を取得
+	Vector3 positionReticle = GetWorld3DReticlePosition();
+	// ビューポート行列
+	matViewport_ =
+	    MakeViewportMatrix(0, 0, WinApp::kWindowWidth, WinApp::kWindowHeight, 0, 1);
+	// ビュー行列とプロジェクション行列、ビューポート行列を合成する
+	Matrix4x4 matViewProjectionViewport{};
+	matViewProjectionViewport =
+	    Multiply(viewProjection.matView, Multiply(viewProjection.matProjection, matViewport_));
+	// ワールド→スクリーン座標変換
+	positionReticle = Transform(positionReticle, matViewProjectionViewport);
+	// スプライトのレティクルに座標設定
+	sprite2DReticle_->SetPosition(Vector2(positionReticle.x, positionReticle.y));
+}
+    // 攻撃
 void Player::Attack() {
 	if (input_->TriggerKey(DIK_SPACE)) {
 		// 弾の速度
@@ -191,22 +206,46 @@ void Player::Update(const ViewProjection& viewProjection) {
 #pragma endregion
 
 	worldTransform_.UpdateMatrix();
+
+	// 3Dレティクルの配置
+	Deploy3DReticle();
+	// 2Dレティクルの配置
+	Deploy2DReticle(viewProjection);
+
+	POINT mousePosition;
+	// マウス座標(スクリーン座標)を取得する
+	GetCursorPos(&mousePosition);
+
+	// クライアントエリア座標に変換する
+	HWND hwnd = WinApp::GetInstance()->GetHwnd();
+	ScreenToClient(hwnd, &mousePosition);
+	// 2Dレティクルのスプライトにマウス座標を代入
+	sprite2DReticle_->SetPosition(Vector2((float)mousePosition.x, (float)mousePosition.y));
+
+	// ビュープロジェクションビューポート合成行列
+	Matrix4x4 matVPV =
+	    Multiply(viewProjection.matView, Multiply(viewProjection.matProjection, matViewport_));
+	// 合成行列の逆行列を計算する
+	Matrix4x4 matInverseVPV = Inverse(matVPV);
+	// スクリーン座標
+	Vector3 posNear = Vector3((float)mousePosition.x, (float)mousePosition.y, 0);
+	Vector3 posFar = Vector3((float)mousePosition.x, (float)mousePosition.y, 1);
+
+	// スクリーン座標系からワールド座標系へ
+	posNear = Transform(posNear, matInverseVPV);
+	posFar = Transform(posFar, matInverseVPV);
+	// マウスレイの方向
+	Vector3 mouseDirection = Subtract(posFar, posNear);
+	mouseDirection = Normalize(mouseDirection);
+	// カメラから照準オブジェクトの距離
+	const float kDistanceTestObject = 10.0f;
+	Vector3 a = Subtract(mouseDirection, posNear);
+	worldTransform3DReticle_.translation_ =
+	    Multiply(kDistanceTestObject, Subtract(mouseDirection, posNear));
+	worldTransform3DReticle_.UpdateMatrix();
+
 	// 弾の処理
 	Attack();
-	// 3Dレティクルの配置
-	DeployReticle();
-
-	// 3Dレティクルのワールド座標を取得
-	Vector3 positionReticle = GetWorld3DReticlePosition();
-	// ビューポート行列
-	Matrix4x4 matViewport = MakeViewportMatrix(0, 0, WinApp::kWindowWidth, WinApp::kWindowHeight, 0, 1);
-	// ビュー行列とプロジェクション行列、ビューポート行列を合成する
-	Matrix4x4 matViewProjectionViewport{};
-	matViewProjectionViewport = Multiply(viewProjection.matView, Multiply(viewProjection.matProjection, matViewport));
-	// ワールド→スクリーン座標変換
-	positionReticle = Transform(positionReticle, matViewProjectionViewport);
-	// スプライトのレティクルに座標設定
-	sprite2DReticle_->SetPosition(Vector2(positionReticle.x, positionReticle.y));
 
 	// 行列を定数バッファに転送
 	worldTransform_.TransferMatrix();
@@ -216,6 +255,12 @@ void Player::Update(const ViewProjection& viewProjection) {
 	ImGui::Text("KeysInfo   SPACE:bullet  A,D:Rotate");
 	// float3スライダー
 	ImGui::SliderFloat3("Player", *inputFloat3, -30.0f, 30.0f);
+	ImGui::Text("2DReticle:(%f,%f)", sprite2DReticle_->GetPosition().x, sprite2DReticle_->GetPosition().y);
+	ImGui::Text("Near(%+.2f,%+.2f,%+.2f)", posNear.x, posNear.y, posNear.z);
+	ImGui::Text("Far(%+.2f,%+.2f,%+.2f)", posFar.x, posFar.y, posFar.z);
+	ImGui::Text(
+	    "3Dreticle:(%+.2f,%+.2f,%+.2f)", worldTransform3DReticle_.translation_.x,
+	    worldTransform3DReticle_.translation_.y, worldTransform3DReticle_.translation_.z);
 	ImGui::End();
 }
 
@@ -227,6 +272,6 @@ void Player::DrawUI() {
 void Player::Draw(ViewProjection& viewProjection) {
 	// player
 	model_->Draw(worldTransform_, viewProjection, playerTexture_);
-// 3Dレティクルを描画
+	// 3Dレティクルを描画
 	model_->Draw(worldTransform3DReticle_, viewProjection);
 }

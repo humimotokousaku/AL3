@@ -331,6 +331,14 @@ Vector3 Multiply(Vector3 v, Matrix4x4 m) {
 	return result;
 }
 
+Vector3 Multiply(const float& scalar, const Vector3& v) {
+	Vector3 result;
+	result.x = v.x * scalar;
+	result.y = v.y * scalar;
+	result.z = v.z * scalar;
+	return result;
+}
+
 // 3次元アフィン変換行列
 Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Vector3& rotate, const Vector3& translate) {
 	// 計算結果

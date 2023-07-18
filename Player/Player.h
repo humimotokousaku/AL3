@@ -32,9 +32,14 @@ public:
 	void Rotate();
 
 	/// <summary>
-	/// レティクルの配置
+	/// 3Dレティクルの配置
 	/// </summary>
-	void DeployReticle();
+	void Deploy3DReticle();
+
+	/// <summary>
+	/// 2Dレティクルの配置
+	/// </summary>
+	void Deploy2DReticle(const ViewProjection& viewProjection);
 
 	/// <summary>
 	/// 攻撃
@@ -87,10 +92,10 @@ public:
 	uint32_t playerTexture_ = 0u;
 	// レティクルハンドル
 	uint32_t reticleTexture_ = 0u;
-
 	// 2Dレティクル用のスプライト
 	Sprite* sprite2DReticle_ = nullptr;
 
+	Matrix4x4 matViewport_;
 
 	GameScene* gameScene_;
 
