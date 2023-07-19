@@ -203,10 +203,30 @@ void Player::Update(const ViewProjection& viewProjection) {
 	// ビュー行列とプロジェクション行列、ビューポート行列を合成する
 	Matrix4x4 matViewProjectionViewport{};
 	matViewProjectionViewport = Multiply(viewProjection.matView, Multiply(viewProjection.matProjection, matViewport));
+
+	// ロックオン
+	for (Enemy* enemy : enemy_) {
+		Vector3 enemyPos = enemy_->GetWorldPosition();
+	}
+
+	enemyPos = Transform(enemyPos, matViewProjectionViewport);
+
 	// ワールド→スクリーン座標変換
 	positionReticle = Transform(positionReticle, matViewProjectionViewport);
+
+	Vector3 a = {
+	    enemyPos.x - positionReticle.x, enemyPos.y - positionReticle.y,
+	    enemyPos.z - positionReticle.z};
+
 	// スプライトのレティクルに座標設定
+	if ((a.x * a.x) + (a.y * a.y) + (a.z * a.z) >= 20 * 20) {
+		
+	}
+	else {
+		positionReticle = enemyPos;
+	}
 	sprite2DReticle_->SetPosition(Vector2(positionReticle.x, positionReticle.y));
+
 
 	// 行列を定数バッファに転送
 	worldTransform_.TransferMatrix();

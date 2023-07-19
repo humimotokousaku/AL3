@@ -84,6 +84,10 @@ void Enemy::Update() {
 	worldTransform_.UpdateMatrix();
 	// 行列を定数バッファに転送
 	worldTransform_.TransferMatrix();
+
+	ImGui::Begin("enemy");
+	ImGui::Text("%f  %f  %f", &worldTransform_.translation_.x);
+	ImGui::End();
 }
 
 void Enemy::Draw(ViewProjection& viewProjection) {

@@ -8,6 +8,7 @@
 #include "Sprite.h"
 #include <list>
 
+class Enemy;
 class GameScene;
 
 class Player : public Collider {
@@ -21,6 +22,8 @@ public:
 	Vector3 GetWorld3DReticlePosition();
 
 	void SetGameScene(GameScene* gameScene) { gameScene_ = gameScene; }
+
+	void SetEnemy(Enemy* enemy) { enemy_ = enemy; }
 
 	/// <summary>
 	/// 親となるワールドトランスフォームをセット
@@ -91,6 +94,7 @@ public:
 	// 2Dレティクル用のスプライト
 	Sprite* sprite2DReticle_ = nullptr;
 
+	Enemy* enemy_;
 
 	GameScene* gameScene_;
 

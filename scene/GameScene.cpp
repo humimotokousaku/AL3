@@ -194,6 +194,7 @@ void GameScene::Update() {
 	// enemyの更新
 	for (Enemy* enemy : enemy_) {
 		enemy->Update();
+		//player_->SetEnemy(enemy);
 	}
 
 	// 弾の更新
@@ -208,8 +209,10 @@ void GameScene::Update() {
 		}
 		return false;
 	});
-	// 自キャラの更新
-	player_->Update(viewProjection_);
+
+		// 自キャラの更新
+		player_->Update(viewProjection_);
+
 	// 終了した弾を削除
 	playerBullets_.remove_if([](PlayerBullet* bullet) {
 		if (bullet->IsDead()) {
