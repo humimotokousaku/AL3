@@ -161,22 +161,27 @@ void Player::Update(const ViewProjection& viewProjection) {
 	// キャラクターの移動の速さ
 	const float kCharacterSpeed = 0.2f;
 
-#pragma region Move
+#pragma region Move	
 
-	// 押した方向で移動ベクトルを変更
+	XINPUT_STATE joyState;
+	// ゲームパッド状態取得
+	if (Input::GetInstance()->GetJoystickState(0, joyState)) {
+		move.x += (float)joyState.Gamepad.sThumbLX / SHRT_MAX * kCharacterSpeed;
+		move.y += (float)joyState.Gamepad.sThumbLY / SHRT_MAX * kCharacterSpeed;
+	}
 
-	// 左右
-	if (input_->PushKey(DIK_LEFT)) {
-		move.x -= kCharacterSpeed;
-	} else if (input_->PushKey(DIK_RIGHT)) {
-		move.x += kCharacterSpeed;
-	}
-	// 上下
-	if (input_->PushKey(DIK_UP)) {
-		move.y += kCharacterSpeed;
-	} else if (input_->PushKey(DIK_DOWN)) {
-		move.y -= kCharacterSpeed;
-	}
+	//// 左右
+	//if (input_->PushKey(DIK_LEFT)) {
+	//	move.x -= kCharacterSpeed;
+	//} else if (input_->PushKey(DIK_RIGHT)) {
+	//	move.x += kCharacterSpeed;
+	//}
+	//// 上下
+	//if (input_->PushKey(DIK_UP)) {
+	//	move.y += kCharacterSpeed;
+	//} else if (input_->PushKey(DIK_DOWN)) {
+	//	move.y -= kCharacterSpeed;
+	//}
 
 	// 移動限界座標
 	const Vector2 kMoveLimit = {40 - 10, 30 - 15};
@@ -208,7 +213,7 @@ void Player::Update(const ViewProjection& viewProjection) {
 	worldTransform_.UpdateMatrix();
 
 	// 3Dレティクルの配置
-	//Deploy3DReticle();
+	Deploy3DReticle();
 	// 2Dレティクルの配置
 	Deploy2DReticle(viewProjection);
 
@@ -223,10 +228,11 @@ void Player::Update(const ViewProjection& viewProjection) {
 	// 2Dレティクルのスプライトにマウス座標を代入
 	sprite2DReticle_->SetPosition(Vector2((float)mousePosition.x, (float)mousePosition.y));
 
+	Matrix4x4 matViewport = MakeViewportMatrix(0, 0, WinApp::kWindowWidth, WinApp::kWindowHeight, 0, 1);
 	// ビュープロジェクションビューポート合成行列
-	Matrix4x4 matVPV = Multiply(viewProjection.matView, Multiply(viewProjection.matProjection, matViewport_));
+	Matrix4x4 matVPV = Multiply(viewProjection.matView, Multiply(viewProjection.matProjection, matViewport));
 	// 合成行列の逆行列を計算する
-	Matrix4x4 matInverseVPV = InverseT(matVPV);
+	Matrix4x4 matInverseVPV = Inverse(matVPV);
 	// matInverseVPV * matVPV = 単位行列になっているかチェック
 	Matrix4x4 checkInverse = Multiply(matInverseVPV, matVPV);
 
@@ -241,11 +247,11 @@ void Player::Update(const ViewProjection& viewProjection) {
 	Vector3 mouseDirection = Subtract(posFar, posNear);
 	mouseDirection = Normalize(mouseDirection);
 	// カメラから照準オブジェクトの距離
-	const float kDistanceTestObject = 10.0f;
+	const float kDistanceTestObject = 50.0f;
 	// 3Dレティクルを2Dカーソルに配置
-	Vector3 a = Subtract(mouseDirection, posNear);
-	worldTransform3DReticle_.translation_ =
-	    Multiply(kDistanceTestObject, Subtract(mouseDirection, posNear));
+	worldTransform3DReticle_.translation_.x = posNear.x + mouseDirection.x * kDistanceTestObject;
+	worldTransform3DReticle_.translation_.y = posNear.y + mouseDirection.y * kDistanceTestObject;
+	worldTransform3DReticle_.translation_.z = posNear.z + mouseDirection.z * kDistanceTestObject;
 
 	worldTransform3DReticle_.UpdateMatrix();
 
