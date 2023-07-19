@@ -57,6 +57,8 @@ Vector3 Multiply(const float& scalar, const Vector3& v);
 // スカラー倍
 Vector3 Multiply(const Vector3& v1, const Vector3& v2);
 
+Matrix4x4 Multiply(const float& scalar, const Matrix4x4& v);
+
 // 内積
 float Dot(const Vector3& v1, const Vector3& v2);
 
@@ -71,3 +73,7 @@ Vector3 TransformNormal(const Vector3& v, const Matrix4x4& m);
 
 // ビューポート変換行列
 Matrix4x4 MakeViewportMatrix(float left, float top, float width, float height, float minDepth, float maxDepth);
+
+float Determinant(Matrix4x4 matrix);
+
+Matrix4x4 InverseT(Matrix4x4 m);

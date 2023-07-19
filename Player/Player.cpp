@@ -208,9 +208,10 @@ void Player::Update(const ViewProjection& viewProjection) {
 	worldTransform_.UpdateMatrix();
 
 	// 3Dレティクルの配置
-	Deploy3DReticle();
+	//Deploy3DReticle();
 	// 2Dレティクルの配置
 	Deploy2DReticle(viewProjection);
+
 
 	POINT mousePosition;
 	// マウス座標(スクリーン座標)を取得する
@@ -223,10 +224,12 @@ void Player::Update(const ViewProjection& viewProjection) {
 	sprite2DReticle_->SetPosition(Vector2((float)mousePosition.x, (float)mousePosition.y));
 
 	// ビュープロジェクションビューポート合成行列
-	Matrix4x4 matVPV =
-	    Multiply(viewProjection.matView, Multiply(viewProjection.matProjection, matViewport_));
+	Matrix4x4 matVPV = Multiply(viewProjection.matView, Multiply(viewProjection.matProjection, matViewport_));
 	// 合成行列の逆行列を計算する
-	Matrix4x4 matInverseVPV = Inverse(matVPV);
+	Matrix4x4 matInverseVPV = InverseT(matVPV);
+	// matInverseVPV * matVPV = 単位行列になっているかチェック
+	Matrix4x4 checkInverse = Multiply(matInverseVPV, matVPV);
+
 	// スクリーン座標
 	Vector3 posNear = Vector3((float)mousePosition.x, (float)mousePosition.y, 0);
 	Vector3 posFar = Vector3((float)mousePosition.x, (float)mousePosition.y, 1);
@@ -239,9 +242,11 @@ void Player::Update(const ViewProjection& viewProjection) {
 	mouseDirection = Normalize(mouseDirection);
 	// カメラから照準オブジェクトの距離
 	const float kDistanceTestObject = 10.0f;
+	// 3Dレティクルを2Dカーソルに配置
 	Vector3 a = Subtract(mouseDirection, posNear);
 	worldTransform3DReticle_.translation_ =
 	    Multiply(kDistanceTestObject, Subtract(mouseDirection, posNear));
+
 	worldTransform3DReticle_.UpdateMatrix();
 
 	// 弾の処理

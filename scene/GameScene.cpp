@@ -181,6 +181,8 @@ void GameScene::Update() {
 	viewProjection_.matView = railCamera_->GetViewProjection().matView;
 	viewProjection_.matProjection = railCamera_->GetViewProjection().matProjection;
 
+	// 自キャラの更新
+	player_->Update(viewProjection_);
 	// 敵の出現するタイミングと座標
 	UpdateEnemyPopCommands();
 	// 敵の削除
@@ -195,7 +197,6 @@ void GameScene::Update() {
 	for (Enemy* enemy : enemy_) {
 		enemy->Update();
 	}
-
 	// 弾の更新
 	for (EnemyBullet* bullet : enemyBullets_) {
 		bullet->Update();
@@ -208,8 +209,7 @@ void GameScene::Update() {
 		}
 		return false;
 	});
-	// 自キャラの更新
-	player_->Update(viewProjection_);
+
 	// 終了した弾を削除
 	playerBullets_.remove_if([](PlayerBullet* bullet) {
 		if (bullet->IsDead()) {
@@ -230,11 +230,6 @@ void GameScene::Update() {
 	collisionManager_->SetGameObject(player_, enemy_, enemyBullets_, playerBullets_);
 	// 衝突マネージャー(当たり判定)
 	collisionManager_->CheckAllCollisions(this,player_);
-
-	//// デバッグカメラの更新
-	//railCamera_->Update();
-	//viewProjection_.matView = railCamera_->GetViewProjection().matView;
-	//viewProjection_.matProjection = railCamera_->GetViewProjection().matProjection;
 
 	// ビュープロジェクション行列の転送
 	viewProjection_.TransferMatrix();
