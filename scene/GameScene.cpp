@@ -158,7 +158,7 @@ void GameScene::Initialize() {
 	// 自キャラの生成
 	player_ = new Player();
 	// 初期位置
-	Vector3 playerPosition(0, -2, 10);
+	Vector3 playerPosition(1, -2, -1);
 	// 自キャラの初期化
 	player_->Initialize(model_, playerTexture_, playerPosition);
 	player_->SetGameScene(this);

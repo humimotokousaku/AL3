@@ -1,7 +1,9 @@
 ﻿#pragma once
 #include "RailCamera/RailCamera.h"
-#include "math/MyMatrix.h"
 #include "ImGuiManager.h"
+#include "math/MyMatrix.h"
+#include <Input.h>
+#include <Xinput.h>
 
 void RailCamera::Initialize(WorldTransform worldTransform, const Vector3& radian) {
 	// ワールドトランスフォームの初期設定
@@ -17,12 +19,28 @@ void RailCamera::Initialize(WorldTransform worldTransform, const Vector3& radian
 }
 
 void RailCamera::Update() {
-	const Vector3 kSpeed{0.0f, 0.0f, 0.02f};
-	Vector3 radian{0.0f, 0.001f, 0.0f};
-	//worldTransform_.translation_ = Add(worldTransform_.translation_, kSpeed);
+	Vector3 velocity{0.0f, 0.0f, 0.02f};
+	Vector3 move{};
+	Vector3 radian{};
+
 
 	// 回転処理
-	//worldTransform_.rotation_ = Add(worldTransform_.rotation_, radian);
+	XINPUT_STATE joyState;
+	if (Input::GetInstance()->GetJoystickState(0, joyState)) {
+		radian.x -= (float)joyState.Gamepad.sThumbRY / SHRT_MAX * 0.02f;
+		radian.y += (float)joyState.Gamepad.sThumbRX / SHRT_MAX * 0.02f;
+		
+	}
+	// 移動処理
+	if (Input::GetInstance()->GetJoystickState(0, joyState)) {
+		move.x += (float)joyState.Gamepad.sThumbLX / SHRT_MAX * 0.2f;
+		move.z += (float)joyState.Gamepad.sThumbLY / SHRT_MAX * 0.2f;
+	}
+	// 向いている方向に移動
+	velocity = TransformNormal(move, worldTransform_.matWorld_);
+
+	worldTransform_.rotation_ = Add(worldTransform_.rotation_, radian);
+	worldTransform_.translation_ = Add(worldTransform_.translation_, velocity);
 
 	// 行列の更新
 	worldTransform_.UpdateMatrix();

@@ -173,13 +173,6 @@ void Player::Update(const ViewProjection& viewProjection) {
 
 #pragma region Move	
 
-	XINPUT_STATE joyState;
-	// ゲームパッド状態取得
-	if (Input::GetInstance()->GetJoystickState(0, joyState)) {
-		move.x += (float)joyState.Gamepad.sThumbLX / SHRT_MAX * kCharacterSpeed;
-		move.y += (float)joyState.Gamepad.sThumbLY / SHRT_MAX * kCharacterSpeed;
-	}
-
 	// 移動限界座標
 	const Vector2 kMoveLimit = {40 - 10, 30 - 15};
 
@@ -214,24 +207,11 @@ void Player::Update(const ViewProjection& viewProjection) {
 	// 2Dレティクルの配置
 	Deploy2DReticle(viewProjection);
 	
-	Vector2 joyRange{};
-	// ジョイスティック状態取得
-	if (Input::GetInstance()->GetJoystickState(0, joyState)) {	
-		joyRange.x += (float)joyState.Gamepad.sThumbRX / SHRT_MAX * 10.0f;
-		joyRange.y += (float)joyState.Gamepad.sThumbRY / SHRT_MAX * 10.0f;
-		spritePosition_.x += joyRange.x;
-		spritePosition_.y -= joyRange.y;
-		// スプライトへの座標変更を反映
-		sprite2DReticle_->SetPosition(spritePosition_);
-	}
-
 	Matrix4x4 matViewport = MakeViewportMatrix(0, 0, WinApp::kWindowWidth, WinApp::kWindowHeight, 0, 1);
 	// ビュープロジェクションビューポート合成行列
 	Matrix4x4 matVPV = Multiply(viewProjection.matView, Multiply(viewProjection.matProjection, matViewport));
 	// 合成行列の逆行列を計算する
 	Matrix4x4 matInverseVPV = Inverse(matVPV);
-	// matInverseVPV * matVPV = 単位行列になっているかチェック
-	Matrix4x4 checkInverse = Multiply(matInverseVPV, matVPV);
 
 	// スクリーン座標
 	Vector3 posNear = Vector3((float)sprite2DReticle_->GetPosition().x, (float)sprite2DReticle_->GetPosition().y, 0);
@@ -260,7 +240,7 @@ void Player::Update(const ViewProjection& viewProjection) {
 
 	// playerの座標表示
 	ImGui::Begin(" ");
-	ImGui::Text("KeysInfo   SPACE:bullet  A,D:Rotate");
+	ImGui::Text("GamePadInfo   R:Bullet  Rstick:Rotate  Lstick:Move");
 	// float3スライダー
 	ImGui::SliderFloat3("Player", *inputFloat3, -30.0f, 30.0f);
 	ImGui::Text("2DReticle:(%f,%f)", sprite2DReticle_->GetPosition().x, sprite2DReticle_->GetPosition().y);
