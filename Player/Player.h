@@ -100,4 +100,6 @@ public:
 	GameScene* gameScene_;
 
 	bool isDead_ = true;
+
+	Vector2 spritePosition_;
 };

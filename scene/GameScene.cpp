@@ -47,7 +47,7 @@ void GameScene::SpawnEnemy(Vector3 pos) {
 void GameScene::LoadEnemyPopData() {
 	// ファイルを開く
 	std::ifstream file;
-	file.open("Resources/enemyPop.csv");
+	file.open("csv/enemyPop.csv");
 	assert(file.is_open());
 
 	// ファイルの内容を文字列ストリームにコピー
