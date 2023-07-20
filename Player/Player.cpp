@@ -6,13 +6,12 @@ Player::Player() {}
 Player::~Player() {}
 
 // Initializeの関数定義
-void Player::Initialize(Model* model, uint32_t textureHandle) { 
+void Player::Initialize(Model* model) { 
 	// NULLポインタチェック
 	assert(model);
 
 	// 引数として受け取ったデータをメンバ変数に記録する
 	model_ = model;
-	playerTexture_ = textureHandle;
 
 	// ワールド変換の初期化
 	worldTransform_.Initialize();
@@ -26,5 +25,5 @@ void Player::Update() {
 
 // Drawの関数定義
 void Player::Draw(ViewProjection& viewProjection) {
-	model_->Draw(worldTransform_, viewProjection, playerTexture_);
+	model_->Draw(worldTransform_, viewProjection);
 }

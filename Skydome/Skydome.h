@@ -1,24 +1,23 @@
 ﻿#pragma once
 #include "Model.h"
+#include "Vector3.h"
 #include "WorldTransform.h"
 
-class Player {
+class Skydome {
 public:
-	Player();
-	~Player();
 	/// <summary>
 	/// 初期化
-	/// <summary>
-	void Initialize(Model* model, uint32_t textureHandle);
+	/// </summary>
+	void Initialize(Model* model, const Vector3& pos);
 
 	/// <summary>
-	/// 更新
-	/// <summary>
+	/// 更新処理
+	/// </summary>
 	void Update();
 
 	/// <summary>
 	/// 描画
-	/// <summary>
+	/// </summary>
 	void Draw(ViewProjection& viewProjection);
 
 private:
@@ -26,6 +25,4 @@ private:
 	WorldTransform worldTransform_;
 	// モデル
 	Model* model_ = nullptr;
-	// テクスチャハンドル
-	uint32_t playerTexture_ = 0u;
 };

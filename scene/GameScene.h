@@ -7,8 +7,11 @@
 #include "Sprite.h"
 #include "ViewProjection.h"
 #include "WorldTransform.h"
-#include "Player.h"
+#include "Player/Player.h"
 #include <memory>
+#include "Skydome/Skydome.h"
+#include "Ground/Ground.h"
+#include "DebugCamera.h"
 
 /// <summary>
 /// ゲームシーン
@@ -49,7 +52,13 @@ private: // メンバ変数
 	// テクスチャハンドル
 	uint32_t playerTexture_ = 0;
 	// 3Dモデルデータ
-	std::unique_ptr<Model> model_;
+	std::unique_ptr<Model> modelPlayer_;
+	// 天球の3Dモデル
+	std::unique_ptr<Model> modelSkydome_;
+	std::unique_ptr<Skydome> skydome_;
+	// 地面の3Dモデル
+	std::unique_ptr<Model> modelGround_;
+	std::unique_ptr<Ground> ground_;
 	
 	// ワールドトランスフォーム
 	WorldTransform worldTransform_;
@@ -58,4 +67,9 @@ private: // メンバ変数
 
 	// 自キャラ
 	std::unique_ptr<Player> player_;
+
+	// デバッグカメラ有効
+	bool isDebugCameraActive_ = false;
+	// デバッグカメラ
+	std::unique_ptr<DebugCamera> debugCamera_ = nullptr;
 };
