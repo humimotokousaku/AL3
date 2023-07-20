@@ -11,7 +11,7 @@ void Ground::Initialize(Model* model, const Vector3& pos) {
 	// 引数で受け取った初期座標をセット
 	worldTransform_.translation_ = pos;
 
-	// 天球の大きさ(大きさによってはカメラのfarZをSetterで設定しよう)
+	// 地面の大きさ(大きさによってはカメラのfarZをSetterで設定しよう)
 	worldTransform_.scale_.x = 100.0f;
 	worldTransform_.scale_.y = 100.0f;
 	worldTransform_.scale_.z = 100.0f;
