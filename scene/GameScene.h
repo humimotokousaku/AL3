@@ -58,6 +58,11 @@ private: // メンバ変数
 	// 地面の3Dモデル
 	std::unique_ptr<Model> modelGround_;
 	std::unique_ptr<Ground> ground_;
+	// 自機の3Dモデル
+	std::unique_ptr<Model> modelFighterBody_;
+	std::unique_ptr<Model> modelFighterHead_;
+	std::unique_ptr<Model> modelFighterL_arm_;
+	std::unique_ptr<Model> modelFighterR_arm_;
 	
 	// ワールドトランスフォーム
 	WorldTransform worldTransform_;

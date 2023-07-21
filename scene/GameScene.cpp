@@ -18,6 +18,10 @@ void GameScene::Initialize() {
 
 	// 3Dモデルの生成
 	modelPlayer_.reset(Model::CreateFromOBJ("Player", true));
+	modelFighterBody_.reset(Model::CreateFromOBJ("float_Body", true));
+	modelFighterHead_.reset(Model::CreateFromOBJ("float_Head", true));
+	modelFighterL_arm_.reset(Model::CreateFromOBJ("float_L_arm", true));
+	modelFighterR_arm_.reset(Model::CreateFromOBJ("float_R_arm", true));
 	// 天球の3Dモデルの生成
 	modelSkydome_.reset(Model::CreateFromOBJ("skydome", true));
 	// 地面の3Dモデルの生成
@@ -35,7 +39,7 @@ void GameScene::Initialize() {
 
 	// 自キャラの生成
 	player_ = std::make_unique<Player>();
-	player_->Initialize(modelPlayer_.get());
+	player_->Initialize(modelFighterBody_.get(),modelFighterHead_.get(),modelFighterL_arm_.get(),modelFighterR_arm_.get());
 	// 天球
 	skydome_ = std::make_unique<Skydome>();
 	skydome_->Initialize(modelSkydome_.get(), {0, 0, 0});
@@ -46,18 +50,21 @@ void GameScene::Initialize() {
 	// カメラ
 	followCamera_ = std::make_unique<FollowCamera>();
 	followCamera_->Initialize();
-	followCamera_->SetTarget(&player_->GetWorldTransform());
+	// 追従するオブジェクトのワールドトランスフォームをセット
+	followCamera_->SetTarget(&player_->GetWorldTransformBase());
 
+	// 自機に追従カメラのビュープロジェクションをアドレス渡し
 	player_->SetViewProjection(&followCamera_->GetViewProjection());
 }
 
 void GameScene::Update() {
-	// 自キャラの更新
+	// 自機
 	player_->Update();
 	// 天球
 	skydome_->Update();
 	// 地面
 	ground_->Update();
+
 	viewProjection_.UpdateMatrix();
 	// カメラ
 	followCamera_->Update();
@@ -65,8 +72,7 @@ void GameScene::Update() {
 	viewProjection_.matProjection = followCamera_->GetViewProjection().matProjection;
 	viewProjection_.TransferMatrix();
 
-	ImGui::Begin(" ");
-	ImGui::Text("L joystick:Move   R joystick:CameraRotation");
+	ImGui::Begin("L_joystick:Move   R_joystick:CameraRotation");
 	ImGui::End();
 
 	// 軸方向の表示を有効

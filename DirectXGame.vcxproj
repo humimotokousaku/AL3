@@ -113,10 +113,10 @@
     <ClCompile Include="Ground\Ground.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="math\MyMatrix.cpp" />
-    <ClCompile Include="math\WorldTransformEx.cpp" />
     <ClCompile Include="Player\Player.cpp" />
     <ClCompile Include="scene\GameScene.cpp" />
     <ClCompile Include="Skydome\Skydome.cpp" />
+    <ClCompile Include="Utility\WorldTransformEx.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="2d\ImGuiManager.h" />
