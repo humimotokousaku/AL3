@@ -1,10 +1,9 @@
 ﻿#include "Player.h"
-#include "WorldTransform.h"
+#include "ImGuiManager.h"
 #include "math/MyMatrix.h"
 #include <Input.h>
 #include <Xinput.h>
 #include <cassert>
-#include "ImGuiManager.h"
 
 Vector3 Player::GetWorldPosition() {
 	// ワールド座標を入れる変数
@@ -38,11 +37,11 @@ void Player::Update() {
 
 	// ゲームパッド状態取得
 	if (Input::GetInstance()->GetJoystickState(0, joyState)) {
-
-	// 速さ
+		// 速さ
 		const float speed = 0.3f;
 		// 移動量
-		Vector3 move{(float)joyState.Gamepad.sThumbLX / SHRT_MAX, 0.0f,
+		Vector3 move{
+		    (float)joyState.Gamepad.sThumbLX / SHRT_MAX, 0.0f,
 		    (float)joyState.Gamepad.sThumbLY / SHRT_MAX};
 		move.x = Normalize(move).x * speed;
 		move.y = Normalize(move).y * speed;
@@ -53,8 +52,6 @@ void Player::Update() {
 	}
 	// 行列を定数バッファに転送
 	worldTransform_.UpdateMatrix();
-
-	
 }
 
 // Drawの関数定義

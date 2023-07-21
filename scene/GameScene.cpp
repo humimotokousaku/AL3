@@ -16,8 +16,6 @@ void GameScene::Initialize() {
 	input_ = Input::GetInstance();
 	audio_ = Audio::GetInstance();
 
-	// ファイル名を指定してテクスチャを読み込む
-	playerTexture_ = TextureManager::Load("sample.png");
 	// 3Dモデルの生成
 	modelPlayer_.reset(Model::CreateFromOBJ("Player", true));
 	// 天球の3Dモデルの生成
@@ -45,46 +43,30 @@ void GameScene::Initialize() {
 	ground_ = std::make_unique<Ground>();
 	ground_->Initialize(modelGround_.get(), {0, 0, 0});
 
-	//// カメラ
-	//followCamera_ = std::make_unique<FollowCamera>();
-	//followCamera_->Initialize();
-	//followCamera_->SetTarget(&player_->GetWorldTransform());
+	// カメラ
+	followCamera_ = std::make_unique<FollowCamera>();
+	followCamera_->Initialize();
+	followCamera_->SetTarget(&player_->GetWorldTransform());
 }
 
 void GameScene::Update() {
-	// カメラ
-	//followCamera_->Update();
-
 	// 自キャラの更新
 	player_->Update();
+
 
 	// 天球
 	skydome_->Update();
 	// 地面
 	ground_->Update();
+	viewProjection_.UpdateMatrix();
+	// カメラ
+	followCamera_->Update();
+	viewProjection_.matView = followCamera_->GetViewProjection().matView;
+	viewProjection_.matProjection = followCamera_->GetViewProjection().matProjection;
+	viewProjection_.TransferMatrix();
 
-	
-#ifdef _DEBUG
-	if (input_->TriggerKey(DIK_C)) {
-		if (!isDebugCameraActive_) {
-			isDebugCameraActive_ = true;
-		} else {
-			isDebugCameraActive_ = false;
-		}
-	}
-#endif
-	if (isDebugCameraActive_) {
-		// デバッグカメラの更新
-		debugCamera_->Update();
-		viewProjection_.matView = debugCamera_->GetViewProjection().matView;
-		viewProjection_.matProjection = debugCamera_->GetViewProjection().matProjection;
 
-		// ビュープロジェクション行列の転送
-		viewProjection_.TransferMatrix();
-	} else {
-		// ビュープロジェクション行列の更新と転送
-		viewProjection_.UpdateMatrix();
-	}
+
 	ImGui::Begin(" ");
 	ImGui::Text("KeyInfo   C:Camera");
 	ImGui::End();

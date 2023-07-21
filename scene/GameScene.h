@@ -50,8 +50,6 @@ private: // メンバ変数
 	Input* input_ = nullptr;
 	Audio* audio_ = nullptr;
 
-	// テクスチャハンドル
-	uint32_t playerTexture_ = 0;
 	// 3Dモデルデータ
 	std::unique_ptr<Model> modelPlayer_;
 	// 天球の3Dモデル
