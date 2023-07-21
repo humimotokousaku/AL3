@@ -44,9 +44,17 @@ void GameScene::Initialize() {
 	// 地面
 	ground_ = std::make_unique<Ground>();
 	ground_->Initialize(modelGround_.get(), {0, 0, 0});
+
+	//// カメラ
+	//followCamera_ = std::make_unique<FollowCamera>();
+	//followCamera_->Initialize();
+	//followCamera_->SetTarget(&player_->GetWorldTransform());
 }
 
 void GameScene::Update() {
+	// カメラ
+	//followCamera_->Update();
+
 	// 自キャラの更新
 	player_->Update();
 

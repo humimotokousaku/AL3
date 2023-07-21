@@ -4,6 +4,10 @@
 
 class Player {
 public:
+	Vector3 GetWorldPosition();
+
+	const WorldTransform& GetWorldTransform() { return worldTransform_; }
+
 	Player();
 	~Player();
 	/// <summary>
