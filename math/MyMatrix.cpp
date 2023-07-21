@@ -106,6 +106,20 @@ Matrix4x4 MakeRotateZMatrix(float radian) {
 	return result;
 }
 
+Matrix4x4 MakeRotateMatrix(const Vector3& radian) { 
+	Matrix4x4 rotateX{};
+	Matrix4x4 rotateY{};
+	Matrix4x4 rotateZ{};
+	rotateX = MakeRotateXMatrix(radian.x);
+	rotateY = MakeRotateYMatrix(radian.y);
+	rotateZ = MakeRotateZMatrix(radian.z);
+
+	Matrix4x4 result{};
+	result = Multiply(rotateX, Multiply(rotateY, rotateZ));
+
+	return result;
+}
+
 // 平行移動行列
 Matrix4x4 MakeTranslateMatrix(const Vector3& translate) {
 	Matrix4x4 result{};

@@ -20,6 +20,9 @@ Matrix4x4 MakeRotateZMatrix(float radian);
 // 行列の積
 Matrix4x4 Multiply(const Matrix4x4& m1, const Matrix4x4& m2);
 
+// 回転行列
+Matrix4x4 MakeRotateMatrix(const Vector3& radian);
+
 // 平行移動行列
 Matrix4x4 MakeTranslateMatrix(const Vector3& translate);
 

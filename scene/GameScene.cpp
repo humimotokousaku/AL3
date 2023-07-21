@@ -47,13 +47,13 @@ void GameScene::Initialize() {
 	followCamera_ = std::make_unique<FollowCamera>();
 	followCamera_->Initialize();
 	followCamera_->SetTarget(&player_->GetWorldTransform());
+
+	player_->SetViewProjection(&followCamera_->GetViewProjection());
 }
 
 void GameScene::Update() {
 	// 自キャラの更新
 	player_->Update();
-
-
 	// 天球
 	skydome_->Update();
 	// 地面
@@ -65,12 +65,9 @@ void GameScene::Update() {
 	viewProjection_.matProjection = followCamera_->GetViewProjection().matProjection;
 	viewProjection_.TransferMatrix();
 
-
-
 	ImGui::Begin(" ");
-	ImGui::Text("KeyInfo   C:Camera");
+	ImGui::Text("L joystick:Move   R joystick:CameraRotation");
 	ImGui::End();
-
 
 	// 軸方向の表示を有効
 	AxisIndicator::GetInstance()->SetVisible(true);

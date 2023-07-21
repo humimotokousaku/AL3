@@ -8,6 +8,10 @@ public:
 
 	const WorldTransform& GetWorldTransform() { return worldTransform_; }
 
+	void SetViewProjection(const ViewProjection* viewProjection) {
+		viewProjection_ = viewProjection;
+	}
+
 	Player();
 	~Player();
 	/// <summary>
@@ -28,6 +32,9 @@ public:
 private:
 	// ワールド変換データ
 	WorldTransform worldTransform_;
+	// カメラのビュープロジェクション
+	const ViewProjection* viewProjection_ = nullptr;
+
 	// モデル
 	Model* model_ = nullptr;
 };

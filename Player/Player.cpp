@@ -34,7 +34,6 @@ void Player::Initialize(Model* model) {
 // Updateの関数定義
 void Player::Update() {
 	XINPUT_STATE joyState;
-
 	// ゲームパッド状態取得
 	if (Input::GetInstance()->GetJoystickState(0, joyState)) {
 		// 速さ
@@ -42,14 +41,23 @@ void Player::Update() {
 		// 移動量
 		Vector3 move{
 		    (float)joyState.Gamepad.sThumbLX / SHRT_MAX, 0.0f,
-		    (float)joyState.Gamepad.sThumbLY / SHRT_MAX};
-		move.x = Normalize(move).x * speed;
-		move.y = Normalize(move).y * speed;
-		move.z = Normalize(move).z * speed;
+		    (float)joyState.Gamepad.sThumbLY / SHRT_MAX
+		};
+		// 移動量の速さを反映
+		move = Multiply(speed,Normalize(move));
+
+		// 回転行列
+		Matrix4x4 rotateMatrix = MakeRotateMatrix(viewProjection_->rotation_);
+		// 移動ベクトルをカメラの角度だけ回転
+		move = TransformNormal(move, rotateMatrix);
 
 		// 移動量
 		worldTransform_.translation_ = Add(worldTransform_.translation_, move);
+
+		// playerのY軸周り角度(θy)
+		worldTransform_.rotation_.y = std::atan2(move.x, move.z);
 	}
+
 	// 行列を定数バッファに転送
 	worldTransform_.UpdateMatrix();
 }
