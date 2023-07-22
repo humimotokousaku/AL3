@@ -1,25 +1,26 @@
 ﻿#pragma once
+#include "Object/ICharacter.h"
 #include "Model.h"
 #include "WorldTransform.h"
 
-class Player {
+class Player : public ICharacter {
 public:
 	Player();
 	~Player();
 	/// <summary>
 	/// 初期化
 	/// <summary>
-	void Initialize(Model* modelBody, Model* modelHead, Model* modelL_arm, Model* modelR_arm);
+	void Initialize(const std::vector<Model*>& models) override;
 
 	/// <summary>
 	/// 更新
 	/// <summary>
-	void Update();
+	void Update() override;
 
 	/// <summary>
 	/// 描画
 	/// <summary>
-	void Draw(ViewProjection& viewProjection);
+	void Draw(const ViewProjection& viewProjection) override;
 
 	// 浮遊ギミック初期化
 	void InitializeFloatingGimmick();
@@ -31,7 +32,7 @@ public:
 	Vector3 GetWorldPosition();
 
 	const WorldTransform& GetWorldTransformBody() { return worldTransformBody_; }
-	const WorldTransform& GetWorldTransformBase() { return worldTransformBase_; }
+	const WorldTransform& GetWorldTransformBase() { return worldTransform_; }
 
 	void SetViewProjection(const ViewProjection* viewProjection) {
 		viewProjection_ = viewProjection;
@@ -42,7 +43,6 @@ public:
 
 private:
 	// ワールド変換データ
-	WorldTransform worldTransformBase_;
 	WorldTransform worldTransformBody_;
 	WorldTransform worldTransformHead_;
 	WorldTransform worldTransformL_arm_;
@@ -51,12 +51,7 @@ private:
 	// カメラのビュープロジェクション
 	const ViewProjection* viewProjection_ = nullptr;
 
-	// モデル
-	Model* modelBody_;
-	Model* modelHead_;
-	Model* modelL_arm_;
-	Model* modelR_arm_;
-
+	const uint16_t kMaxMoveModelParts = 2;
 	// 浮遊ギミックの媒介変数
-	float floatingParameter_ = 0.0f;
+	float floatingParameter_[2];
 };

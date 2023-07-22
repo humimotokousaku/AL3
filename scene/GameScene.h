@@ -7,7 +7,8 @@
 #include "Sprite.h"
 #include "ViewProjection.h"
 #include "WorldTransform.h"
-#include "Player/Player.h"
+#include "Object/Player/Player.h"
+#include "Object/Enemy/Enemy.h"
 #include <memory>
 #include "Skydome/Skydome.h"
 #include "Ground/Ground.h"
@@ -63,6 +64,8 @@ private: // メンバ変数
 	std::unique_ptr<Model> modelFighterHead_;
 	std::unique_ptr<Model> modelFighterL_arm_;
 	std::unique_ptr<Model> modelFighterR_arm_;
+	// 敵の3Dモデル
+	std::unique_ptr<Model> modelEnemy_;
 	
 	// ワールドトランスフォーム
 	WorldTransform worldTransform_;
@@ -71,6 +74,9 @@ private: // メンバ変数
 
 	// 自キャラ
 	std::unique_ptr<Player> player_;
+
+	// 敵
+	std::unique_ptr<Enemy> enemy_;
 
 	// カメラ
 	std::unique_ptr<FollowCamera> followCamera_;

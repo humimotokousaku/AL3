@@ -11,17 +11,24 @@ GameScene::~GameScene(){
 }
 
 void GameScene::Initialize() {
-
 	dxCommon_ = DirectXCommon::GetInstance();
 	input_ = Input::GetInstance();
 	audio_ = Audio::GetInstance();
 
 	// 3Dモデルの生成
-	modelPlayer_.reset(Model::CreateFromOBJ("Player", true));
 	modelFighterBody_.reset(Model::CreateFromOBJ("float_Body", true));
 	modelFighterHead_.reset(Model::CreateFromOBJ("float_Head", true));
 	modelFighterL_arm_.reset(Model::CreateFromOBJ("float_L_arm", true));
 	modelFighterR_arm_.reset(Model::CreateFromOBJ("float_R_arm", true));
+	modelEnemy_.reset(Model::CreateFromOBJ("Enemy", true));
+	// 自機モデル
+	std::vector<Model*> playerModels = {
+	    modelFighterBody_.get(), modelFighterHead_.get(), modelFighterL_arm_.get(),
+	    modelFighterR_arm_.get()};
+	// 敵モデル
+	std::vector<Model*> enemyModels = {
+		modelEnemy_.get()};
+
 	// 天球の3Dモデルの生成
 	modelSkydome_.reset(Model::CreateFromOBJ("skydome", true));
 	// 地面の3Dモデルの生成
@@ -39,7 +46,12 @@ void GameScene::Initialize() {
 
 	// 自キャラの生成
 	player_ = std::make_unique<Player>();
-	player_->Initialize(modelFighterBody_.get(),modelFighterHead_.get(),modelFighterL_arm_.get(),modelFighterR_arm_.get());
+	player_->Initialize(playerModels);
+
+	// 敵
+	enemy_ = std::make_unique<Enemy>();
+	enemy_->Initialize(enemyModels);
+
 	// 天球
 	skydome_ = std::make_unique<Skydome>();
 	skydome_->Initialize(modelSkydome_.get(), {0, 0, 0});
@@ -60,6 +72,8 @@ void GameScene::Initialize() {
 void GameScene::Update() {
 	// 自機
 	player_->Update();
+	// 敵
+	enemy_->Update();
 	// 天球
 	skydome_->Update();
 	// 地面
@@ -107,7 +121,10 @@ void GameScene::Draw() {
 	/// <summary>
 	/// ここに3Dオブジェクトの描画処理を追加できる
 	/// </summary>
+	// player
 	player_->Draw(viewProjection_);
+	// 敵
+	enemy_->Draw(viewProjection_);
 
 	// 天球
 	skydome_->Draw(viewProjection_);
