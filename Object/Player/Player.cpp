@@ -6,6 +6,7 @@
 #include <cassert>
 #define _USE_MATH_DEFINES
 #include "math.h"
+#include "GlobalVariables.h"
 
 Player::Player() {}
 Player::~Player() {}
@@ -33,6 +34,14 @@ void Player::Initialize(const std::vector<Model*>& models) {
 	worldTransformL_arm_.Initialize();
 	worldTransformR_arm_.Initialize();
 	worldTransformHammer_.Initialize();
+	float s = 10;
+	GlobalVariables* globalVariables{};
+	globalVariables = GlobalVariables::GetInstance();
+	const char* groupName = "Player";
+	// グループを追加
+	GlobalVariables::GetInstance()->CreateGroup(groupName);
+	globalVariables->SetValue(groupName, "Test", s);
+
 }
 
 // Updateの関数定義
