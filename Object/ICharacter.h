@@ -8,7 +8,8 @@ enum ModelParts {
 	kModelIndexBody,
 	kModelIndexHead,
 	kModelIndexL_arm,
-	kModelIndexR_arm
+	kModelIndexR_arm,
+	kModelIndexWeapon
 };
 
 class ICharacter {

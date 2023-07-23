@@ -16,15 +16,21 @@ void GameScene::Initialize() {
 	audio_ = Audio::GetInstance();
 
 	// 3Dモデルの生成
+
+	// 自機
 	modelFighterBody_.reset(Model::CreateFromOBJ("float_Body", true));
 	modelFighterHead_.reset(Model::CreateFromOBJ("float_Head", true));
 	modelFighterL_arm_.reset(Model::CreateFromOBJ("float_L_arm", true));
 	modelFighterR_arm_.reset(Model::CreateFromOBJ("float_R_arm", true));
+	// 自機の武器
+	modelFighterHammer_.reset(Model::CreateFromOBJ("Hammer", true));
+	// 敵
 	modelEnemy_.reset(Model::CreateFromOBJ("Enemy", true));
+
 	// 自機モデル
 	std::vector<Model*> playerModels = {
 	    modelFighterBody_.get(), modelFighterHead_.get(), modelFighterL_arm_.get(),
-	    modelFighterR_arm_.get()};
+	    modelFighterR_arm_.get(), modelFighterHammer_.get()};
 	// 敵モデル
 	std::vector<Model*> enemyModels = {
 		modelEnemy_.get()};
