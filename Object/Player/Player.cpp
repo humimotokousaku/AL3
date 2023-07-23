@@ -35,13 +35,11 @@ void Player::Initialize(const std::vector<Model*>& models) {
 	worldTransformR_arm_.Initialize();
 	worldTransformHammer_.Initialize();
 	float s = 10;
-	GlobalVariables* globalVariables{};
-	globalVariables = GlobalVariables::GetInstance();
+	globalVariables_ = GlobalVariables::GetInstance();
 	const char* groupName = "Player";
 	// グループを追加
 	GlobalVariables::GetInstance()->CreateGroup(groupName);
-	globalVariables->SetValue(groupName, "Test", s);
-
+	globalVariables_->SetValue(groupName, "Test", s);
 }
 
 // Updateの関数定義
@@ -95,6 +93,8 @@ void Player::Update() {
 	worldTransformHead_.UpdateMatrix();
 	worldTransformL_arm_.UpdateMatrix();
 	worldTransformR_arm_.UpdateMatrix();
+
+	globalVariables_->SaveFile("Player");
 }
 
 // Drawの関数定義

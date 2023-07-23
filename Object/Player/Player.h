@@ -4,6 +4,7 @@
 #include "Model.h"
 #include "Object/ICharacter.h"
 #include "WorldTransform.h"
+#include "GlobalVariables.h"
 
 
 class Player : public ICharacter {
@@ -81,4 +82,6 @@ private:
 	const uint16_t kMaxMoveModelParts = 2;
 	// 浮遊ギミックの媒介変数
 	float floatingParameter_[2];
+
+	GlobalVariables* globalVariables_;
 };
