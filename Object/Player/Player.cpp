@@ -34,12 +34,12 @@ void Player::Initialize(const std::vector<Model*>& models) {
 	worldTransformL_arm_.Initialize();
 	worldTransformR_arm_.Initialize();
 	worldTransformHammer_.Initialize();
-	float s = 10;
+
 	globalVariables_ = GlobalVariables::GetInstance();
 	const char* groupName = "Player";
 	// グループを追加
 	GlobalVariables::GetInstance()->CreateGroup(groupName);
-	globalVariables_->SetValue(groupName, "Test", s);
+	globalVariables_->AddItem(groupName, "Test", 90);
 }
 
 // Updateの関数定義
