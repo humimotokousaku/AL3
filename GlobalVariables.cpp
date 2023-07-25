@@ -9,18 +9,47 @@ GlobalVariables* GlobalVariables::GetInstance() {
 	return &instance;
 }
 
-int32_t GlobalVariables::GetIntValue(const std::string& groupName, const std::string& key) const{
+int32_t GlobalVariables::GetIntValue(const std::string& groupName, const std::string& key) {
 	// グループを検索
 	std::map<std::string, Group>::iterator itGroup = datas_.find(groupName);
-
 	// 項目が未登録なら
 	assert(itGroup != datas_.end());
+
+	Group& group = datas_[groupName];
+
+	auto itemIt = group.items.find(key);
+	assert(itemIt != group.items.end());
+
+	return std::get<int32_t>(itemIt->second.value);
 }
 
-float GlobalVariables::GetFloatValue(const std::string& groupName, const std::string& key) const {}
+float GlobalVariables::GetFloatValue(const std::string& groupName, const std::string& key) {
+	// グループを検索
+	std::map<std::string, Group>::iterator itGroup = datas_.find(groupName);
+	// 項目が未登録なら
+	assert(itGroup != datas_.end());
 
-Vector3
-    GlobalVariables::GetVector3Value(const std::string& groupName, const std::string& key) const {}
+	Group& group = datas_[groupName];
+
+	auto itemIt = group.items.find(key);
+	assert(itemIt != group.items.end());
+
+	return std::get<float>(itemIt->second.value);
+}
+
+Vector3 GlobalVariables::GetVector3Value(const std::string& groupName, const std::string& key) {
+
+	// グループを検索
+	std::map<std::string, Group>::iterator itGroup = datas_.find(groupName);
+	// 項目が未登録なら
+	assert(itGroup != datas_.end());
+
+	Group& group = datas_[groupName];
+
+	assert(group.items.find(key) == datas_[groupName].items.end());
+
+	return std::get<Vector3>(group.items.end()->second.value);
+}
 
 void GlobalVariables::SetValue(
     const std::string& groupName, const std::string& key, int32_t value) {

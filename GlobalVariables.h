@@ -9,11 +9,11 @@ public:
 	static GlobalVariables* GetInstance();
 
 	// 値の取得(int)
-	int32_t GetIntValue(const std::string& groupName, const std::string& key) const;
+	int32_t GetIntValue(const std::string& groupName, const std::string& key) ;
 	// 値の取得(float)
-	float GetFloatValue(const std::string& groupName, const std::string& key) const;
+	float GetFloatValue(const std::string& groupName, const std::string& key);
 	// 値の取得(Vector3)
-	Vector3 GetVector3Value(const std::string& groupName, const std::string& key) const;
+	Vector3 GetVector3Value(const std::string& groupName, const std::string& key);
 
 	// 値のセット(int)
 	void SetValue(const std::string& groupName, const std::string& key, int32_t value);

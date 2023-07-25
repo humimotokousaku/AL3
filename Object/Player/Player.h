@@ -53,6 +53,9 @@ public:
 	// パーツの親子関係
 	void SetParent(const WorldTransform* parent);
 
+	// 調整項目の適用
+	void ApplyGlobalVariables();
+
 private:
 	// 振るまい
 	enum class Behavior {
@@ -82,6 +85,8 @@ private:
 	const uint16_t kMaxMoveModelParts = 2;
 	// 浮遊ギミックの媒介変数
 	float floatingParameter_[2];
+	int32_t floatingCycle[2];
+	float floatingAmplitude = 0.5f;
 
 	GlobalVariables* globalVariables_;
 };

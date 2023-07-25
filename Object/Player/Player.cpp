@@ -39,7 +39,12 @@ void Player::Initialize(const std::vector<Model*>& models) {
 	const char* groupName = "Player";
 	// グループを追加
 	GlobalVariables::GetInstance()->CreateGroup(groupName);
-	globalVariables_->AddItem(groupName, "Test", 90);
+	globalVariables_->GetVector3Value(groupName, "Head Translation");
+	globalVariables_->GetVector3Value(groupName, "ArmL Translation");
+	globalVariables_->GetVector3Value(groupName, "ArmR Translation");
+	globalVariables_->GetIntValue(groupName, "floatingCycle_Arms");
+	globalVariables_->GetIntValue(groupName, "floatingCycleBody");
+	globalVariables_->GetFloatValue(groupName, "floatingAmplitude");
 }
 
 // Updateの関数定義
@@ -189,7 +194,7 @@ void Player::InitializeFloatingGimmick() {
 
 void Player::UpdateFloatingGimmick() {
 	// 浮遊移動のサイクル<frame>
-	uint16_t floatingCycle[2]{};
+	//uint16_t floatingCycle[2]{};
 	floatingCycle[0] = 30;
 	floatingCycle[1] = 60;
 	// 1フレームでのパラメータ加算値
@@ -202,7 +207,7 @@ void Player::UpdateFloatingGimmick() {
 		floatingParameter_[i] = (float)std::fmod(floatingParameter_[i], 2.0f * M_PI);
 	}
 	// 浮遊の振幅<m>
-	const float floatingAmplitude = 0.5f;
+	
 	// 浮遊を座標に反映
 	worldTransformBody_.translation_.y = std::sin(floatingParameter_[0]) * floatingAmplitude;
 
@@ -228,4 +233,15 @@ void Player::SetParent(const WorldTransform* parent) {
 	worldTransformL_arm_.parent_ = parent;
 	worldTransformR_arm_.parent_ = parent;
 	worldTransformHammer_.parent_ = parent;
+}
+
+void Player::ApplyGlobalVariables() {
+	GlobalVariables* globalVariables = GlobalVariables::GetInstance();
+	const char* groupName = "Player";
+	worldTransformHead_.translation_ = globalVariables->GetVector3Value(groupName, "Head Translation"); 
+	worldTransformL_arm_.translation_ = globalVariables->GetVector3Value(groupName, "ArmL Translation");
+	worldTransformR_arm_.translation_ = globalVariables->GetVector3Value(groupName, "ArmR Translation");
+	floatingCycle[0] = globalVariables->GetIntValue(groupName, "floatingCycle_Arms");
+	floatingCycle[1] = globalVariables->GetIntValue(groupName, "floatingCycleBody");
+	floatingAmplitude = globalVariables->GetFloatValue(groupName, "floatingAmplitude");
 }
