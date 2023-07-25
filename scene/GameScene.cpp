@@ -80,6 +80,9 @@ void GameScene::Initialize() {
         {20, 0,  0},
         {30, 0,  0}
     };
+
+	// 3Dライン
+	PrimitiveDrawer::GetInstance()->SetViewProjection(&viewProjection_);
 }
 
 Vector3 GameScene::CatmullRomSpline(const std::vector<Vector3>& controlPoints, float t) {
@@ -172,11 +175,7 @@ void GameScene::Draw() {
 	/// <summary>
 	/// ここに3Dオブジェクトの描画処理を追加できる
 	/// </summary>
-	for (size_t i = 0; i < segmentCount; i++) {
-		primitiveDrawer_->DrawLine3d(
-		    pointsDrawing_.at(i), pointsDrawing_.at(i + 1), Vector4{1.0f, 0.0f, 0.0f, 1.0f});
-	}
-	
+
 	// 自機
 	player_->Draw(viewProjection_);
 
@@ -187,6 +186,13 @@ void GameScene::Draw() {
 
 	// 天球
 	skydome_->Draw(viewProjection_);
+
+	// 3Dライン
+	for (int i = 0; i < segmentCount - 1; i++) {
+		PrimitiveDrawer::GetInstance()->DrawLine3d(
+		    pointsDrawing_[i], pointsDrawing_[i + 1], {1.0f, 0.0f, 0.0f, 1.0f});
+	}
+	
 
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();

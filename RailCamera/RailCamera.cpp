@@ -7,7 +7,9 @@ void RailCamera::Initialize(WorldTransform worldTransform, const Vector3& radian
 	// ワールドトランスフォームの初期設定
 	// 引数で受け取った初期座標をセット
 	worldTransform_ = worldTransform;
-	worldTransform_.translation_.z = -10;
+	worldTransform_.translation_.x = 5;
+	worldTransform_.translation_.y = 5;
+	worldTransform_.translation_.z = -30;
 
 	// 引数で受け取った初期座標をセット
 	worldTransform_.rotation_ = radian;
@@ -23,9 +25,7 @@ void RailCamera::Update() {
 	// 行列の更新
 	worldTransform_.UpdateMatrix();
 	// カメラオブジェクトのワールド行列からビュー行列を計算する
-	viewProjection_.matView = Inverse(worldTransform_.matWorld_);
-
-	//viewProjection_.TransferMatrix();
+	viewProjection_.matView = Inverse(worldTransform_.matWorld_);;
 
 	ImGui::Begin("Camera");
 	ImGui::DragFloat3("translation", &worldTransform_.translation_.x, 0.1f);
