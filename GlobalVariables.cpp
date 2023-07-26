@@ -84,32 +84,23 @@ void GlobalVariables::SetValue(
 }
 
 void GlobalVariables::AddItem(const std::string& groupName, const std::string& key, int32_t value) {
-	// グループを検索
-	std::map<std::string, Group>::iterator itGroup = datas_.find(groupName);
-
 	// 項目が未登録なら
-	if (itGroup == datas_.end()) {
+	if (datas_.find(groupName) == datas_.end()) {
 		SetValue(groupName, key, value);
 	}
 }
 
 void GlobalVariables::AddItem(const std::string& groupName, const std::string& key, float value) {
-	// グループを検索
-	std::map<std::string, Group>::iterator itGroup = datas_.find(groupName);
-
 	// 項目が未登録なら
-	if (itGroup == datas_.end()) {
+	if (datas_.find(groupName) == datas_.end()) {
 		SetValue(groupName, key, value);
 	}
 }
 
 void GlobalVariables::AddItem(
     const std::string& groupName, const std::string& key, Vector3& value) {
-	// グループを検索
-	std::map<std::string, Group>::iterator itGroup = datas_.find(groupName);
-
 	// 項目が未登録なら
-	if (itGroup == datas_.end()) {
+	if (datas_.find(groupName) == datas_.end()) {
 		SetValue(groupName, key, value);
 	}
 }
