@@ -35,16 +35,16 @@ void Player::Initialize(const std::vector<Model*>& models) {
 	worldTransformR_arm_.Initialize();
 	worldTransformHammer_.Initialize();
 
-	globalVariables_ = GlobalVariables::GetInstance();
+	GlobalVariables* globalVariables = GlobalVariables::GetInstance();
 	const char* groupName = "Player";
 	// グループを追加
 	GlobalVariables::GetInstance()->CreateGroup(groupName);
-	globalVariables_->GetVector3Value(groupName, "Head Translation");
-	globalVariables_->GetVector3Value(groupName, "ArmL Translation");
-	globalVariables_->GetVector3Value(groupName, "ArmR Translation");
-	globalVariables_->GetIntValue(groupName, "floatingCycle_Arms");
-	globalVariables_->GetIntValue(groupName, "floatingCycleBody");
-	globalVariables_->GetFloatValue(groupName, "floatingAmplitude");
+	globalVariables->AddItem(groupName, "Head Translation", worldTransformHead_.translation_);
+	globalVariables->AddItem(groupName, "ArmL Translation", worldTransformL_arm_.translation_);
+	globalVariables->AddItem(groupName, "ArmR Translation", worldTransformR_arm_.translation_);
+	globalVariables->AddItem(groupName, "floatingCycle_Arms", floatingCycle[0]);
+	globalVariables->AddItem(groupName, "floatingCycleBody", floatingCycle[1]);
+	globalVariables->AddItem(groupName, "floatingAmplitude", floatingAmplitude);
 }
 
 // Updateの関数定義
@@ -99,7 +99,10 @@ void Player::Update() {
 	worldTransformL_arm_.UpdateMatrix();
 	worldTransformR_arm_.UpdateMatrix();
 
-	globalVariables_->SaveFile("Player");
+	GlobalVariables* globalVariables = GlobalVariables::GetInstance();
+
+	ApplyGlobalVariables();
+	globalVariables->SaveFile("Player");
 }
 
 // Drawの関数定義

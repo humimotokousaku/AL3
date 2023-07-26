@@ -85,8 +85,6 @@ private:
 	const uint16_t kMaxMoveModelParts = 2;
 	// 浮遊ギミックの媒介変数
 	float floatingParameter_[2];
-	int32_t floatingCycle[2];
-	float floatingAmplitude = 0.5f;
-
-	GlobalVariables* globalVariables_;
+	int floatingCycle[2];
+	float floatingAmplitude;
 };

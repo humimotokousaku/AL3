@@ -10,45 +10,44 @@ GlobalVariables* GlobalVariables::GetInstance() {
 }
 
 int32_t GlobalVariables::GetIntValue(const std::string& groupName, const std::string& key) {
-	// グループを検索
-	std::map<std::string, Group>::iterator itGroup = datas_.find(groupName);
-	// 項目が未登録なら
-	assert(itGroup != datas_.end());
+	// 指定したグループが存在するかをassertで確認
+	assert(datas_.find(groupName) != datas_.end());
 
+	// 指定したグループの参照を取得
 	Group& group = datas_[groupName];
 
-	auto itemIt = group.items.find(key);
-	assert(itemIt != group.items.end());
+	// 指定したキーが存在するかをassertで確認
+	assert(group.items.find(key) != group.items.end());
 
-	return std::get<int32_t>(itemIt->second.value);
+	// 指定したグループから指定したキーの値を取得して返す
+	return std::get<int32_t>(group.items[key].value);
 }
 
 float GlobalVariables::GetFloatValue(const std::string& groupName, const std::string& key) {
-	// グループを検索
-	std::map<std::string, Group>::iterator itGroup = datas_.find(groupName);
-	// 項目が未登録なら
-	assert(itGroup != datas_.end());
+	// 指定したグループが存在するかをassertで確認
+	assert(datas_.find(groupName) != datas_.end());
 
+	// 指定したグループの参照を取得
 	Group& group = datas_[groupName];
 
-	auto itemIt = group.items.find(key);
-	assert(itemIt != group.items.end());
+	// 指定したキーが存在するかをassertで確認
+	assert(group.items.find(key) != group.items.end());
 
-	return std::get<float>(itemIt->second.value);
+	// 指定したグループから指定したキーの値を取得して返す
+	return std::get<float>(group.items[key].value);
 }
 
 Vector3 GlobalVariables::GetVector3Value(const std::string& groupName, const std::string& key) {
+	// 指定したグループが存在するかをassertで確認
+	assert(datas_.find(groupName) != datas_.end());
 
-	// グループを検索
-	std::map<std::string, Group>::iterator itGroup = datas_.find(groupName);
-	// 項目が未登録なら
-	assert(itGroup != datas_.end());
-
+	// 指定したグループの参照を取得
 	Group& group = datas_[groupName];
 
-	assert(group.items.find(key) == datas_[groupName].items.end());
+	// 指定したキーが存在するかをassertで確認
+	assert(group.items.find(key) != group.items.end());
 
-	return std::get<Vector3>(group.items.end()->second.value);
+	return std::get<Vector3>(group.items[key].value);
 }
 
 void GlobalVariables::SetValue(
@@ -84,23 +83,29 @@ void GlobalVariables::SetValue(
 }
 
 void GlobalVariables::AddItem(const std::string& groupName, const std::string& key, int32_t value) {
+	// 指定したグループの参照を取得
+	Group& group = datas_[groupName];
 	// 項目が未登録なら
-	if (datas_.find(groupName) == datas_.end()) {
+	if (group.items.find(key) == group.items.end()) {
 		SetValue(groupName, key, value);
 	}
 }
 
 void GlobalVariables::AddItem(const std::string& groupName, const std::string& key, float value) {
+	// 指定したグループの参照を取得
+	Group& group = datas_[groupName];
 	// 項目が未登録なら
-	if (datas_.find(groupName) == datas_.end()) {
+	if (group.items.find(key) == group.items.end()) {
 		SetValue(groupName, key, value);
 	}
 }
 
 void GlobalVariables::AddItem(
     const std::string& groupName, const std::string& key, Vector3& value) {
+	// 指定したグループの参照を取得
+	Group& group = datas_[groupName];
 	// 項目が未登録なら
-	if (datas_.find(groupName) == datas_.end()) {
+	if (group.items.find(key) == group.items.end()) {
 		SetValue(groupName, key, value);
 	}
 }
