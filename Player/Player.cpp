@@ -4,6 +4,7 @@
 #include "ImGuiManager.h"
 #include "WorldTransform.h"
 #include "math/MyMatrix.h"
+#include "math/Lerp.h"
 #include <cassert>
 
 void Player::OnCollision() {}
@@ -67,6 +68,22 @@ void Player::DeployReticle() {
 	worldTransform3DReticle_.translation_.z = GetWorldPosition().z + offset.z;
 
 	worldTransform3DReticle_.UpdateMatrix();
+}
+
+void Player::LockOnReticle(Enemy* enemy, const ViewProjection& viewProjection) { 
+	Vector2 enemyScreenPos = enemy->GetEnemyScreenPos(viewProjection);
+	Vector2 e2r{};
+	e2r.x = enemyScreenPos.x - positionReticle_.x;
+	e2r.y = enemyScreenPos.y - positionReticle_.y;
+	float e2rR = 80;
+	if ((e2r.x * e2r.x) + (e2r.y * e2r.y) <= e2rR * e2rR) {
+		worldTransform3DReticle_.translation_ = enemy->GetEnemyPos();
+		worldTransform3DReticle_.UpdateMatrix();
+		sprite2DReticle_->SetPosition(enemyScreenPos);
+	}
+	else {
+		//Lerp()
+	}
 }
 
 // 攻撃
@@ -197,35 +214,17 @@ void Player::Update(const ViewProjection& viewProjection) {
 	DeployReticle();
 
 	// 3Dレティクルのワールド座標を取得
-	Vector3 positionReticle = GetWorld3DReticlePosition();
+	positionReticle_ = GetWorld3DReticlePosition();
 	// ビューポート行列
 	Matrix4x4 matViewport = MakeViewportMatrix(0, 0, WinApp::kWindowWidth, WinApp::kWindowHeight, 0, 1);
 	// ビュー行列とプロジェクション行列、ビューポート行列を合成する
 	Matrix4x4 matViewProjectionViewport{};
 	matViewProjectionViewport = Multiply(viewProjection.matView, Multiply(viewProjection.matProjection, matViewport));
 
-	// ロックオン
-	for (Enemy* enemy : enemy_) {
-		Vector3 enemyPos = enemy_->GetWorldPosition();
-	}
-
-	enemyPos = Transform(enemyPos, matViewProjectionViewport);
-
 	// ワールド→スクリーン座標変換
-	positionReticle = Transform(positionReticle, matViewProjectionViewport);
+	positionReticle_ = Transform(positionReticle_, matViewProjectionViewport);
 
-	Vector3 a = {
-	    enemyPos.x - positionReticle.x, enemyPos.y - positionReticle.y,
-	    enemyPos.z - positionReticle.z};
-
-	// スプライトのレティクルに座標設定
-	if ((a.x * a.x) + (a.y * a.y) + (a.z * a.z) >= 20 * 20) {
-		
-	}
-	else {
-		positionReticle = enemyPos;
-	}
-	sprite2DReticle_->SetPosition(Vector2(positionReticle.x, positionReticle.y));
+	sprite2DReticle_->SetPosition(Vector2(positionReticle_.x, positionReticle_.y));
 
 
 	// 行列を定数バッファに転送

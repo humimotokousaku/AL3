@@ -65,6 +65,8 @@ public: // メンバ関数
 	// 座標取得
 	Vector3 GetEnemyPos() { return this->worldTransform_.translation_; }
 
+	Vector2 GetEnemyScreenPos(const ViewProjection& viewProjection);
+
 	// Setter
 	void SetPlayer(Player* player) { player_ = player; }
 	void SetGameScene(GameScene* gameScene) { gameScene_ = gameScene; }

@@ -25,6 +25,8 @@ public:
 
 	void SetEnemy(Enemy* enemy) { enemy_ = enemy; }
 
+	void LockOnReticle(Enemy* enemy, const ViewProjection& viewProjection);
+
 	/// <summary>
 	/// 親となるワールドトランスフォームをセット
 	/// </summary>
@@ -90,6 +92,8 @@ public:
 	uint32_t playerTexture_ = 0u;
 	// レティクルハンドル
 	uint32_t reticleTexture_ = 0u;
+
+	Vector3 positionReticle_;
 
 	// 2Dレティクル用のスプライト
 	Sprite* sprite2DReticle_ = nullptr;

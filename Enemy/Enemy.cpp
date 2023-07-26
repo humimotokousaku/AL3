@@ -22,6 +22,23 @@ Vector3 Enemy::GetWorldPosition() {
 	return worldPos;
 }
 
+
+Vector2 Enemy::GetEnemyScreenPos(const ViewProjection& viewProjection) {
+	Vector3 enemyPos = GetWorldPosition();
+	// ビューポート行列
+	Matrix4x4 matViewport =
+	    MakeViewportMatrix(0, 0, WinApp::kWindowWidth, WinApp::kWindowHeight, 0, 1);
+	// ビュー行列とプロジェクション行列、ビューポート行列を合成する
+	Matrix4x4 matViewProjectionViewport{};
+	matViewProjectionViewport =
+	    Multiply(viewProjection.matView, Multiply(viewProjection.matProjection, matViewport));
+
+	// ワールド→スクリーン座標変換
+	enemyPos = Transform(enemyPos, matViewProjectionViewport);
+
+	return {enemyPos.x, enemyPos.y};
+}
+
 void Enemy::ChangeState(BaseEnemyState* pState) {
 	delete state_;
 	state_ = pState;

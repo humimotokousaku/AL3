@@ -210,8 +210,11 @@ void GameScene::Update() {
 		return false;
 	});
 
-		// 自キャラの更新
-		player_->Update(viewProjection_);
+	// 自キャラの更新
+	player_->Update(viewProjection_);
+	for (Enemy* enemy : enemy_) {
+		player_->LockOnReticle(enemy, viewProjection_);
+	}
 
 	// 終了した弾を削除
 	playerBullets_.remove_if([](PlayerBullet* bullet) {
