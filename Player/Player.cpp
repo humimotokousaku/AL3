@@ -61,8 +61,6 @@ void Player::Update() {
 			// 移動量
 			worldTransform_.translation_ = Add(worldTransform_.translation_, move);
 
-			// playerのY軸周り角度(θy)
-			//worldTransform_.rotation_.y = std::atan2(move.x, move.z);
 			// 目標角度の算出
 			goalAngle_ = std::atan2(move.x, move.z);
 		}
