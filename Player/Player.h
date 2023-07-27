@@ -37,4 +37,6 @@ private:
 
 	// モデル
 	Model* model_ = nullptr;
+
+	float goalAngle_;
 };

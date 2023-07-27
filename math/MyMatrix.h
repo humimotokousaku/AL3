@@ -79,3 +79,13 @@ Matrix4x4 MakeViewportMatrix(float left, float top, float width, float height, f
 float Determinant(Matrix4x4 matrix);
 
 Matrix4x4 InverseT(Matrix4x4 m);
+
+// bには差分を入れる
+float Lerp(const float& a, const float& b, float t);
+
+Vector3 Lerp(const Vector3& v1, const Vector3& v2, float t);
+
+Vector3 Slerp(Vector3 start, Vector3 end, float t);
+
+// 最短角度補間
+float LerpShortAngle(float a, float b, float t);

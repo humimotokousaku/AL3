@@ -38,25 +38,38 @@ void Player::Update() {
 	if (Input::GetInstance()->GetJoystickState(0, joyState)) {
 		// 速さ
 		const float speed = 0.3f;
+		// しきい値
+		const float threshold = 0.7f;
+		bool isMoving = false;
 		// 移動量
 		Vector3 move{
 		    (float)joyState.Gamepad.sThumbLX / SHRT_MAX, 0.0f,
-		    (float)joyState.Gamepad.sThumbLY / SHRT_MAX
-		};
-		// 移動量の速さを反映
-		move = Multiply(speed,Normalize(move));
+		    (float)joyState.Gamepad.sThumbLY / SHRT_MAX};
+		if (Length(move) > threshold) {
+			isMoving = true;
+		}
 
-		// 回転行列
-		Matrix4x4 rotateMatrix = MakeRotateMatrix(viewProjection_->rotation_);
-		// 移動ベクトルをカメラの角度だけ回転
-		move = TransformNormal(move, rotateMatrix);
+		if (isMoving) {
+			// 移動量の速さを反映
+			move = Multiply(speed, Normalize(move));
 
-		// 移動量
-		worldTransform_.translation_ = Add(worldTransform_.translation_, move);
+			// 回転行列
+			Matrix4x4 rotateMatrix = MakeRotateMatrix(viewProjection_->rotation_);
+			// 移動ベクトルをカメラの角度だけ回転
+			move = TransformNormal(move, rotateMatrix);
 
-		// playerのY軸周り角度(θy)
-		worldTransform_.rotation_.y = std::atan2(move.x, move.z);
+			// 移動量
+			worldTransform_.translation_ = Add(worldTransform_.translation_, move);
+
+			// playerのY軸周り角度(θy)
+			//worldTransform_.rotation_.y = std::atan2(move.x, move.z);
+			// 目標角度の算出
+			goalAngle_ = std::atan2(move.x, move.z);
+		}
 	}
+
+	// 最短角度補間
+	worldTransform_.rotation_.y = LerpShortAngle(worldTransform_.rotation_.y, goalAngle_, 0.1f);
 
 	// 行列を定数バッファに転送
 	worldTransform_.UpdateMatrix();
