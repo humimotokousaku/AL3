@@ -144,7 +144,6 @@
     <ClInclude Include="base\TextureManager.h" />
     <ClInclude Include="base\WinApp.h" />
     <ClInclude Include="Camera\FollowCamera.h" />
-    <ClInclude Include="Enemy\Enemy.h" />
     <ClInclude Include="Ground\Ground.h" />
     <ClInclude Include="input\Input.h" />
     <ClInclude Include="math\Matrix4x4.h" />
@@ -152,6 +151,7 @@
     <ClInclude Include="math\Vector2.h" />
     <ClInclude Include="math\Vector3.h" />
     <ClInclude Include="math\Vector4.h" />
+    <ClInclude Include="Object\Enemy\Enemy.h" />
     <ClInclude Include="Object\ICharacter.h" />
     <ClInclude Include="Object\Player\Player.h" />
     <ClInclude Include="scene\GameScene.h" />

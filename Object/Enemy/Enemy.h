@@ -19,4 +19,14 @@ public:
 	/// 描画
 	/// <summary>
 	void Draw(const ViewProjection& viewProjection) override;
+
+	// 浮遊ギミック初期化
+	void InitializeFloatingGimmick();
+
+	// 浮遊ギミック更新
+	void UpdateFloatingGimmick();
+
+private:
+	// 浮遊ギミックの媒介変数
+	float floatingParameter_;
 };
