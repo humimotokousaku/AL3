@@ -11,6 +11,12 @@
 class Enemy;
 class GameScene;
 
+enum ReticleMode {
+	NORMAL,
+	LOCKON,
+	EASE
+};
+
 class Player : public Collider {
 public:
 	// 衝突を検出したら呼び出されるコールバック関数
@@ -99,6 +105,9 @@ public:
 	Sprite* sprite2DReticle_ = nullptr;
 
 	Enemy* enemy_;
+
+	int preReticleMode_ = NORMAL;
+	int reticleMode_ = NORMAL;
 
 	GameScene* gameScene_;
 

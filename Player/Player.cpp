@@ -3,8 +3,8 @@
 #include "GameScene.h"
 #include "ImGuiManager.h"
 #include "WorldTransform.h"
-#include "math/MyMatrix.h"
 #include "math/Lerp.h"
+#include "math/MyMatrix.h"
 #include <cassert>
 
 void Player::OnCollision() {}
@@ -61,7 +61,7 @@ void Player::DeployReticle() {
 	offset.x *= kDistancePlayerTo3DReticle;
 	offset.y *= kDistancePlayerTo3DReticle;
 	offset.z *= kDistancePlayerTo3DReticle;
-	
+
 	// 3Dレティクルの座標を設定
 	worldTransform3DReticle_.translation_.x = GetWorldPosition().x + offset.x;
 	worldTransform3DReticle_.translation_.y = GetWorldPosition().y + offset.y;
@@ -70,19 +70,51 @@ void Player::DeployReticle() {
 	worldTransform3DReticle_.UpdateMatrix();
 }
 
-void Player::LockOnReticle(Enemy* enemy, const ViewProjection& viewProjection) { 
+void Player::LockOnReticle(Enemy* enemy, const ViewProjection& viewProjection) {
 	Vector2 enemyScreenPos = enemy->GetEnemyScreenPos(viewProjection);
 	Vector2 e2r{};
 	e2r.x = enemyScreenPos.x - positionReticle_.x;
 	e2r.y = enemyScreenPos.y - positionReticle_.y;
-	float e2rR = 80;
+	float e2rR = 50;
 	if ((e2r.x * e2r.x) + (e2r.y * e2r.y) <= e2rR * e2rR) {
-		worldTransform3DReticle_.translation_ = enemy->GetEnemyPos();
-		worldTransform3DReticle_.UpdateMatrix();
-		sprite2DReticle_->SetPosition(enemyScreenPos);
-	}
-	else {
-		//Lerp()
+		preReticleMode_ = LOCKON;
+		reticleMode_ = LOCKON;
+		if (reticleMode_ == LOCKON) {
+			worldTransform3DReticle_.translation_ = enemy->GetEnemyPos();
+			worldTransform3DReticle_.UpdateMatrix();
+
+			sprite2DReticle_->SetPosition(enemyScreenPos);
+		}
+	} else {
+		reticleMode_ = EASE;
+		if (reticleMode_ == EASE) {
+			if (preReticleMode_ == LOCKON) {
+				Vector3 a = Subtract(
+				    {positionReticle_.x, positionReticle_.y, positionReticle_.z},
+				    Vector3{enemyScreenPos.x, enemyScreenPos.x, 0});
+				Vector3 speed = {0.1f, 0.1f, 0.1f};
+				a = Normalize(a);
+				speed = Normalize(speed);
+				speed = Lerp(speed, a, 0.1f);
+				a.x *= 0.5f;
+				a.y *= 0.5f;
+				a.z *= 0.5f;
+				positionReticle_ = Add(positionReticle_, speed);
+
+					// ビューポート行列
+				Matrix4x4 matViewport =
+				    MakeViewportMatrix(0, 0, WinApp::kWindowWidth, WinApp::kWindowHeight, 0, 1);
+				// ビュー行列とプロジェクション行列、ビューポート行列を合成する
+				Matrix4x4 matViewProjectionViewport{};
+				matViewProjectionViewport = Multiply(
+				    viewProjection.matView, Multiply(viewProjection.matProjection, matViewport));
+
+				// ワールド→スクリーン座標変換
+				positionReticle_ = Transform(positionReticle_, matViewProjectionViewport);
+
+				sprite2DReticle_->SetPosition(Vector2(positionReticle_.x, positionReticle_.y));
+			}
+		}
 	}
 }
 
@@ -104,7 +136,7 @@ void Player::Attack() {
 		velocity.x *= kBulletSpeed;
 		velocity.y *= kBulletSpeed;
 		velocity.z *= kBulletSpeed;
-		
+
 		// 弾を生成し、初期化
 		PlayerBullet* newBullet = new PlayerBullet();
 		newBullet->Initialize(model_, worldPos, velocity);
@@ -129,7 +161,6 @@ void Player::Initialize(Model* model, uint32_t textureHandle, const Vector3& pos
 	// レティクル
 	reticleTexture_ = TextureManager::Load("black.png");
 
-	
 	// レティクル用のテクスチャ取得
 	uint32_t textureReticle = TextureManager::Load("reticle.png");
 
@@ -215,11 +246,14 @@ void Player::Update(const ViewProjection& viewProjection) {
 
 	// 3Dレティクルのワールド座標を取得
 	positionReticle_ = GetWorld3DReticlePosition();
-	// ビューポート行列
-	Matrix4x4 matViewport = MakeViewportMatrix(0, 0, WinApp::kWindowWidth, WinApp::kWindowHeight, 0, 1);
+
+		// ビューポート行列
+	Matrix4x4 matViewport =
+	    MakeViewportMatrix(0, 0, WinApp::kWindowWidth, WinApp::kWindowHeight, 0, 1);
 	// ビュー行列とプロジェクション行列、ビューポート行列を合成する
 	Matrix4x4 matViewProjectionViewport{};
-	matViewProjectionViewport = Multiply(viewProjection.matView, Multiply(viewProjection.matProjection, matViewport));
+	matViewProjectionViewport =
+	    Multiply(viewProjection.matView, Multiply(viewProjection.matProjection, matViewport));
 
 	// ワールド→スクリーン座標変換
 	positionReticle_ = Transform(positionReticle_, matViewProjectionViewport);
@@ -238,14 +272,12 @@ void Player::Update(const ViewProjection& viewProjection) {
 	ImGui::End();
 }
 
-void Player::DrawUI() {
-	sprite2DReticle_->Draw(); 
-}
+void Player::DrawUI() { sprite2DReticle_->Draw(); }
 
 // Drawの関数定義
 void Player::Draw(ViewProjection& viewProjection) {
 	// player
 	model_->Draw(worldTransform_, viewProjection, playerTexture_);
-// 3Dレティクルを描画
+	// 3Dレティクルを描画
 	model_->Draw(worldTransform3DReticle_, viewProjection);
 }
