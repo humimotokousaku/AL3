@@ -8,6 +8,8 @@ class GlobalVariables {
 public:
 	static GlobalVariables* GetInstance();
 
+	bool GetIsSave() { return isSave_; }
+
 	// 値の取得(int)
 	int32_t GetIntValue(const std::string& groupName, const std::string& key);
 	// 値の取得(float)
@@ -77,4 +79,6 @@ public:
 
 	// グローバル変数の保存先ファイルパス
 	const std::string kDirectoryPath = "Resources/GlobalVariables/";
+
+	bool isSave_;
 };

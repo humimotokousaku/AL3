@@ -102,7 +102,11 @@ void Player::Update() {
 	GlobalVariables* globalVariables = GlobalVariables::GetInstance();
 
 	ApplyGlobalVariables();
-	globalVariables->SaveFile("Player");
+
+	// ボタンを押したらsave
+	if (globalVariables->GetInstance()->GetIsSave()) {
+		globalVariables->SaveFile("Player");
+	}
 }
 
 // Drawの関数定義

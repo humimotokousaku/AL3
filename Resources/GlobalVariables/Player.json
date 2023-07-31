@@ -1,7 +1,7 @@
 {
     "Player": {
         "ArmL Translation": [
-            -1.600000023841858,
+            -1.5,
             5.0,
             0.0
         ],
@@ -12,12 +12,11 @@
         ],
         "Head Translation": [
             0.0,
-            0.0,
+            0.4000000059604645,
             0.0
         ],
-        "Test": 48,
-        "floatingAmplitude": 0.0,
-        "floatingCycleBody": 32,
-        "floatingCycle_Arms": 36
+        "floatingAmplitude": 1.0420000553131104,
+        "floatingCycleBody": 36,
+        "floatingCycle_Arms": 17
     }
 }

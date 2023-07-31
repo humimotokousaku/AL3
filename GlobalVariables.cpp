@@ -215,7 +215,7 @@ void GlobalVariables::LoadFile(const std::string& groupName) {
 			int32_t value = itItem->get<int32_t>();
 			SetValue(groupName, itemName, value);
 		} // floatの値を保持している場合
-		else if (itItem->is_number_integer()) {
+		else if (itItem->is_number_float()) {
 			// double型の値を登録
 			double value = itItem->get<double>();
 			SetValue(groupName, itemName, static_cast<float>(value));
@@ -298,10 +298,14 @@ void GlobalVariables::Update() {
 			SaveFile(groupName);
 			std::string message = std::format("{}.json saved.", groupName);
 			MessageBoxA(nullptr, message.c_str(), "GlobalVariables", 0);
+			isSave_ = true;
 		}
-
+		if (isSave_) {
+			isSave_ = false;
+		}
 		ImGui::EndMenu();
 	}
+
 
 	ImGui::EndMenuBar();
 	ImGui::End();
