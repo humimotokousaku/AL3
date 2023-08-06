@@ -75,25 +75,21 @@ void Player::LockOnReticle(Enemy* enemy, const ViewProjection& viewProjection) {
 	Vector2 e2r{};
 	e2r.x = enemyScreenPos.x - positionReticle_.x;
 	e2r.y = enemyScreenPos.y - positionReticle_.y;
+	Vector3 startPos;
 	float e2rR = 30;
+	bool isLockon{};
+	Vector3 lockonPos{};
+	if (isLockon) {
+		isLockon_ = true;
+	} else {
+		isLockon_ = false;
+	}
+	// 敵に近寄ったらロックオン
 	if ((e2r.x * e2r.x) + (e2r.y * e2r.y) <= e2rR * e2rR) {
-		worldTransform3DReticle_.translation_ = enemy->GetEnemyPos();
+		worldTransform3DReticle_.translation_ = enemy->GetWorldPosition();
 		worldTransform3DReticle_.UpdateMatrix();
 
-		sprite2DReticle_->SetPosition(enemyScreenPos);
-
-	} else {
-		Vector3 a = Subtract(
-		    {positionReticle_.x, positionReticle_.y, positionReticle_.z},
-		    Vector3{enemyScreenPos.x, enemyScreenPos.x, 0});
-		Vector3 speed = {0.1f, 0.1f, 0.1f};
-		a = Normalize(a);
-		speed = Normalize(speed);
-		speed = Lerp(speed, a, 0.1f);
-		a.x *= 0.5f;
-		a.y *= 0.5f;
-		a.z *= 0.5f;
-		positionReticle_ = Add(positionReticle_, speed);
+		positionReticle_ = GetWorld3DReticlePosition();
 
 		// ビューポート行列
 		Matrix4x4 matViewport =
@@ -106,7 +102,37 @@ void Player::LockOnReticle(Enemy* enemy, const ViewProjection& viewProjection) {
 		// ワールド→スクリーン座標変換
 		positionReticle_ = Transform(positionReticle_, matViewProjectionViewport);
 
-		sprite2DReticle_->SetPosition(Vector2(positionReticle_.x, positionReticle_.y));
+		sprite2DReticle_->SetPosition({positionReticle_.x, positionReticle_.y});
+		isLockon = true;
+
+	} else {
+		if (isLockon) {
+			//startPos = GetWorld3DReticlePosition();
+			//Vector3 a = Subtract(
+			//    {positionReticle_.x, positionReticle_.y, positionReticle_.z},
+			//    Vector3{enemyScreenPos.x, enemyScreenPos.x, 0});
+			//Vector3 speed = {0.1f, 0.1f, 0.1f};
+			//a = Normalize(a);
+			//speed = Normalize(speed);
+			//speed = Lerp(speed, a, 0.1f);
+			//a.x *= 0.5f;
+			//a.y *= 0.5f;
+			//a.z *= 0.5f;
+			//positionReticle_ = Add(positionReticle_, speed);
+
+			//// ビューポート行列
+			//Matrix4x4 matViewport =
+			//    MakeViewportMatrix(0, 0, WinApp::kWindowWidth, WinApp::kWindowHeight, 0, 1);
+			//// ビュー行列とプロジェクション行列、ビューポート行列を合成する
+			//Matrix4x4 matViewProjectionViewport{};
+			//matViewProjectionViewport = Multiply(
+			//    viewProjection.matView, Multiply(viewProjection.matProjection, matViewport));
+
+			//// ワールド→スクリーン座標変換
+			//positionReticle_ = Transform(positionReticle_, matViewProjectionViewport);
+
+			//sprite2DReticle_->SetPosition(Vector2(positionReticle_.x, positionReticle_.y));
+		}
 	}
 }
 
@@ -236,21 +262,22 @@ void Player::Update(const ViewProjection& viewProjection) {
 	// 3Dレティクルの配置
 	DeployReticle();
 
-	// 3Dレティクルのワールド座標を取得
-	positionReticle_ = GetWorld3DReticlePosition();
+	if (!isLockon_) {
+		// 3Dレティクルのワールド座標を取得
+		positionReticle_ = GetWorld3DReticlePosition();
+		// ビューポート行列
+		Matrix4x4 matViewport =
+		    MakeViewportMatrix(0, 0, WinApp::kWindowWidth, WinApp::kWindowHeight, 0, 1);
+		// ビュー行列とプロジェクション行列、ビューポート行列を合成する
+		Matrix4x4 matViewProjectionViewport{};
+		matViewProjectionViewport =
+		    Multiply(viewProjection.matView, Multiply(viewProjection.matProjection, matViewport));
 
-	// ビューポート行列
-	Matrix4x4 matViewport =
-	    MakeViewportMatrix(0, 0, WinApp::kWindowWidth, WinApp::kWindowHeight, 0, 1);
-	// ビュー行列とプロジェクション行列、ビューポート行列を合成する
-	Matrix4x4 matViewProjectionViewport{};
-	matViewProjectionViewport =
-	    Multiply(viewProjection.matView, Multiply(viewProjection.matProjection, matViewport));
+		// ワールド→スクリーン座標変換
+		positionReticle_ = Transform(positionReticle_, matViewProjectionViewport);
 
-	// ワールド→スクリーン座標変換
-	positionReticle_ = Transform(positionReticle_, matViewProjectionViewport);
-
-	sprite2DReticle_->SetPosition(Vector2(positionReticle_.x, positionReticle_.y));
+		sprite2DReticle_->SetPosition(Vector2(positionReticle_.x, positionReticle_.y));
+	}
 
 	// 行列を定数バッファに転送
 	worldTransform_.TransferMatrix();

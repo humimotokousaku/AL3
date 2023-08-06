@@ -105,9 +105,8 @@ public:
 	Sprite* sprite2DReticle_ = nullptr;
 
 	Enemy* enemy_;
-
-	int preReticleMode_ = NORMAL;
-	int reticleMode_ = NORMAL;
+	bool isLockon_ = false;
+	Vector3 lockonPos_;
 
 	GameScene* gameScene_;
 
