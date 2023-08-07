@@ -35,6 +35,8 @@ public: // メンバ関数
 	/// </summary>
 	void Initialize();
 
+	void UpdatePlayerPosition(float t);
+
 	Vector3 CatmullRomSpline(const std::vector<Vector3>& controlPoints, float t);
 
 	/// <summary>
@@ -84,6 +86,11 @@ private: // メンバ変数
 	std::vector<Vector3> pointsDrawing_;
 	// 線分の数
 	const size_t segmentCount = 100;
+
+	Vector3 target_;
+
+	float t_;
+	float targetT_;
 
 	// ImGuiで値を入力する変数
 	float inputFloat[3] = {0, 0, 0};

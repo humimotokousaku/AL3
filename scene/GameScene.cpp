@@ -53,7 +53,7 @@ void GameScene::Initialize() {
 	// 初期位置
 	Vector3 playerPosition(0, -2, 10);
 	// 自キャラの初期化
-	player_->Initialize(model_, playerTexture_,playerPosition);
+	player_->Initialize(model_, playerTexture_, playerPosition);
 	// 自キャラとレールカメラの親子関係を結ぶ
 	player_->SetParent(&railCamera_->GetWorldTransform());
 
@@ -74,15 +74,17 @@ void GameScene::Initialize() {
 	// スプライン曲線制御点（通過点）の初期化
 	controlPoints_ = {
 	    {0,  0,  0},
-        {10, 10, 0},
+        {10, 10, 10},
         {10, 15, 0},
-        {20, 15, 0},
+        {20, 15, 20},
         {20, 0,  0},
-        {30, 0,  0}
+        {30, 0,  -10}
     };
 
 	// 3Dライン
 	PrimitiveDrawer::GetInstance()->SetViewProjection(&viewProjection_);
+
+	targetT_ = 1.0f / segmentCount;
 }
 
 Vector3 GameScene::CatmullRomSpline(const std::vector<Vector3>& controlPoints, float t) {
@@ -112,6 +114,13 @@ Vector3 GameScene::CatmullRomSpline(const std::vector<Vector3>& controlPoints, f
 	return interpolatedPoint;
 }
 
+void GameScene::UpdatePlayerPosition(float t) {
+	Vector3 cameraPosition{};
+	// Catmull-Romスプライン関数で補間された位置を取得
+	cameraPosition = CatmullRomSpline(controlPoints_, t);
+	railCamera_->SetTranslation(cameraPosition);
+}
+
 void GameScene::Update() {
 	viewProjection_.UpdateMatrix();
 	// 自キャラの更新
@@ -128,18 +137,33 @@ void GameScene::Update() {
 	// 衝突マネージャー(当たり判定)
 	collisionManager_->CheckAllCollisions();
 
-	// デバッグカメラの更新
-	railCamera_->Update();
-	viewProjection_.matView = railCamera_->GetViewProjection().matView;
-	viewProjection_.matProjection = railCamera_->GetViewProjection().matProjection;
-
 	// 線分の数+1個分の頂点座標の計算
 	for (size_t i = 0; i < segmentCount + 1; i++) {
 		float t = 1.0f / segmentCount * i;
+		
 		Vector3 pos = CatmullRomSpline(controlPoints_, t);
 		// 描画用頂点リストに追加
 		pointsDrawing_.push_back(pos);
 	}
+	
+	// カメラの移動
+	if (t_ < 0.99f) {
+		t_ += 1.0f / segmentCount / 10;
+	} else {
+		t_ = 0.99f;
+	}
+	if (targetT_ < 0.99f) {
+		targetT_ += 1.0f / segmentCount / 10;
+	} else {
+		targetT_ = 1.0f;
+	}
+	target_ = CatmullRomSpline(controlPoints_, targetT_);
+	UpdatePlayerPosition(t_);
+
+	// デバッグカメラの更新
+	railCamera_->Update(target_);
+	viewProjection_.matView = railCamera_->GetViewProjection().matView;
+	viewProjection_.matProjection = railCamera_->GetViewProjection().matProjection;
 
 	// ビュープロジェクション行列の転送
 	viewProjection_.TransferMatrix();
@@ -192,7 +216,6 @@ void GameScene::Draw() {
 		PrimitiveDrawer::GetInstance()->DrawLine3d(
 		    pointsDrawing_[i], pointsDrawing_[i + 1], {1.0f, 0.0f, 0.0f, 1.0f});
 	}
-	
 
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();

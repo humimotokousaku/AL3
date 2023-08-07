@@ -17,7 +17,10 @@ public:
 	/// <summary>
 	/// 更新処理
 	/// </summary>
-	void Update();
+	void Update(Vector3 target);
+
+	void SetTranslation(Vector3 pos) { worldTransform_.translation_ = pos; }
+	void SetViewTranslation(Vector3 pos) { viewProjection_.translation_ = pos; }
 
 private:
 	// ワールド変換データ
