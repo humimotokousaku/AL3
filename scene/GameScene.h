@@ -77,6 +77,4 @@ private: // メンバ変数
 
 	// デバッグカメラ有効
 	bool isDebugCameraActive_ = false;
-	// デバッグカメラ
-	std::unique_ptr<DebugCamera> debugCamera_ = nullptr;
 };

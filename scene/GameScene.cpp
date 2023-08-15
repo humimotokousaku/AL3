@@ -27,13 +27,9 @@ void GameScene::Initialize() {
 	// 地面の3Dモデルの生成
 	modelGround_.reset(Model::CreateFromOBJ("Ground", true));
 
-	// デバッグカメラの生成
-	debugCamera_ = std::make_unique<DebugCamera>(1280, 720);
 
 	// ワールドトランスフォームの初期化
 	worldTransform_.Initialize();
-	// ビュープロジェクションの初期化
-	debugCamera_->SetFarZ(1000); // 今回は天球の大きさ的に大丈夫なので初期値
 	// ビュープロジェクションの初期化
 	viewProjection_.Initialize();
 
@@ -78,7 +74,7 @@ void GameScene::Update() {
 	// 軸方向の表示を有効
 	AxisIndicator::GetInstance()->SetVisible(true);
 	// 軸方向表示が参照するビュープロジェクションを指定
-	AxisIndicator::GetInstance()->SetTargetViewProjection(&debugCamera_->GetViewProjection());
+	AxisIndicator::GetInstance()->SetTargetViewProjection(&followCamera_->GetViewProjection());
 }
 
 void GameScene::Draw() {
