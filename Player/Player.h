@@ -1,20 +1,36 @@
 ﻿#pragma once
+#include "Collision/Collider.h"
 #include "Model.h"
+#include "Sprite.h"
 #include "WorldTransform.h"
 
-class Player {
+class GameScene;
+
+class Player  {
 public:
+	// 衝突を検出したら呼び出されるコールバック関数
+	//void OnCollision() override;
+
+	// ワールド行列の平行移動成分を取得
+	Vector3 GetWorldPosition();
+
 	Player();
 	~Player();
 	/// <summary>
 	/// 初期化
 	/// <summary>
-	void Initialize(Model* modelBody, Model* modelHead, Model* modelL_arm, Model* modelR_arm);
+	void Initialize(
+	    Model* modelBody, Model* modelHead, Model* modelL_arm, Model* modelR_arm, Model* modelGun, Model* modelBullet);
 
 	/// <summary>
 	/// 更新
 	/// <summary>
 	void Update();
+
+	/// <summary>
+	/// UI描画
+	/// </summary>
+	void DrawUI();
 
 	/// <summary>
 	/// 描画
@@ -27,8 +43,18 @@ public:
 	// 浮遊ギミック更新
 	void UpdateFloatingGimmick();
 
+	void Deploy3DReticle();
+
+	void Deploy2DReticle(const ViewProjection& viewProjection);
+
+	void Attack();
+
 	// 自機のワールド座標
-	Vector3 GetWorldPosition();
+	//Vector3 GetWorldPosition();
+
+	Vector3 GetWorld3DReticlePosition();
+
+	void SetGameScene(GameScene* gameScene) { gameScene_ = gameScene; }
 
 	const WorldTransform& GetWorldTransformBody() { return worldTransformBody_; }
 	const WorldTransform& GetWorldTransformBase() { return worldTransformBase_; }
@@ -47,6 +73,9 @@ private:
 	WorldTransform worldTransformHead_;
 	WorldTransform worldTransformL_arm_;
 	WorldTransform worldTransformR_arm_;
+	WorldTransform worldTransformGun_;
+	// 3Dレティクル用ワールドトランスフォーム
+	WorldTransform worldTransform3DReticle_;
 
 	// カメラのビュープロジェクション
 	const ViewProjection* viewProjection_ = nullptr;
@@ -56,7 +85,22 @@ private:
 	Model* modelHead_;
 	Model* modelL_arm_;
 	Model* modelR_arm_;
+	Model* modelGun_;
+	Model* modelBullet_;
 
 	// 浮遊ギミックの媒介変数
 	float floatingParameter_ = 0.0f;
+
+		// レティクルハンドル
+	uint32_t reticleTexture_ = 0u;
+	// 2Dレティクル用のスプライト
+	Sprite* sprite2DReticle_ = nullptr;
+
+	Matrix4x4 matViewport_;
+
+	GameScene* gameScene_;
+
+	bool isDead_ = true;
+
+	Vector2 spritePosition_;
 };

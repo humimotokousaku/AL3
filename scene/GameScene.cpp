@@ -4,10 +4,18 @@
 #include "ImGuiManager.h"
 #include <cassert>
 
+void GameScene::AddPlayerBullet(PlayerBullet* playerBullet) {
+	// リストに登録する
+	playerBullets_.push_back(playerBullet);
+}
+
 GameScene::GameScene() {}
 
 GameScene::~GameScene(){
-
+	delete modelBullet_;
+	for (PlayerBullet* bullet : playerBullets_) {
+		delete bullet;
+	}
 }
 
 void GameScene::Initialize() {
@@ -22,6 +30,11 @@ void GameScene::Initialize() {
 	modelFighterHead_.reset(Model::CreateFromOBJ("float_Head", true));
 	modelFighterL_arm_.reset(Model::CreateFromOBJ("float_L_arm", true));
 	modelFighterR_arm_.reset(Model::CreateFromOBJ("float_R_arm", true));
+	modelFighterGun_.reset(Model::CreateFromOBJ("gun", true));
+
+	// Playerの弾モデルの生成
+	modelBullet_ = Model::Create();
+
 	// 天球の3Dモデルの生成
 	modelSkydome_.reset(Model::CreateFromOBJ("skydome", true));
 	// 地面の3Dモデルの生成
@@ -35,13 +48,14 @@ void GameScene::Initialize() {
 
 	// 自キャラの生成
 	player_ = std::make_unique<Player>();
-	player_->Initialize(modelFighterBody_.get(),modelFighterHead_.get(),modelFighterL_arm_.get(),modelFighterR_arm_.get());
+	player_->Initialize(modelFighterBody_.get(),modelFighterHead_.get(),modelFighterL_arm_.get(),modelFighterR_arm_.get(), modelFighterGun_.get(), modelBullet_);
 	// 天球
 	skydome_ = std::make_unique<Skydome>();
 	skydome_->Initialize(modelSkydome_.get(), {0, 0, 0});
 	// 地面
 	ground_ = std::make_unique<Ground>();
 	ground_->Initialize(modelGround_.get(), {0, 0, 0});
+	player_->SetGameScene(this);
 
 	// カメラ
 	followCamera_ = std::make_unique<FollowCamera>();
@@ -56,6 +70,19 @@ void GameScene::Initialize() {
 void GameScene::Update() {
 	// 自機
 	player_->Update();
+	// 終了した弾を削除
+	playerBullets_.remove_if([](PlayerBullet* bullet) {
+		if (bullet->IsDead()) {
+			delete bullet;
+			return true;
+		}
+		return false;
+	});
+	// 弾の更新
+	for (PlayerBullet* bullet : playerBullets_) {
+		bullet->Update();
+	}
+
 	// 天球
 	skydome_->Update();
 	// 地面
@@ -104,7 +131,10 @@ void GameScene::Draw() {
 	/// ここに3Dオブジェクトの描画処理を追加できる
 	/// </summary>
 	player_->Draw(viewProjection_);
-
+	// 自弾
+	for (PlayerBullet* bullet : playerBullets_) {
+		bullet->Draw(viewProjection_);
+	}
 	// 天球
 	skydome_->Draw(viewProjection_);
 	// 地面
