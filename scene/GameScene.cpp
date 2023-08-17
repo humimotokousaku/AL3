@@ -3,29 +3,29 @@
 #include "TextureManager.h"
 #include "ImGuiManager.h"
 #include <cassert>
-
-void GameScene::AddPlayerBullet(PlayerBullet* playerBullet) {
-	// リストに登録する
-	playerBullets_.push_back(playerBullet);
-}
+#include <fstream>
 
 GameScene::GameScene() {}
 
 GameScene::~GameScene(){
 	delete modelBullet_;
+	// 自機の弾
 	for (PlayerBullet* bullet : playerBullets_) {
 		delete bullet;
+	}
+	// 壁
+	for (Block* block : block_) {
+		delete block;
 	}
 }
 
 void GameScene::Initialize() {
-
 	dxCommon_ = DirectXCommon::GetInstance();
 	input_ = Input::GetInstance();
 	audio_ = Audio::GetInstance();
+	LoadBlockPopData();
 
 	// 3Dモデルの生成
-	modelPlayer_.reset(Model::CreateFromOBJ("Player", true));
 	modelFighterBody_.reset(Model::CreateFromOBJ("float_Body", true));
 	modelFighterHead_.reset(Model::CreateFromOBJ("float_Head", true));
 	modelFighterL_arm_.reset(Model::CreateFromOBJ("float_L_arm", true));
@@ -39,7 +39,8 @@ void GameScene::Initialize() {
 	modelSkydome_.reset(Model::CreateFromOBJ("skydome", true));
 	// 地面の3Dモデルの生成
 	modelGround_.reset(Model::CreateFromOBJ("Ground", true));
-
+	// 壁
+	modelBlock_.reset(Model::Create());
 
 	// ワールドトランスフォームの初期化
 	worldTransform_.Initialize();
@@ -81,6 +82,12 @@ void GameScene::Update() {
 	// 弾の更新
 	for (PlayerBullet* bullet : playerBullets_) {
 		bullet->Update();
+	}
+	// 敵の出現するタイミングと座標
+	UpdateBlockPopCommands();
+	// 壁の更新
+	for (Block* block : block_) {
+		block->Update();
 	}
 
 	// 天球
@@ -135,6 +142,10 @@ void GameScene::Draw() {
 	for (PlayerBullet* bullet : playerBullets_) {
 		bullet->Draw(viewProjection_);
 	}
+	// 壁
+	for (Block* block : block_) {
+		block->Draw(viewProjection_);
+	}
 	// 天球
 	skydome_->Draw(viewProjection_);
 	// 地面
@@ -158,4 +169,82 @@ void GameScene::Draw() {
 	Sprite::PostDraw();
 
 #pragma endregion
+}
+
+void GameScene::AddPlayerBullet(PlayerBullet* playerBullet) {
+	// リストに登録する
+	playerBullets_.push_back(playerBullet);
+}
+
+void GameScene::SetBlock(Vector3 pos, Vector3 scale) {
+	Block* block = new Block();
+	// 初期化
+	block->Initialize(modelBlock_.get(), pos, scale);
+	// リストに登録
+	block_.push_back(block);
+}
+
+void GameScene::LoadBlockPopData() {
+	// ファイルを開く
+	std::ifstream file;
+	file.open("csv/enemyPop.csv");
+	assert(file.is_open());
+
+	// ファイルの内容を文字列ストリームにコピー
+	blockPopCommands_ << file.rdbuf();
+
+	// ファイルを閉じる
+	file.close();
+}
+
+void GameScene::UpdateBlockPopCommands() {
+	// 1桁分の文字列を入れる変数
+	std::string line;
+
+	// コマンド実行ループ
+	while (getline(blockPopCommands_, line)) {
+		// 1桁の文字列をストリームに変換して解析しやすくする
+		std::istringstream line_stream(line);
+
+		std::string word;
+		// ,区切りで行の先頭文字列を取得
+		getline(line_stream, word, ',');
+
+		// "//"から始まる行はコメント
+		if (word.find("//") == 0) {
+			// コメント行を飛ばす
+			continue;
+		}
+
+		// POPコマンド
+		if (word.find("POP") == 0) {
+			// 座標
+			// x
+			getline(line_stream, word, ',');
+			float posX = (float)std::atof(word.c_str());
+			// y
+			getline(line_stream, word, ',');
+			float posY = (float)std::atof(word.c_str());
+			// z
+			getline(line_stream, word, ',');
+			float posZ = (float)std::atof(word.c_str());
+
+			// スケール
+			// x
+			getline(line_stream, word, ',');
+			float scaleX = (float)std::atof(word.c_str());
+			// y
+			getline(line_stream, word, ',');
+			float scaleY = (float)std::atof(word.c_str());
+			// z
+			getline(line_stream, word, ',');
+			float scaleZ = (float)std::atof(word.c_str());
+
+			// 敵を発生させる
+			SetBlock(Vector3(posX, posY, posZ), Vector3(scaleX, scaleY, scaleZ));
+
+			// コマンドループを抜ける
+			break;
+		}
+	}
 }

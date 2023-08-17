@@ -1,5 +1,6 @@
 #pragma once
 #include "Audio.h"
+#include "Block.h"
 #include "DirectXCommon.h"
 #include "Input.h"
 #include "Model.h"
@@ -14,6 +15,7 @@
 #include "DebugCamera.h"
 #include "Camera/FollowCamera.h"
 #include <memory>
+#include <sstream>
 
 /// <summary>
 /// ゲームシーン
@@ -21,13 +23,6 @@
 class GameScene {
 
 public: // メンバ関数
-	// 弾リストを取得
-	const std::list<PlayerBullet*>& GetPlayerBullets() const { return playerBullets_; }
-
-	Player* GetPlayer() { return player_.get(); }
-
-	void AddPlayerBullet(PlayerBullet* playerBullet);
-
 	/// <summary>
 	/// コンストクラタ
 	/// </summary>
@@ -53,39 +48,57 @@ public: // メンバ関数
 	/// </summary>
 	void Draw();
 
+	// 弾リストを取得
+	const std::list<PlayerBullet*>& GetPlayerBullets() const { return playerBullets_; }
+
+	Player* GetPlayer() { return player_.get(); }
+
+	void AddPlayerBullet(PlayerBullet* playerBullet);
+
+	// csvのデータをもとに壁の座標と大きさを設定
+	void SetBlock(Vector3 pos, Vector3 scale);
+
+	// csvの読み込み
+	void LoadBlockPopData();
+
+	// csvに書かれている壁の座標と大きさのデータを読む
+	void UpdateBlockPopCommands();
+
 private: // メンバ変数
 	DirectXCommon* dxCommon_ = nullptr;
 	Input* input_ = nullptr;
 	Audio* audio_ = nullptr;
 
+	std::stringstream blockPopCommands_;
+
 	// 3Dモデルデータ
-	std::unique_ptr<Model> modelPlayer_;
-	// 天球の3Dモデル
+
+	// 天球
 	std::unique_ptr<Model> modelSkydome_;
 	std::unique_ptr<Skydome> skydome_;
-	// 地面の3Dモデル
+	// 地面
 	std::unique_ptr<Model> modelGround_;
 	std::unique_ptr<Ground> ground_;
-	// 自機の3Dモデル
+	// 壁などの障害物
+	std::unique_ptr<Model> modelBlock_;
+	std::list<Block*> block_;
+	// 自機
 	std::unique_ptr<Model> modelFighterBody_;
 	std::unique_ptr<Model> modelFighterHead_;
 	std::unique_ptr<Model> modelFighterL_arm_;
 	std::unique_ptr<Model> modelFighterR_arm_;
 	std::unique_ptr<Model> modelFighterGun_;
 	Model* modelBullet_;
-	
-	// ワールドトランスフォーム
-	WorldTransform worldTransform_;
-	// ビュープロジェクション
-	ViewProjection viewProjection_;
-
 	// 自キャラ
 	std::unique_ptr<Player> player_;
 	// 自弾
 	std::list<PlayerBullet*> playerBullets_;
 
+	// ワールドトランスフォーム
+	WorldTransform worldTransform_;
+	// ビュープロジェクション
+	ViewProjection viewProjection_;
+
 	// カメラ
 	std::unique_ptr<FollowCamera> followCamera_;
-	// デバッグカメラ有効
-	bool isDebugCameraActive_ = false;
 };

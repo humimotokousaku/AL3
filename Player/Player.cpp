@@ -109,8 +109,11 @@ void Player::Attack() {
 	}
 
 	// Rトリガーを押していたら
-	if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER) {
-		// 弾の速度
+	if (input_->TriggerKey(DIK_SPACE)) {
+	
+
+	//if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER) {
+		//  弾の速度
 		const float kBulletSpeed = 1.0f;
 		Vector3 velocity(0, 0, kBulletSpeed);
 		// 速度ベクトルを自機の向きに合わせて回転させる
@@ -136,7 +139,10 @@ void Player::Attack() {
 
 		// 弾を登録
 		gameScene_->AddPlayerBullet(newBullet);
+	
+	//}
 	}
+
 }
 
 Player::Player() {}
@@ -170,6 +176,8 @@ void Player::Initialize(
 
 	// スプライト生成
 	sprite2DReticle_ = Sprite::Create(textureReticle, {640, 320}, {1, 1, 1, 1}, {0.5f, 0.5f});
+
+	input_ = Input::GetInstance();
 
 	// 腕の座標指定
 	worldTransformL_arm_.translation_.x = -1.5f;

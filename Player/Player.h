@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "Collision/Collider.h"
+#include "Input.h"
 #include "Model.h"
 #include "Sprite.h"
 #include "WorldTransform.h"
@@ -100,4 +101,8 @@ private:
 	bool isDead_ = true;
 
 	Vector2 spritePosition_;
+
+	bool isBullet_;
+
+	Input* input_;
 };
