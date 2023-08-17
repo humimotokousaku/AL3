@@ -49,9 +49,6 @@ public:
 
 	void Attack();
 
-	// 自機のワールド座標
-	//Vector3 GetWorldPosition();
-
 	Vector3 GetWorld3DReticlePosition();
 
 	void SetGameScene(GameScene* gameScene) { gameScene_ = gameScene; }

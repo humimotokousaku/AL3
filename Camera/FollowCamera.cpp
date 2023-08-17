@@ -1,12 +1,10 @@
 ﻿#include "Camera/FollowCamera.h"
+#include "ImGuiManager.h"
 #include "math/MyMatrix.h"
 #include <Input.h>
 #include <Xinput.h>
 
-void FollowCamera::Initialize() { 
-
-	viewProjection_.Initialize(); 
-}
+void FollowCamera::Initialize() { viewProjection_.Initialize(); }
 
 void FollowCamera::Update() {
 	if (target_) {
@@ -19,14 +17,26 @@ void FollowCamera::Update() {
 		offset = TransformNormal(offset, rotateMatrix);
 
 		// 座標をコピーしてオフセット分ずらす
-		viewProjection_.translation_ = Add(target_->translation_,offset);
+		viewProjection_.translation_ = Add(target_->translation_, offset);
 	}
 	XINPUT_STATE joyState;
+
 	if (Input::GetInstance()->GetJoystickState(0, joyState)) {
 		const float kRadian = 0.02f;
+		if (viewProjection_.rotation_.x >= -0.26f && viewProjection_.rotation_.x <= 0.26f) {
+			viewProjection_.rotation_.x -= (float)joyState.Gamepad.sThumbRY / SHRT_MAX * kRadian;
+		}
 		viewProjection_.rotation_.y += (float)joyState.Gamepad.sThumbRX / SHRT_MAX * kRadian;
-	}
 
-	viewProjection_.UpdateViewMatrix(); 
+	} 
+	if (viewProjection_.rotation_.x <= -0.26f) {
+		viewProjection_.rotation_.x = -0.2599999f;
+	} else if (viewProjection_.rotation_.x >= 0.26f) {
+		viewProjection_.rotation_.x = 0.2599999f;
+	}
+	viewProjection_.UpdateViewMatrix();
 	viewProjection_.TransferMatrix();
+	ImGui::Begin("camera");
+	ImGui::Text("view.rotate.x %f", viewProjection_.rotation_.x);
+	ImGui::End();
 }
