@@ -19,8 +19,10 @@ public:
 	// 衝突マスク(相手)を設定
 	void SetCollisionMask(uint32_t collisionMask) { collisionMask_ = collisionMask; }
 
+	// 衝突してないときに呼ばれる関数
+	virtual bool NonCollision() = 0;
 	// 衝突時に呼ばれる関数
-	virtual void OnCollision() = 0;
+	virtual bool OnCollision() = 0;
 
 	// ワールド座標を取得
 	virtual Vector3 GetWorldPosition() = 0;
@@ -28,6 +30,8 @@ public:
 private:
 	// 衝突半径
 	float radius_ = 1.0f;
+	// 1frame前の位置
+	//Vector3 prePos_;
 
 	// 衝突属性(自分)
 	uint32_t collisionAttribute_ = 0xffffffff;

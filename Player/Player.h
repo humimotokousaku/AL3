@@ -7,13 +7,15 @@
 
 class GameScene;
 
-class Player  {
+class Player : public Collider {
 public:
+	// 衝突してない場合
+	bool NonCollision() override;
 	// 衝突を検出したら呼び出されるコールバック関数
-	//void OnCollision() override;
+	bool OnCollision() override;
 
 	// ワールド行列の平行移動成分を取得
-	Vector3 GetWorldPosition();
+	Vector3 GetWorldPosition() override;
 
 	Player();
 	~Player();
@@ -57,6 +59,8 @@ public:
 	const WorldTransform& GetWorldTransformBody() { return worldTransformBody_; }
 	const WorldTransform& GetWorldTransformBase() { return worldTransformBase_; }
 
+	void SetWorldPos(Vector3 prePos);
+
 	void SetViewProjection(const ViewProjection* viewProjection) {
 		viewProjection_ = viewProjection;
 	}
@@ -89,7 +93,7 @@ private:
 	// 浮遊ギミックの媒介変数
 	float floatingParameter_ = 0.0f;
 
-		// レティクルハンドル
+	// レティクルハンドル
 	uint32_t reticleTexture_ = 0u;
 	// 2Dレティクル用のスプライト
 	Sprite* sprite2DReticle_ = nullptr;
@@ -105,4 +109,9 @@ private:
 	bool isBullet_;
 
 	Input* input_;
+	
+	Vector3 nextPos_;
+
+	// 壁に当たった時に今の移動ベクトルと逆の方向のベクトルを入れる
+	Vector3 velocity_;
 };

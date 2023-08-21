@@ -1,13 +1,13 @@
 #include "GameScene.h"
 #include "AxisIndicator.h"
-#include "TextureManager.h"
 #include "ImGuiManager.h"
+#include "TextureManager.h"
 #include <cassert>
 #include <fstream>
 
 GameScene::GameScene() {}
 
-GameScene::~GameScene(){
+GameScene::~GameScene() {
 	delete modelBullet_;
 	// 自機の弾
 	for (PlayerBullet* bullet : playerBullets_) {
@@ -49,7 +49,9 @@ void GameScene::Initialize() {
 
 	// 自キャラの生成
 	player_ = std::make_unique<Player>();
-	player_->Initialize(modelFighterBody_.get(),modelFighterHead_.get(),modelFighterL_arm_.get(),modelFighterR_arm_.get(), modelFighterGun_.get(), modelBullet_);
+	player_->Initialize(
+	    modelFighterBody_.get(), modelFighterHead_.get(), modelFighterL_arm_.get(),
+	    modelFighterR_arm_.get(), modelFighterGun_.get(), modelBullet_);
 	// 天球
 	skydome_ = std::make_unique<Skydome>();
 	skydome_->Initialize(modelSkydome_.get(), {0, 0, 0});
@@ -63,12 +65,26 @@ void GameScene::Initialize() {
 	followCamera_->Initialize();
 	// 追従するオブジェクトのワールドトランスフォームをセット
 	followCamera_->SetTarget(&player_->GetWorldTransformBase());
-
 	// 自機に追従カメラのビュープロジェクションをアドレス渡し
 	player_->SetViewProjection(&followCamera_->GetViewProjection());
+
+	// 衝突マネージャーの生成
+	collisionManager_ = std::make_unique<CollisionManager>();
 }
 
 void GameScene::Update() {
+	// 敵の出現するタイミングと座標
+	UpdateBlockPopCommands();
+	// 壁の更新
+	for (Block* block : block_) {
+		block->Update();
+	}
+	for (Block* block : block_) {
+		if (block->GetIsCollision()) {
+			isResetPos_ = true;
+		}
+	}
+
 	// 自機
 	player_->Update();
 	// 終了した弾を削除
@@ -83,27 +99,24 @@ void GameScene::Update() {
 	for (PlayerBullet* bullet : playerBullets_) {
 		bullet->Update();
 	}
-	// 敵の出現するタイミングと座標
-	UpdateBlockPopCommands();
-	// 壁の更新
-	for (Block* block : block_) {
-		block->Update();
-	}
 
 	// 天球
 	skydome_->Update();
 	// 地面
 	ground_->Update();
 
+	// 当たり判定を必要とするObjectをまとめてセットする
+	collisionManager_->SetGameObject(player_.get(), block_, playerBullets_);
+	// 衝突マネージャー(当たり判定)
+	collisionManager_->CheckAllCollisions(this);
+
 	viewProjection_.UpdateMatrix();
 	// カメラ
 	followCamera_->Update();
 	viewProjection_.matView = followCamera_->GetViewProjection().matView;
 	viewProjection_.matProjection = followCamera_->GetViewProjection().matProjection;
-	viewProjection_.TransferMatrix();
 
-	ImGui::Begin("L_joystick:Move   R_joystick:CameraRotation");
-	ImGui::End();
+	viewProjection_.TransferMatrix();
 
 	// 軸方向の表示を有効
 	AxisIndicator::GetInstance()->SetVisible(true);

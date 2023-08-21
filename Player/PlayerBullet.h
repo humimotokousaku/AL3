@@ -8,8 +8,10 @@
 /// </summary>
 class PlayerBullet : public Collider{
 public: // メンバ関数
+	// 衝突してない場合
+	bool NonCollision() override;
 	// 衝突を検出したら呼び出されるコールバック関数
-	void OnCollision() override;
+	bool OnCollision() override;
 
 	// ワールド行列の平行移動成分を取得
 	Vector3 GetWorldPosition() override;

@@ -1,6 +1,9 @@
 #pragma once
 #include "Audio.h"
 #include "Block.h"
+#include "Camera/FollowCamera.h"
+#include "Collision/CollisionManager.h"
+#include "DebugCamera.h"
 #include "DirectXCommon.h"
 #include "Input.h"
 #include "Model.h"
@@ -12,8 +15,6 @@
 #include "Player/PlayerBullet.h"
 #include "Skydome/Skydome.h"
 #include "Ground/Ground.h"
-#include "DebugCamera.h"
-#include "Camera/FollowCamera.h"
 #include <memory>
 #include <sstream>
 
@@ -50,6 +51,8 @@ public: // メンバ関数
 
 	// 弾リストを取得
 	const std::list<PlayerBullet*>& GetPlayerBullets() const { return playerBullets_; }
+	// 壁リストを取得
+	const std::list<Block*>& GetBlock() const { return block_; }
 
 	Player* GetPlayer() { return player_.get(); }
 
@@ -101,4 +104,9 @@ private: // メンバ変数
 
 	// カメラ
 	std::unique_ptr<FollowCamera> followCamera_;
+
+	// 衝突マネージャー
+	std::unique_ptr<CollisionManager> collisionManager_;
+
+	bool isResetPos_ = false;
 };

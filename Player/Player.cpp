@@ -5,10 +5,20 @@
 #include <Xinput.h>
 #include <cassert>
 #define _USE_MATH_DEFINES
-#include "math.h"
 #include "GameScene.h"
+#include "math.h"
 
-//void Player::OnCollision() {}
+bool Player::NonCollision() { return false; }
+bool Player::OnCollision() {
+	// 移動ベクトルを反転
+	velocity_ = Multiply(-1.0f, velocity_);
+	// 
+	worldTransformBase_.translation_ = Add(velocity_, worldTransformBase_.translation_);
+	worldTransformBody_.translation_ = Add(velocity_, worldTransformBody_.translation_);
+	worldTransformBase_.UpdateMatrix();
+	worldTransformBody_.UpdateMatrix();
+	return true;
+}
 
 Vector3 Player::GetWorldPosition() {
 	// ワールド座標を入れる変数
@@ -32,6 +42,15 @@ Vector3 Player::GetWorld3DReticlePosition() {
 	return worldPos;
 }
 
+void Player::SetWorldPos(Vector3 prePos) {
+	worldTransformBase_.matWorld_.m[3][0] = prePos.x;
+	worldTransformBase_.matWorld_.m[3][1] = prePos.y;
+	worldTransformBase_.matWorld_.m[3][2] = prePos.z;
+	worldTransformBody_.matWorld_.m[3][0] = prePos.x;
+	worldTransformBody_.matWorld_.m[3][1] = prePos.y;
+	worldTransformBody_.matWorld_.m[3][2] = prePos.z;
+}
+
 void Player::SetParent(const WorldTransform* parent) {
 	// 親子関係を結ぶ
 	worldTransformBase_.parent_ = parent;
@@ -41,9 +60,7 @@ void Player::SetParent(const WorldTransform* parent) {
 	worldTransformGun_.parent_ = parent;
 }
 
-void Player::InitializeFloatingGimmick() { 
-	floatingParameter_ = 0.0f;
-}
+void Player::InitializeFloatingGimmick() { floatingParameter_ = 0.0f; }
 
 void Player::UpdateFloatingGimmick() {
 	// 浮遊移動のサイクル<frame>
@@ -63,7 +80,6 @@ void Player::UpdateFloatingGimmick() {
 	worldTransformL_arm_.rotation_.x = std::sin(floatingParameter_) * 0.75f;
 	worldTransformR_arm_.rotation_.x = std::sin(floatingParameter_) * 0.75f;
 }
-
 
 void Player::Deploy3DReticle() {
 	// 自機から3Dレティクルへの距離
@@ -109,10 +125,8 @@ void Player::Attack() {
 	}
 
 	// Rトリガーを押していたら
-	if (input_->TriggerKey(DIK_SPACE)) {
-	
-
-	//if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER) {
+	if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER ||
+	    input_->TriggerKey(DIK_SPACE)) {
 		//  弾の速度
 		const float kBulletSpeed = 1.0f;
 		Vector3 velocity(0, 0, kBulletSpeed);
@@ -139,10 +153,7 @@ void Player::Attack() {
 
 		// 弾を登録
 		gameScene_->AddPlayerBullet(newBullet);
-	
-	//}
 	}
-
 }
 
 Player::Player() {}
@@ -150,7 +161,8 @@ Player::~Player() { delete sprite2DReticle_; }
 
 // Initializeの関数定義
 void Player::Initialize(
-    Model* modelBody, Model* modelHead, Model* modelL_arm, Model* modelR_arm, Model* modelGun, Model* modelBullet) {
+    Model* modelBody, Model* modelHead, Model* modelL_arm, Model* modelR_arm, Model* modelGun,
+    Model* modelBullet) {
 	// NULLポインタチェック
 	assert(modelBody);
 	assert(modelHead);
@@ -188,7 +200,10 @@ void Player::Initialize(
 	worldTransformGun_.translation_.y = 5.0f;
 	worldTransformGun_.translation_.z = 1.5f;
 
-	// 身体のパーツの親子関係を結ぶ	
+	// 当たり判定の半径設定
+	SetRadius(2.0f);
+
+	// 身体のパーツの親子関係を結ぶ
 	SetParent(&GetWorldTransformBody());
 
 	// 浮遊ギミックの初期化
@@ -218,10 +233,9 @@ void Player::Update() {
 		// 移動量
 		Vector3 move{
 		    (float)joyState.Gamepad.sThumbLX / SHRT_MAX, 0.0f,
-		    (float)joyState.Gamepad.sThumbLY / SHRT_MAX
-		};
+		    (float)joyState.Gamepad.sThumbLY / SHRT_MAX};
 		// 移動量の速さを反映
-		move = Multiply(speed,Normalize(move));
+		move = Multiply(speed, Normalize(move));
 
 		// 回転行列
 		Matrix4x4 rotateMatrix = MakeRotateMatrix(viewProjection_->rotation_);
@@ -229,6 +243,7 @@ void Player::Update() {
 		move = TransformNormal(move, rotateMatrix);
 		// Playerは見ている方向に進んでいくので地面にも進んでしまう。なのでy軸方向には進まないようにする
 		move.y = 0;
+		velocity_ = move;
 
 		// 移動量
 		worldTransformBase_.translation_ = Add(worldTransformBase_.translation_, move);
@@ -244,7 +259,8 @@ void Player::Update() {
 
 	// アフィン変換行列をワールド行列に代入
 	worldTransformBase_.matWorld_ = MakeAffineMatrix(
-	    worldTransformBase_.scale_, worldTransformBase_.rotation_, worldTransformBase_.translation_);
+	    worldTransformBase_.scale_, worldTransformBase_.rotation_,
+	    worldTransformBase_.translation_);
 
 #pragma endregion
 
@@ -312,16 +328,17 @@ void Player::Update() {
 	ImGui::Text(
 	    "player.pos %f %f %f", worldTransformBase_.translation_.x,
 	    worldTransformBase_.translation_.y, worldTransformBase_.translation_.z);
+	ImGui::Text(
+	    "player.worldTransform.matWorld_ %f %f %f", worldTransformBase_.matWorld_.m[3][0],
+	    worldTransformBase_.matWorld_.m[3][1], worldTransformBase_.matWorld_.m[3][2]);
 	ImGui::End();
 }
 
-void Player::DrawUI() {
-	sprite2DReticle_->Draw();
-}
+void Player::DrawUI() { sprite2DReticle_->Draw(); }
 
 // Drawの関数定義
 void Player::Draw(ViewProjection& viewProjection) {
-	modelBody_->Draw(worldTransformBody_, viewProjection); 
+	modelBody_->Draw(worldTransformBody_, viewProjection);
 	modelHead_->Draw(worldTransformHead_, viewProjection);
 	modelL_arm_->Draw(worldTransformL_arm_, viewProjection);
 	modelR_arm_->Draw(worldTransformR_arm_, viewProjection);

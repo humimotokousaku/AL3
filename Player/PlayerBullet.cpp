@@ -5,7 +5,11 @@
 #include <cassert>
 #include "ImGuiManager.h"
 
-void PlayerBullet::OnCollision() { isDead_ = true; }
+bool PlayerBullet::NonCollision() { return false; }
+bool PlayerBullet::OnCollision() { 
+	isDead_ = true;
+	return true; 
+}
 
 Vector3 PlayerBullet::GetWorldPosition() {
 	// ワールド座標を入れる変数
@@ -26,6 +30,8 @@ void PlayerBullet::Initialize(Model* model, const Vector3& pos, const Vector3& v
 	// テクスチャ読み込み
 	bulletTexture_ = TextureManager::Load("red.png");
 
+	// 当たり判定の半径設定
+	SetRadius(1.0f);
 	// 衝突属性を設定
 	SetCollisionAttribute(kCollisionAttributePlayer);
 	// 衝突対象を自分の属性以外に設定
