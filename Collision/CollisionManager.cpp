@@ -2,9 +2,12 @@
 #include "GameScene.h"
 
 void CollisionManager::SetGameObject(
-    Player* player, const std::list<Block*>& block, const std::list<PlayerBullet*>& playerBullet) {
+    Player* player, const std::list<PlayerBullet*>& playerBullet, /*const std::list<Enemy*>& enemy,
+    const std::list<EnemyBullet*>& enemyBullet,*/ const std::list<Block*>& block) {
 	SetPlayer(player);
 	SetPlayerBullet(playerBullet);
+	//SetEnemy(enemy);
+	//SetEnemyBullet(enemyBullet);
 	SetBlock(block);
 }
 
@@ -41,38 +44,50 @@ void CollisionManager::CheckCollisionPair(Collider* colliderA, Collider* collide
 }
 
 void CollisionManager::CheckAllCollisions(GameScene* gameScene) {
-		// リストのクリア
-		colliders_.clear();
+	// リストのクリア
+	colliders_.clear();
 
-		// 自弾リストの取得
-		const std::list<PlayerBullet*>& playerBullets = gameScene->GetPlayerBullets();
-		// 壁リストの取得
-		const std::list<Block*>& blocks = gameScene->GetBlock();
+	// 自弾リストの取得
+	const std::list<PlayerBullet*>& playerBullets = gameScene->GetPlayerBullets();
+	// 敵弾リストの取得
+	//const std::list<EnemyBullet*>& enemyBullets = gameScene->GetEnemyBullets();
+	// 壁リストの取得
+	const std::list<Block*>& blocks = gameScene->GetBlock();
 
-		// 自機
-		colliders_.push_back(player_);
-		// 自弾について
-		for (PlayerBullet* bullet : playerBullets) {
-			colliders_.push_back(bullet);
+	// 自機
+	colliders_.push_back(player_);
+	// 自弾について
+	for (PlayerBullet* bullet : playerBullets) {
+		colliders_.push_back(bullet);
+	}
+
+	//// 敵について
+	//for (Enemy* enemy : enemy_) {
+	//	colliders_.push_back(enemy);
+	//}
+	//// 敵弾
+	//for (EnemyBullet* bullet : enemyBullets) {
+	//	colliders_.push_back(bullet);
+	//}
+
+	// 壁を登録
+	for (Block* block : blocks) {
+		colliders_.push_back(block);
+	}
+
+	// リスト内のペアを総当たり
+	std::list<Collider*>::iterator itrA = colliders_.begin();
+	for (; itrA != colliders_.end(); ++itrA) {
+		Collider* colliderA = *itrA;
+
+		// イテレータBはイテレータAの次の要素から回す(重複判定を回避)
+		std::list<Collider*>::iterator itrB = itrA;
+		itrB++;
+
+		for (; itrB != colliders_.end(); ++itrB) {
+			Collider* colliderB = *itrB;
+			// 当たり判定と応答(フレンドリーファイアしないように設定)
+			CheckCollisionPair(colliderA, colliderB);
 		}
-		// 壁を登録
-	    for (Block* block : blocks) {
-		    colliders_.push_back(block);
-		}
-
-		// リスト内のペアを総当たり
-		std::list<Collider*>::iterator itrA = colliders_.begin();
-		for (; itrA != colliders_.end(); ++itrA) {
-			Collider* colliderA = *itrA;
-
-			// イテレータBはイテレータAの次の要素から回す(重複判定を回避)
-			std::list<Collider*>::iterator itrB = itrA;
-			itrB++;
-
-			for (; itrB != colliders_.end(); ++itrB) {
-				Collider* colliderB = *itrB;
-				// 当たり判定と応答(フレンドリーファイアしないように設定)
-				CheckCollisionPair(colliderA, colliderB);
-			}
-		}
+	}
 }

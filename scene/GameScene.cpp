@@ -23,7 +23,10 @@ void GameScene::Initialize() {
 	dxCommon_ = DirectXCommon::GetInstance();
 	input_ = Input::GetInstance();
 	audio_ = Audio::GetInstance();
-	LoadBlockPopData();
+	
+	// csvデータの読み込み
+	LoadCsvData("csv/blockPop.csv", &blockPopCommands_);
+	//LoadCsvData("csv/enemyPop.csv", &enemyPopCommands_);
 
 	// 3Dモデルの生成
 	modelFighterBody_.reset(Model::CreateFromOBJ("float_Body", true));
@@ -34,6 +37,9 @@ void GameScene::Initialize() {
 
 	// Playerの弾モデルの生成
 	modelBullet_ = Model::Create();
+
+	// 敵のモデル
+	modelEnemy_.reset(Model::Create());
 
 	// 天球の3Dモデルの生成
 	modelSkydome_.reset(Model::CreateFromOBJ("skydome", true));
@@ -99,6 +105,33 @@ void GameScene::Update() {
 	for (PlayerBullet* bullet : playerBullets_) {
 		bullet->Update();
 	}
+	// 敵の出現するタイミングと座標
+	//UpdateEnemyPopCommands();
+	// 敵の削除
+	//enemy_.remove_if([](Enemy* enemy) {
+	//	if (enemy->isDead()) {
+	//		delete enemy;
+	//		return true;
+	//	}
+	//	return false;
+	//});
+	//// enemyの更新
+	//for (Enemy* enemy : enemy_) {
+	//	enemy->Update();
+	//}
+	// 弾の更新
+	//for (EnemyBullet* bullet : enemyBullets_) {
+	//	bullet->Update();
+	//}
+	//// 終了した弾を削除
+	//enemyBullets_.remove_if([](EnemyBullet* bullet) {
+	//	if (bullet->isDead()) {
+	//		delete bullet;
+	//		return true;
+	//	}
+	//	return false;
+	//});
+
 
 	// 天球
 	skydome_->Update();
@@ -106,9 +139,13 @@ void GameScene::Update() {
 	ground_->Update();
 
 	// 当たり判定を必要とするObjectをまとめてセットする
-	collisionManager_->SetGameObject(player_.get(), block_, playerBullets_);
+	collisionManager_->SetGameObject(player_.get(), playerBullets_, /*enemy_, enemyBullets_,*/ block_);
 	// 衝突マネージャー(当たり判定)
-	collisionManager_->CheckAllCollisions(this);
+	//for (Enemy* enemy : enemy_) {
+	//	for (EnemyBullet* enemyBullet : enemyBullets_) {
+			collisionManager_->CheckAllCollisions(this);
+	//	}
+	//}
 
 	viewProjection_.UpdateMatrix();
 	// カメラ
@@ -150,17 +187,30 @@ void GameScene::Draw() {
 	/// <summary>
 	/// ここに3Dオブジェクトの描画処理を追加できる
 	/// </summary>
+	// 自機
 	player_->Draw(viewProjection_);
 	// 自弾
 	for (PlayerBullet* bullet : playerBullets_) {
 		bullet->Draw(viewProjection_);
 	}
+
+	//// 敵
+	//for (Enemy* enemy : enemy_) {
+	//	enemy->Draw(viewProjection_);
+	//}
+	//// 敵弾
+	//for (EnemyBullet* bullet : enemyBullets_) {
+	//	bullet->Draw(viewProjection_);
+	//}
+
 	// 壁
 	for (Block* block : block_) {
 		block->Draw(viewProjection_);
 	}
+
 	// 天球
 	skydome_->Draw(viewProjection_);
+
 	// 地面
 	ground_->Draw(viewProjection_);
 
@@ -189,6 +239,11 @@ void GameScene::AddPlayerBullet(PlayerBullet* playerBullet) {
 	playerBullets_.push_back(playerBullet);
 }
 
+void GameScene::AddEnemyBullet(EnemyBullet* enemyBullet) {
+	// リストに登録する
+	enemyBullets_.push_back(enemyBullet);
+}
+
 void GameScene::SetBlock(Vector3 pos, Vector3 scale) {
 	Block* block = new Block();
 	// 初期化
@@ -197,14 +252,25 @@ void GameScene::SetBlock(Vector3 pos, Vector3 scale) {
 	block_.push_back(block);
 }
 
-void GameScene::LoadBlockPopData() {
+void GameScene::SpawnEnemy(Vector3 pos) {
+	//Enemy* enemy = new Enemy();
+	//// 自機の位置をもらう
+	//enemy->SetPlayer(player_.get());
+	//// 初期化
+	//enemy->Initialize(modelEnemy_.get(), pos);
+	//enemy->SetGameScene(this);
+	//// リストに登録
+	//enemy_.push_back(enemy);
+}
+
+void GameScene::LoadCsvData(const char* csvName, std::stringstream* popCommands) {
 	// ファイルを開く
 	std::ifstream file;
-	file.open("csv/enemyPop.csv");
+	file.open(csvName);
 	assert(file.is_open());
 
 	// ファイルの内容を文字列ストリームにコピー
-	blockPopCommands_ << file.rdbuf();
+	*popCommands << file.rdbuf();
 
 	// ファイルを閉じる
 	file.close();
@@ -261,3 +327,67 @@ void GameScene::UpdateBlockPopCommands() {
 		}
 	}
 }
+
+//
+//void GameScene::UpdateEnemyPopCommands() {
+//	// 待機処理
+//	if (isWait_) {
+//		waitTime_--;
+//		if (waitTime_ <= 0) {
+//			// 待機完了
+//			isWait_ = false;
+//		}
+//		return;
+//	}
+//
+//	// 1桁分の文字列を入れる変数
+//	std::string line;
+//
+//	// コマンド実行ループ
+//	while (getline(enemyPopCommands_, line)) {
+//		// 1桁の文字列をストリームに変換して解析しやすくする
+//		std::istringstream line_stream(line);
+//
+//		std::string word;
+//		// ,区切りで行の先頭文字列を取得
+//		getline(line_stream, word, ',');
+//
+//		// "//"から始まる行はコメント
+//		if (word.find("//") == 0) {
+//			// コメント行を飛ばす
+//			continue;
+//		}
+//
+//		// POPコマンド
+//		if (word.find("POP") == 0) {
+//			// x座標
+//			getline(line_stream, word, ',');
+//			float x = (float)std::atof(word.c_str());
+//
+//			// y座標
+//			getline(line_stream, word, ',');
+//			float y = (float)std::atof(word.c_str());
+//
+//			// z座標
+//			getline(line_stream, word, ',');
+//			float z = (float)std::atof(word.c_str());
+//
+//			// 敵を発生させる
+//			SpawnEnemy(Vector3(x, y, z));
+//		}
+//		// WAITコマンド
+//		else if (word.find("WAIT") == 0) {
+//			getline(line_stream, word, ',');
+//
+//			// 待ち時間
+//			int32_t waitTime = atoi(word.c_str());
+//
+//			// 待ち時間
+//			isWait_ = true;
+//			waitTime_ = waitTime;
+//
+//			// コマンドループを抜ける
+//			break;
+//		}
+//	}
+//}

@@ -4,6 +4,7 @@
 #include "Model.h"
 #include "Sprite.h"
 #include "WorldTransform.h"
+#include <optional>
 
 class GameScene;
 
@@ -40,31 +41,40 @@ public:
 	/// <summary>
 	void Draw(ViewProjection& viewProjection);
 
+	// 攻撃
+	void Attack();
+	// ステップ移動
+	void StepMove();
+
 	// 浮遊ギミック初期化
 	void InitializeFloatingGimmick();
-
 	// 浮遊ギミック更新
 	void UpdateFloatingGimmick();
 
+	// 遷移行動更新
+	void BehaviorRootUpdate();
+	// 通常行動初期化
+	void BehaviorRootInitialize();
+	// 攻撃行動初期化
+	void BehaviorStepInitialize();
+	// 攻撃行動更新
+	void BehaviorStepUpdate();
+
+	// 3Dレティクル
 	void Deploy3DReticle();
-
+	 // 2Dレティクル
 	void Deploy2DReticle(const ViewProjection& viewProjection);
-
-	void Attack();
-
-	Vector3 GetWorld3DReticlePosition();
-
-	void SetGameScene(GameScene* gameScene) { gameScene_ = gameScene; }
 
 	const WorldTransform& GetWorldTransformBody() { return worldTransformBody_; }
 	const WorldTransform& GetWorldTransformBase() { return worldTransformBase_; }
+	Vector3 GetWorld3DReticlePosition();
 
+	// ワールド座標をセット
 	void SetWorldPos(Vector3 prePos);
-
-	void SetViewProjection(const ViewProjection* viewProjection) {
-		viewProjection_ = viewProjection;
-	}
-
+	// ビュー行列をセット
+	void SetViewProjection(const ViewProjection* viewProjection) { viewProjection_ = viewProjection; }
+	// ゲームシーンのアドレスをセット
+	void SetGameScene(GameScene* gameScene) { gameScene_ = gameScene; }
 	// パーツの親子関係
 	void SetParent(const WorldTransform* parent);
 
@@ -114,4 +124,17 @@ private:
 
 	// 壁に当たった時に今の移動ベクトルと逆の方向のベクトルを入れる
 	Vector3 velocity_;
+
+	//bool isStep_;
+	int stepFrame_;
+
+	// 振るまい
+	enum class Behavior {
+		kRoot,  // 通常状態
+		//kAttack, // 攻撃中
+		kStep    // 回避
+	};
+	Behavior behavior_ = Behavior::kRoot;
+	// 次の振るまいリクエスト
+	std::optional<Behavior> behaviorRequest_ = std::nullopt;
 };

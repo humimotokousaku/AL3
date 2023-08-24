@@ -6,10 +6,7 @@
 #include "ImGuiManager.h"
 
 bool PlayerBullet::NonCollision() { return false; }
-bool PlayerBullet::OnCollision() { 
-	isDead_ = true;
-	return true; 
-}
+bool PlayerBullet::OnCollision() { isDead_ = true;  return true;}
 
 Vector3 PlayerBullet::GetWorldPosition() {
 	// ワールド座標を入れる変数
@@ -71,6 +68,8 @@ void PlayerBullet::Update() {
 	ImGui::Text(
 	    "x%f  y%f   z%f", worldTransform_.translation_.x, worldTransform_.translation_.y,
 	    worldTransform_.translation_.z);
+	ImGui::Text("timer %d", deathTimer_);
+	ImGui::Text("isDead %d", isDead_);
 	ImGui::End();
 }
 

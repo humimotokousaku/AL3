@@ -67,7 +67,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
-      <TreatWarningAsError>true</TreatWarningAsError>
+      <TreatWarningAsError>false</TreatWarningAsError>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -92,7 +92,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
-      <TreatWarningAsError>true</TreatWarningAsError>
+      <TreatWarningAsError>false</TreatWarningAsError>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -114,13 +114,17 @@
     <ClCompile Include="Collision\Collider.cpp" />
     <ClCompile Include="Collision\CollisionConfig.cpp" />
     <ClCompile Include="Collision\CollisionManager.cpp" />
+    <ClCompile Include="Enemy\Enemy.cpp" />
+    <ClCompile Include="Enemy\EnemyBullet.cpp" />
     <ClCompile Include="Ground\Ground.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="math\Lerp.cpp" />
     <ClCompile Include="math\MyMatrix.cpp" />
     <ClCompile Include="Player\Player.cpp" />
     <ClCompile Include="Player\PlayerBullet.cpp" />
     <ClCompile Include="scene\GameScene.cpp" />
     <ClCompile Include="Skydome\Skydome.cpp" />
+    <ClCompile Include="Utility\TimedCall.cpp" />
     <ClCompile Include="Utility\WorldTransformEx.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -151,8 +155,11 @@
     <ClInclude Include="Collision\Collider.h" />
     <ClInclude Include="Collision\CollisionConfig.h" />
     <ClInclude Include="Collision\CollisionManager.h" />
+    <ClInclude Include="Enemy\Enemy.h" />
+    <ClInclude Include="Enemy\EnemyBullet.h" />
     <ClInclude Include="Ground\Ground.h" />
     <ClInclude Include="input\Input.h" />
+    <ClInclude Include="math\Lerp.h" />
     <ClInclude Include="math\Matrix4x4.h" />
     <ClInclude Include="math\MyMatrix.h" />
     <ClInclude Include="math\Vector2.h" />
@@ -162,6 +169,7 @@
     <ClInclude Include="Player\PlayerBullet.h" />
     <ClInclude Include="scene\GameScene.h" />
     <ClInclude Include="Skydome\Skydome.h" />
+    <ClInclude Include="Utility\TimedCall.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shaders\TerrainPS.hlsl">

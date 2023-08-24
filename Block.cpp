@@ -7,10 +7,9 @@ bool Block::NonCollision() {
 	isCollision_ = false;
 	return false;
 }
-
 bool Block::OnCollision() { 
 	isCollision_ = true;
-	return true; 
+	return true;
 }
 
 void Block::ResetPlayerPos(Player* player) { 
