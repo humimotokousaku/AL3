@@ -9,54 +9,6 @@
 #include <cassert>
 #include <stdio.h>
 
-bool Enemy::NonCollision() { 
-	isDead_ = false;
-	return false;
-}
-bool Enemy::OnCollision() {
-	isDead_ = true;
-	return true;
-}
-
-Vector3 Enemy::GetWorldPosition() {
-	// ワールド座標を入れる変数
-	Vector3 worldPos{};
-	// ワールド行列の平行移動成分を取得
-	worldPos.x = worldTransform_.matWorld_.m[3][0];
-	worldPos.y = worldTransform_.matWorld_.m[3][1];
-	worldPos.z = worldTransform_.matWorld_.m[3][2];
-
-	return worldPos;
-}
-
-void Enemy::ChangeState(BaseEnemyState* pState) {
-	delete state_;
-	state_ = pState;
-}
-
-void Enemy::Move(const Vector3 velocity) {
-	worldTransform_.translation_ = Add(worldTransform_.translation_, velocity);
-}
-
-void Enemy::Fire() {
-	assert(player_);
-
-	// 弾の速度(正の数だと敵の後ろから弾が飛ぶ)
-	const float kBulletSpeed = -0.5f;
-	Vector3 velocity{0, 0, kBulletSpeed};
-
-	// 自キャラのワールド座標を取得する
-	player_->GetWorldPosition();
-	
-	// 弾を生成し、初期化
-	EnemyBullet* newBullet = new EnemyBullet();
-	newBullet->Initialize(model_, GetWorldPosition(), velocity);
-	newBullet->SetPlayer(player_);
-
-	// 弾を登録
-	gameScene_->AddEnemyBullet(newBullet);
-}
-
 Enemy::Enemy() { state_ = new EnemyStateApproach(); }
 Enemy::~Enemy() {}
 
@@ -98,6 +50,51 @@ void Enemy::Update() {
 void Enemy::Draw(ViewProjection& viewProjection) {
 	// enemy
 	model_->Draw(worldTransform_, viewProjection, enemyTexture_);
+}
+
+bool Enemy::NonCollision() { return false; }
+bool Enemy::OnCollision() {
+	isDead_ = true;
+	return true;
+}
+
+Vector3 Enemy::GetWorldPosition() {
+	// ワールド座標を入れる変数
+	Vector3 worldPos{};
+	// ワールド行列の平行移動成分を取得
+	worldPos.x = worldTransform_.matWorld_.m[3][0];
+	worldPos.y = worldTransform_.matWorld_.m[3][1];
+	worldPos.z = worldTransform_.matWorld_.m[3][2];
+
+	return worldPos;
+}
+
+void Enemy::ChangeState(BaseEnemyState* pState) {
+	delete state_;
+	state_ = pState;
+}
+
+void Enemy::Move(const Vector3 velocity) {
+	worldTransform_.translation_ = Add(worldTransform_.translation_, velocity);
+}
+
+void Enemy::Fire() {
+	assert(player_);
+
+	// 弾の速度(正の数だと敵の後ろから弾が飛ぶ)
+	const float kBulletSpeed = -0.5f;
+	Vector3 velocity{0, 0, kBulletSpeed};
+
+	// 自キャラのワールド座標を取得する
+	player_->GetWorldPosition();
+
+	// 弾を生成し、初期化
+	EnemyBullet* newBullet = new EnemyBullet();
+	newBullet->Initialize(model_, GetWorldPosition(), velocity);
+	newBullet->SetPlayer(player_);
+
+	// 弾を登録
+	gameScene_->AddEnemyBullet(newBullet);
 }
 
 EnemyStateApproach::~EnemyStateApproach() {

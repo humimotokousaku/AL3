@@ -113,7 +113,7 @@ void Player::Update() {
 	default:
 
 		break;
-		// 攻撃行動
+		// 回避行動
 	case Behavior::kStep:
 		BehaviorStepUpdate();
 		break;
@@ -168,7 +168,6 @@ void Player::Draw(ViewProjection& viewProjection) {
 }
 
 bool Player::NonCollision() {
-	isDead_ = false;
 	return false;
 }
 bool Player::OnCollision() {
@@ -263,7 +262,7 @@ void Player::BehaviorRootUpdate() {
 		move.y = 0;
 		// 移動ベクトルをメンバ変数に反映
 		velocity_ = move;
-		if (!isDead_) {
+		//if (!isDead_) {
 			// 移動量
 			worldTransformBase_.translation_ = Add(worldTransformBase_.translation_, move);
 			worldTransformBody_.translation_ = worldTransformBase_.translation_;
@@ -274,7 +273,7 @@ void Player::BehaviorRootUpdate() {
 				worldTransformBase_.rotation_.y = std::atan2(move.x, move.z);
 				worldTransformBody_.rotation_.y = worldTransformBase_.rotation_.y;
 			}
-		}
+		//}
 	}
 
 	// 浮遊ギミックの更新処理
@@ -298,6 +297,12 @@ void Player::Attack() {
 	// Rトリガーを押していたら
 	if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER ||
 	    input_->TriggerKey(DIK_SPACE)) {
+		// 射撃中はカメラの向いている方向に身体を向ける
+		worldTransformBase_.rotation_ = viewProjection_->rotation_;
+		worldTransformBase_.rotation_.x = 0;
+		worldTransformBody_.rotation_ = viewProjection_->rotation_;
+		worldTransformBody_.rotation_.x = 0;
+
 		//  弾の速度
 		const float kBulletSpeed = 6.0f;
 		Vector3 velocity(0, 0, kBulletSpeed);
@@ -324,13 +329,6 @@ void Player::Attack() {
 
 		// 弾を登録
 		gameScene_->AddPlayerBullet(newBullet);
-
-		// 射撃中はカメラの向いている方向に身体を向ける
-		worldTransformBase_.rotation_ = viewProjection_->rotation_;
-		worldTransformBase_.rotation_.x = 0;
-
-		worldTransformBody_.rotation_ = viewProjection_->rotation_;
-		worldTransformBody_.rotation_.x = 0;
 	}
 }
 

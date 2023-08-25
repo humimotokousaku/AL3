@@ -83,7 +83,7 @@ public: // メンバ関数
 	void UpdateBlockPopCommands();
 
 	// csvに書かれている敵の座標と発生する時間のデータを読む
-	//void UpdateEnemyPopCommands();
+	void UpdateEnemyPopCommands();
 
 private: // メンバ変数
 	DirectXCommon* dxCommon_ = nullptr;
@@ -95,7 +95,7 @@ private: // メンバ変数
 	// ブロック
 	std::stringstream blockPopCommands_;
 	// 敵
-	//std::stringstream enemyPopCommands_;
+	std::stringstream enemyPopCommands_;
 
 	// 3Dモデルデータ
 
@@ -129,12 +129,12 @@ private: // メンバ変数
 	// 自弾
 	std::list<PlayerBullet*> playerBullets_;
 
-	//// 敵
-	//std::list<Enemy*> enemy_;
-	//// 敵が発生待機中か
-	//bool isWait_ = false;
-	//// 敵が発生するまでの時間
-	//int32_t waitTime_ = 0;
+	// 敵
+	std::list<Enemy*> enemy_;
+	// 敵が発生待機中か
+	bool isWait_ = false;
+	// 敵が発生するまでの時間
+	int32_t waitTime_ = 0;
 	// 敵弾
 	std::list<EnemyBullet*> enemyBullets_;
 

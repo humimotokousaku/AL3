@@ -7,7 +7,7 @@
 #include <cassert>
 
 bool EnemyBullet::NonCollision() {
-	isDead_ = false;
+	//isDead_ = false;
 	return false;
 }
 bool EnemyBullet::OnCollision() {
