@@ -26,12 +26,14 @@ void Enemy::Initialize(Model* model, const Vector3& pos) {
 	// 衝突対象を自分の属性以外に設定
 	SetCollisionMask(~kCollisionAttributeEnemy);
 
-	SetRadius(1.0f);
+	SetRadius(8.0f);
 
 	// ワールド変換の初期化
 	worldTransform_.Initialize();
 	// 引数で受け取った初期座標をセット
 	worldTransform_.translation_ = pos;
+
+	worldTransform_.scale_ = {4,4,4};
 
 	// 状態遷移
 	state_->Initialize(this);

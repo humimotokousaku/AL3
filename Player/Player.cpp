@@ -374,7 +374,7 @@ void Player::StepMove() {
 
 void Player::Deploy3DReticle() {
 	// 自機から3Dレティクルへの距離
-	const float kDistancePlayerTo3DReticle = 100.0f;
+	const float kDistancePlayerTo3DReticle = 200.0f;
 	// 自機から3Dレティクルへのオフセット(Z+向き)
 	Vector3 offset{0, 0, 1.0f};
 	// 自機のワールド行列の回転を反映する
@@ -442,7 +442,7 @@ void Player::Deploy2DReticle(const ViewProjection& viewProjection) {
 	Vector3 mouseDirection = Subtract(posFar, posNear);
 	mouseDirection = Normalize(mouseDirection);
 	// カメラから照準オブジェクトの距離
-	const float kDistanceTestObject = 100.0f;
+	const float kDistanceTestObject = 200.0f;
 	// 3Dレティクルを2Dカーソルに配置
 	worldTransform3DReticle_.translation_.x = posNear.x + mouseDirection.x * kDistanceTestObject;
 	worldTransform3DReticle_.translation_.y = posNear.y + mouseDirection.y * kDistanceTestObject;
