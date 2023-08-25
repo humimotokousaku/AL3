@@ -1,5 +1,6 @@
 ﻿#include "Player.h"
 #include "ImGuiManager.h"
+#include "math/Lerp.h"
 #include "math/MyMatrix.h"
 #include <Input.h>
 #include <Xinput.h>
@@ -167,9 +168,7 @@ void Player::Draw(ViewProjection& viewProjection) {
 	modelBullet_->Draw(worldTransform3DReticle_, viewProjection);
 }
 
-bool Player::NonCollision() {
-	return false;
-}
+bool Player::NonCollision() { return false; }
 bool Player::OnCollision() {
 	// 移動ベクトルを反転
 	velocity_ = Multiply(-1.0f, velocity_);
@@ -247,34 +246,50 @@ void Player::BehaviorRootUpdate() {
 	if (Input::GetInstance()->GetJoystickState(0, joyState)) {
 		// 速さ
 		const float speed = 0.7f;
+		// しきい値
+		const float threshold = 0.7f;
+		bool isMoving = false;
 		// 移動量
 		move = {
 		    (float)joyState.Gamepad.sThumbLX / SHRT_MAX, 0.0f,
 		    (float)joyState.Gamepad.sThumbLY / SHRT_MAX};
-		// 移動量の速さを反映
-		move = Multiply(speed, Normalize(move));
+		if (Length(move) > threshold) {
+			isMoving = true;
+		}
 
-		// 回転行列
-		rotateMatrix = MakeRotateMatrix(viewProjection_->rotation_);
-		// 移動ベクトルをカメラの角度だけ回転
-		move = TransformNormal(move, rotateMatrix);
-		// Playerは見ている方向に進んでいくので地面にも進んでしまう。なのでy軸方向には進まないようにする
-		move.y = 0;
-		// 移動ベクトルをメンバ変数に反映
-		velocity_ = move;
-		//if (!isDead_) {
+		if (isMoving) {
+			// 移動量の速さを反映
+			move = Multiply(speed, Normalize(move));
+
+			// 回転行列
+			rotateMatrix = MakeRotateMatrix(viewProjection_->rotation_);
+			// 移動ベクトルをカメラの角度だけ回転
+			move = TransformNormal(move, rotateMatrix);
+			// Playerは見ている方向に進んでいくので地面にも進んでしまう。なのでy軸方向には進まないようにする
+			move.y = 0;
+			// 移動ベクトルをメンバ変数に反映
+			velocity_ = move;
 			// 移動量
 			worldTransformBase_.translation_ = Add(worldTransformBase_.translation_, move);
 			worldTransformBody_.translation_ = worldTransformBase_.translation_;
 
 			// playerのY軸周り角度(θy)
 			// moveが0じゃないときに値を渡さないとplayerが止まった時に挙動がおかしくなる
-			if (move.x != 0 && move.z != 0) {
-				worldTransformBase_.rotation_.y = std::atan2(move.x, move.z);
-				worldTransformBody_.rotation_.y = worldTransformBase_.rotation_.y;
-			}
-		//}
+			// if (move.x != 0 && move.z != 0) {
+			//	worldTransformBase_.rotation_.y = std::atan2(move.x, move.z);
+			//	worldTransformBody_.rotation_.y = worldTransformBase_.rotation_.y;
+			//}
+			// 目標角度の算出
+			goalAngle_ = std::atan2(move.x, move.z);
+		}
 	}
+
+	// 最短角度補間
+	worldTransformBase_.rotation_.y =
+	    LerpShortAngle(worldTransformBase_.rotation_.y, goalAngle_, 0.1f);
+
+	worldTransformBody_.rotation_.y =
+	    LerpShortAngle(worldTransformBody_.rotation_.y, goalAngle_, 0.1f);
 
 	// 浮遊ギミックの更新処理
 	UpdateFloatingGimmick();

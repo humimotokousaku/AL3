@@ -100,6 +100,9 @@ private:
 	Model* modelGun_;
 	Model* modelBullet_;
 
+	// 目標角度
+	float goalAngle_;
+
 	// 浮遊ギミックの媒介変数
 	float floatingParameter_ = 0.0f;
 
@@ -119,13 +122,10 @@ private:
 	bool isBullet_;
 
 	Input* input_;
-	
-	Vector3 nextPos_;
 
 	// 壁に当たった時に今の移動ベクトルと逆の方向のベクトルを入れる
 	Vector3 velocity_;
 
-	//bool isStep_;
 	int stepFrame_;
 
 	// 振るまい
