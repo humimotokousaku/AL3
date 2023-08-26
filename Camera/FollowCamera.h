@@ -4,7 +4,13 @@
 
 class FollowCamera {
 public:
-	void SetTarget(const WorldTransform* target) { target_ = target; }
+
+
+	void Initialize();
+
+	void Update();
+
+	void SetTarget(const WorldTransform* target);
 
 	/// <summary>
 	/// ビュープロジェクションを取得
@@ -12,11 +18,17 @@ public:
 	/// <returns>ビュープロジェクション</returns>
 	const ViewProjection& GetViewProjection() { return viewProjection_; }
 
-	void Initialize();
+	float GetDstinationAngleY() { return destinationAngleY_; }
 
-	void Update();
+	// 追従対象からのオフセットを計算
+	Vector3 TargetOffset() const;
+
+	void Reset();
 
 private:
 	ViewProjection viewProjection_;
 	const WorldTransform* target_ = nullptr;
+	// ｔ移住対象の残像座標
+	Vector3 interTarget_ = {};
+	float destinationAngleY_ = 0.0f;
 };

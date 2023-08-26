@@ -237,7 +237,10 @@ void Player::UpdateFloatingGimmick() {
 	worldTransformR_arm_.rotation_.x = std::sin(floatingParameter_) * 0.75f;
 }
 
-void Player::BehaviorRootInitialize() {}
+void Player::BehaviorRootInitialize() {
+	workDash_.dashParameter_ = 0;
+	worldTransformBase_.rotation_.y = goalAngle_;
+}
 void Player::BehaviorRootUpdate() {
 	Matrix4x4 rotateMatrix{};
 	Vector3 move{};

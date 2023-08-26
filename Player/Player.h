@@ -137,4 +137,10 @@ private:
 	Behavior behavior_ = Behavior::kRoot;
 	// 次の振るまいリクエスト
 	std::optional<Behavior> behaviorRequest_ = std::nullopt;
+
+	struct WorkDash {
+		// ダッシュ用の媒介変数
+		uint32_t dashParameter_ = 0;
+	};
+	WorkDash workDash_;
 };
