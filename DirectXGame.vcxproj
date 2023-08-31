@@ -109,16 +109,14 @@
     <ClCompile Include="2d\ImGuiManager.cpp" />
     <ClCompile Include="base\DirectXCommon.cpp" />
     <ClCompile Include="base\WinApp.cpp" />
-    <ClCompile Include="Block.cpp" />
     <ClCompile Include="Camera\FollowCamera.cpp" />
     <ClCompile Include="Collision\Collider.cpp" />
     <ClCompile Include="Collision\CollisionConfig.cpp" />
     <ClCompile Include="Collision\CollisionManager.cpp" />
     <ClCompile Include="Enemy\Enemy.cpp" />
     <ClCompile Include="Enemy\EnemyBullet.cpp" />
-    <ClCompile Include="FollowEnemy.cpp" />
+    <ClCompile Include="Enemy\FollowEnemy.cpp" />
     <ClCompile Include="Ground\Ground.cpp" />
-    <ClCompile Include="IScene.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="math\Lerp.cpp" />
     <ClCompile Include="math\MyMatrix.cpp" />
@@ -126,7 +124,6 @@
     <ClCompile Include="Player\PlayerBullet.cpp" />
     <ClCompile Include="scene\GameScene.cpp" />
     <ClCompile Include="Skydome\Skydome.cpp" />
-    <ClCompile Include="TitleScene.cpp" />
     <ClCompile Include="Utility\TimedCall.cpp" />
     <ClCompile Include="Utility\WorldTransformEx.cpp" />
   </ItemGroup>
@@ -153,17 +150,15 @@
     <ClInclude Include="base\SafeDelete.h" />
     <ClInclude Include="base\TextureManager.h" />
     <ClInclude Include="base\WinApp.h" />
-    <ClInclude Include="Block.h" />
     <ClInclude Include="Camera\FollowCamera.h" />
     <ClInclude Include="Collision\Collider.h" />
     <ClInclude Include="Collision\CollisionConfig.h" />
     <ClInclude Include="Collision\CollisionManager.h" />
     <ClInclude Include="Enemy\Enemy.h" />
     <ClInclude Include="Enemy\EnemyBullet.h" />
-    <ClInclude Include="FollowEnemy.h" />
+    <ClInclude Include="Enemy\FollowEnemy.h" />
     <ClInclude Include="Ground\Ground.h" />
     <ClInclude Include="input\Input.h" />
-    <ClInclude Include="IScene.h" />
     <ClInclude Include="math\Lerp.h" />
     <ClInclude Include="math\Matrix4x4.h" />
     <ClInclude Include="math\MyMatrix.h" />
@@ -174,7 +169,6 @@
     <ClInclude Include="Player\PlayerBullet.h" />
     <ClInclude Include="scene\GameScene.h" />
     <ClInclude Include="Skydome\Skydome.h" />
-    <ClInclude Include="TitleScene.h" />
     <ClInclude Include="Utility\TimedCall.h" />
   </ItemGroup>
   <ItemGroup>

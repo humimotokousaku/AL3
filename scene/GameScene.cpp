@@ -278,7 +278,7 @@ void GameScene::Update() {
 
 			// 当たり判定を必要とするObjectをまとめてセットする
 			collisionManager_->SetGameObject(
-			    player_.get(), playerBullets_, enemy_, enemyBullets_, followEnemys_, block_);
+			    player_.get(), playerBullets_, enemy_, enemyBullets_, followEnemys_);
 			// 衝突マネージャー(当たり判定)
 			collisionManager_->CheckAllCollisions(this);
 
@@ -376,11 +376,6 @@ case CLEAR_SCENE:
 			bullet->Draw(viewProjection_);
 		}
 
-		// 壁
-		for (Block* block : block_) {
-			block->Draw(viewProjection_);
-		}
-
 		// 天球
 		skydome_->Draw(viewProjection_);
 
@@ -461,14 +456,6 @@ void GameScene::AddEnemyBullet(EnemyBullet* enemyBullet) {
 	enemyBullets_.push_back(enemyBullet);
 }
 
-void GameScene::SetBlock(Vector3 pos, Vector3 scale) {
-	Block* block = new Block();
-	// 初期化
-	block->Initialize(modelBlock_.get(), pos, scale);
-	// リストに登録
-	block_.push_back(block);
-}
-
 void GameScene::SpawnEnemy(Vector3 pos) {
 	Enemy* enemy = new Enemy();
 	// 自機の位置をもらう
@@ -507,58 +494,6 @@ void GameScene::LoadCsvData(const char* csvName, std::stringstream& popCommands)
 
 	// ファイルを閉じる
 	file.close();
-}
-
-void GameScene::UpdateBlockPopCommands() {
-	// 1桁分の文字列を入れる変数
-	std::string line;
-
-	// コマンド実行ループ
-	while (getline(blockPopCommands_, line)) {
-		// 1桁の文字列をストリームに変換して解析しやすくする
-		std::istringstream line_stream(line);
-
-		std::string word;
-		// ,区切りで行の先頭文字列を取得
-		getline(line_stream, word, ',');
-
-		// "//"から始まる行はコメント
-		if (word.find("//") == 0) {
-			// コメント行を飛ばす
-			continue;
-		}
-
-		// POPコマンド
-		if (word.find("POP") == 0) {
-			// 座標
-			// x
-			getline(line_stream, word, ',');
-			float posX = (float)std::atof(word.c_str());
-			// y
-			getline(line_stream, word, ',');
-			float posY = (float)std::atof(word.c_str());
-			// z
-			getline(line_stream, word, ',');
-			float posZ = (float)std::atof(word.c_str());
-
-			// スケール
-			// x
-			getline(line_stream, word, ',');
-			float scaleX = (float)std::atof(word.c_str());
-			// y
-			getline(line_stream, word, ',');
-			float scaleY = (float)std::atof(word.c_str());
-			// z
-			getline(line_stream, word, ',');
-			float scaleZ = (float)std::atof(word.c_str());
-
-			// 敵を発生させる
-			SetBlock(Vector3(posX, posY, posZ), Vector3(scaleX, scaleY, scaleZ));
-
-			// コマンドループを抜ける
-			break;
-		}
-	}
 }
 
 void GameScene::UpdateFollowEnemyPopCommands() {

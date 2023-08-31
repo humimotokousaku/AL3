@@ -5,8 +5,7 @@
 #include "Player/PlayerBullet.h"
 #include "Enemy/Enemy.h"
 #include "Enemy/EnemyBullet.h"
-#include "FollowEnemy.h"
-#include "Block.h"
+#include "Enemy/FollowEnemy.h"
 #include <list>
 
 class GameScene;
@@ -18,14 +17,12 @@ public:
 	void SetEnemy(const std::list<Enemy*>& enemy) { enemy_ = enemy; }
 	void SetEnemyBullet(const std::list<EnemyBullet*>& enemyBullet) { enemyBullet_ = enemyBullet; }
 	void SetFollowEnemy(const std::list<FollowEnemy*>& followEnemy) { followEnemy_ = followEnemy; }
-	void SetBlock(const std::list<Block*>& block) { block_ = block; }
 
 	// 当たり判定を必要とするObjectをまとめてセットする
 	void SetGameObject(
 	    Player* player, const std::list<PlayerBullet*>& playerBullet,
 	    const std::list<Enemy*>& enemy, const std::list<EnemyBullet*>& enemyBullet,
-		const std::list<FollowEnemy*> followEnemy,
-	    const std::list<Block*>& block);
+		const std::list<FollowEnemy*> followEnemy);
 
 	void CheckCollisionPair(Collider* colliderA, Collider* colliderB);
 
@@ -43,7 +40,4 @@ private:
 	std::list<Enemy*> enemy_;
 	std::list<EnemyBullet*> enemyBullet_;
 	std::list<FollowEnemy*> followEnemy_;
-
-	// 壁
-	std::list<Block*> block_;
 };

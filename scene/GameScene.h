@@ -1,6 +1,5 @@
 #pragma once
 #include "Audio.h"
-#include "Block.h"
 #include "Camera/FollowCamera.h"
 #include "Collision/CollisionManager.h"
 #include "DebugCamera.h"
@@ -15,17 +14,16 @@
 #include "Player/PlayerBullet.h"
 #include "Enemy/Enemy.h"
 #include "Enemy/EnemyBullet.h"
-#include "FollowEnemy.h"
+#include "Enemy/FollowEnemy.h"
 #include "Skydome/Skydome.h"
 #include "Ground/Ground.h"
-#include "IScene.h"
 #include <memory>
 #include <sstream>
 
 /// <summary>
 /// ゲームシーン
 /// </summary>
-class GameScene : public IScene {
+class GameScene{
 
 public: // メンバ関数
 	/// <summary>
@@ -41,22 +39,22 @@ public: // メンバ関数
 	/// <summary>
 	/// 初期化
 	/// </summary>
-	void Initialize()override;
+	void Initialize();
 
 	/// <summary>
 	/// 毎フレーム処理
 	/// </summary>
-	void Update()override;
+	void Update();
 
 	/// <summary>
 	/// 描画
 	/// </summary>
-	void Draw()override;
+	void Draw();
 
 	/// <summary>
 	/// 解放処理
 	/// </summary>
-	void Finalize() override;
+	void Finalize();
 
 	// 自機を取得
 	Player* GetPlayer() { return player_.get(); }
@@ -66,8 +64,6 @@ public: // メンバ関数
 	const std::list<EnemyBullet*>& GetEnemyBullets() const { return enemyBullets_; }
 	// 追尾敵リストの取得
 	const std::list<FollowEnemy*>& GetFollowEnemys() const { return followEnemys_; }
-	// 壁リストを取得
-	const std::list<Block*>& GetBlock() const { return block_; }
 
 	int GetScene() { return scene_; }
 	void SetScene(int scene) { scene_ = scene; }
@@ -77,9 +73,6 @@ public: // メンバ関数
 
 	// 敵弾を追加する
 	void AddEnemyBullet(EnemyBullet* enemyBullet);
-
-	// csvのデータをもとに壁の座標と大きさを設定
-	void SetBlock(Vector3 pos, Vector3 scale);
 
 	// 敵の発生
 	void SpawnEnemy(Vector3 pos);
@@ -94,9 +87,6 @@ public: // メンバ関数
 	/// <param name="csvName">ファイル名(パス名も入れる)</param>
 	/// <param name="popCommands"></param>
 	void LoadCsvData(const char* csvName, std::stringstream& popCommands);
-
-	// csvに書かれている壁の座標と大きさのデータを読む
-	void UpdateBlockPopCommands();
 
 	// csvに書かれている敵の座標と発生する時間のデータを読む
 	void UpdateEnemyPopCommands();
@@ -158,9 +148,6 @@ private: // メンバ変数
 	std::unique_ptr<Model> modelGround_;
 	std::unique_ptr<Ground> ground_;
 
-	// 壁などの障害物
-	std::unique_ptr<Model> modelBlock_;
-	std::list<Block*> block_;
 	// 壁に当たったら位置をリセット
 	bool isResetPos_ = false;
 
