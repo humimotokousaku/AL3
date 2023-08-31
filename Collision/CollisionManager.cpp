@@ -3,11 +3,13 @@
 
 void CollisionManager::SetGameObject(
     Player* player, const std::list<PlayerBullet*>& playerBullet, const std::list<Enemy*>& enemy,
-    const std::list<EnemyBullet*>& enemyBullet, const std::list<Block*>& block) {
+    const std::list<EnemyBullet*>& enemyBullet, const std::list<FollowEnemy*> followEnemy,
+    const std::list<Block*>& block) {
 	SetPlayer(player);
 	SetPlayerBullet(playerBullet);
 	SetEnemy(enemy);
 	SetEnemyBullet(enemyBullet);
+	SetFollowEnemy(followEnemy);
 	SetBlock(block);
 }
 
@@ -52,6 +54,8 @@ void CollisionManager::CheckAllCollisions(GameScene* gameScene) {
 		const std::list<PlayerBullet*>& playerBullets = gameScene->GetPlayerBullets();
 		// 敵弾リストの取得
 		const std::list<EnemyBullet*>& enemyBullets = gameScene->GetEnemyBullets();
+		// 追尾敵リストの取得
+	    const std::list<FollowEnemy*>& followEnemys = gameScene->GetFollowEnemys();
 		// 壁リストの取得
 		const std::list<Block*>& blocks = gameScene->GetBlock();
 
@@ -69,6 +73,10 @@ void CollisionManager::CheckAllCollisions(GameScene* gameScene) {
 		// 敵弾
 		for (EnemyBullet* bullet : enemyBullets) {
 			colliders_.push_back(bullet);
+		}
+		// 追尾敵
+	    for (FollowEnemy* followEnemy : followEnemys) {
+		    colliders_.push_back(followEnemy);
 		}
 
 		// 壁を登録

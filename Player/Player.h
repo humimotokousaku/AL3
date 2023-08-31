@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "Collision/Collider.h"
+#include "Audio.h"
 #include "Input.h"
 #include "Model.h"
 #include "Sprite.h"
@@ -115,13 +116,11 @@ private:
 
 	GameScene* gameScene_;
 
-	bool isDead_ = true;
-
 	Vector2 spritePosition_;
 
-	bool isBullet_;
-
 	Input* input_;
+	Audio* audio_;
+	uint32_t shotSound_ = 0;
 
 	// 壁に当たった時に今の移動ベクトルと逆の方向のベクトルを入れる
 	Vector3 velocity_;
@@ -143,4 +142,14 @@ private:
 		uint32_t dashParameter_ = 0;
 	};
 	WorkDash workDash_;
+
+	bool isDead_ = false;
+	bool isDecrementHp_;
+	int hp_;
+
+	bool isHit_;
+	int invincibleFrame_;
+
+	bool isShot_;
+	int shotCoolTime_;
 };

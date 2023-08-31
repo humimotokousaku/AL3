@@ -44,6 +44,9 @@ void Player::Initialize(
 
 	input_ = Input::GetInstance();
 
+	audio_ = Audio::GetInstance();
+	shotSound_ = audio_->LoadWave("se_moa05.wav");
+
 	// 腕の座標指定
 	worldTransformL_arm_.translation_.x = -1.5f;
 	worldTransformR_arm_.translation_.x = 1.5f;
@@ -74,6 +77,18 @@ void Player::Initialize(
 	spritePosition_ = sprite2DReticle_->GetPosition();
 	// 3Dレティクルのワールドトランスフォーム初期化
 	worldTransform3DReticle_.Initialize();
+
+	isDecrementHp_ = false;
+	hp_ = 1;
+	isDead_ = false;
+	velocity_ = {0, 0, 0};
+	stepFrame_ = 0;
+
+	isHit_ = false;
+	invincibleFrame_ = 0;
+
+	isShot_ = false;
+	shotCoolTime_ = 0;
 }
 
 // Updateの関数定義
@@ -84,8 +99,10 @@ void Player::Update() {
 		return;
 	};
 	// Lトリガーを押したらステップ回避(長押しでブースト)
-	if ((joyState.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER)) {
-		behaviorRequest_ = Behavior::kStep;
+	if (stepFrame_ == 0) {
+		if ((joyState.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER)) {
+			behaviorRequest_ = Behavior::kStep;
+		}
 	}
 
 	// 初期化
@@ -135,6 +152,44 @@ void Player::Update() {
 	// 弾の処理
 	Attack();
 
+	if (GetWorldPosition().x > 200) {
+		worldTransformBase_.translation_.x = 200;
+		worldTransformBody_.translation_.x = 200;
+	}
+	if (GetWorldPosition().x < -200) {
+		worldTransformBase_.translation_.x = -200;
+		worldTransformBody_.translation_.x = -200;
+	}
+	if (GetWorldPosition().z > 200) {
+		worldTransformBase_.translation_.z = 200;
+		worldTransformBody_.translation_.z = 200;
+	}
+	if (GetWorldPosition().z < -200) {
+		worldTransformBase_.translation_.z = -200;
+		worldTransformBody_.translation_.z = -200;
+	}
+
+	// hpの減る処理
+	if (isDecrementHp_) {
+		hp_--;
+		isDecrementHp_ = false;
+		isHit_ = true;
+	}
+	if (isHit_) {
+		if (invincibleFrame_ <= 120) {
+			SetRadius(0);
+		} else if (invincibleFrame_ <= 120) {
+			isHit_ = false;
+		}
+		invincibleFrame_++;
+	} else {
+		invincibleFrame_ = 0;
+	}
+
+	if (isDead_) {
+		gameScene_->SetScene(2);
+	}
+
 	// 行列を定数バッファに転送
 	worldTransformBase_.UpdateMatrix();
 	worldTransformBody_.UpdateMatrix();
@@ -142,19 +197,6 @@ void Player::Update() {
 	worldTransformL_arm_.UpdateMatrix();
 	worldTransformR_arm_.UpdateMatrix();
 	worldTransformGun_.UpdateMatrix();
-
-	ImGui::Begin("player");
-	ImGui::Text(
-	    "player.pos %f %f %f", worldTransformBase_.translation_.x,
-	    worldTransformBase_.translation_.y, worldTransformBase_.translation_.z);
-	ImGui::Text(
-	    "player.worldTransform.rotate_ %f %f %f", worldTransformBase_.rotation_.x,
-	    worldTransformBase_.rotation_.y, worldTransformBase_.rotation_.z);
-	ImGui::Text("behavior %d", behaviorRequest_);
-	ImGui::Text("stepFrame %d", stepFrame_);
-	ImGui::Text("Vel %f %f", velocity_.x, velocity_.z);
-
-	ImGui::End();
 }
 
 void Player::DrawUI() { sprite2DReticle_->Draw(); }
@@ -164,18 +206,14 @@ void Player::Draw(ViewProjection& viewProjection) {
 	modelL_arm_->Draw(worldTransformL_arm_, viewProjection);
 	modelR_arm_->Draw(worldTransformR_arm_, viewProjection);
 	modelGun_->Draw(worldTransformGun_, viewProjection);
-	// 3Dレティクルを描画
-	modelBullet_->Draw(worldTransform3DReticle_, viewProjection);
 }
 
 bool Player::NonCollision() { return false; }
 bool Player::OnCollision() {
-	// 移動ベクトルを反転
-	velocity_ = Multiply(-1.0f, velocity_);
-	//
-	worldTransformBase_.translation_ = Add(velocity_, worldTransformBase_.translation_);
-	worldTransformBase_.UpdateMatrix();
-	isDead_ = true;
+	isDecrementHp_ = true;
+	if (hp_ <= 0) {
+		isDead_ = true;
+	}
 	return true;
 }
 
@@ -248,7 +286,7 @@ void Player::BehaviorRootUpdate() {
 	// ゲームパッド状態取得
 	if (Input::GetInstance()->GetJoystickState(0, joyState)) {
 		// 速さ
-		const float speed = 0.7f;
+		const float speed = 1.5f;
 		// しきい値
 		const float threshold = 0.7f;
 		bool isMoving = false;
@@ -276,12 +314,6 @@ void Player::BehaviorRootUpdate() {
 			worldTransformBase_.translation_ = Add(worldTransformBase_.translation_, move);
 			worldTransformBody_.translation_ = worldTransformBase_.translation_;
 
-			// playerのY軸周り角度(θy)
-			// moveが0じゃないときに値を渡さないとplayerが止まった時に挙動がおかしくなる
-			// if (move.x != 0 && move.z != 0) {
-			//	worldTransformBase_.rotation_.y = std::atan2(move.x, move.z);
-			//	worldTransformBody_.rotation_.y = worldTransformBase_.rotation_.y;
-			//}
 			// 目標角度の算出
 			goalAngle_ = std::atan2(move.x, move.z);
 		}
@@ -289,10 +321,10 @@ void Player::BehaviorRootUpdate() {
 
 	// 最短角度補間
 	worldTransformBase_.rotation_.y =
-	    LerpShortAngle(worldTransformBase_.rotation_.y, goalAngle_, 0.1f);
+	    LerpShortAngle(worldTransformBase_.rotation_.y, goalAngle_, 0.5f);
 
 	worldTransformBody_.rotation_.y =
-	    LerpShortAngle(worldTransformBody_.rotation_.y, goalAngle_, 0.1f);
+	    LerpShortAngle(worldTransformBody_.rotation_.y, goalAngle_, 0.5f);
 
 	// 浮遊ギミックの更新処理
 	UpdateFloatingGimmick();
@@ -313,40 +345,53 @@ void Player::Attack() {
 	}
 
 	// Rトリガーを押していたら
-	if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER ||
-	    input_->TriggerKey(DIK_SPACE)) {
+	if (!isShot_) {
+		if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER) {
+			isShot_ = true;
+
+			//  弾の速度
+			const float kBulletSpeed = 7.0f;
+			Vector3 velocity(0, 0, kBulletSpeed);
+			// 速度ベクトルを自機の向きに合わせて回転させる
+			Vector3 worldPos;
+			worldPos.x = worldTransformGun_.matWorld_.m[3][0];
+			worldPos.y = worldTransformGun_.matWorld_.m[3][1];
+			worldPos.z = worldTransformGun_.matWorld_.m[3][2];
+
+			velocity = TransformNormal(velocity, worldTransformBase_.matWorld_);
+			// 自機から照準オブジェクトへのベクトル
+			Vector3 worldReticlePos = {
+			    worldTransform3DReticle_.matWorld_.m[3][0],
+			    worldTransform3DReticle_.matWorld_.m[3][1],
+			    worldTransform3DReticle_.matWorld_.m[3][2]};
+			velocity = Subtract(worldReticlePos, worldPos);
+			velocity = Normalize(velocity);
+			velocity.x *= kBulletSpeed;
+			velocity.y *= kBulletSpeed;
+			velocity.z *= kBulletSpeed;
+
+			// 弾を生成し、初期化
+			PlayerBullet* newBullet = new PlayerBullet();
+			newBullet->Initialize(modelBullet_, worldPos, velocity);
+
+			// 弾を登録
+			gameScene_->AddPlayerBullet(newBullet);
+		}
+	}
+	// 次の射撃までの間隔をあける
+	if (isShot_) {
+		//audio_->PlayWave(shotSound_, false, 0.02f);
 		// 射撃中はカメラの向いている方向に身体を向ける
 		worldTransformBase_.rotation_ = viewProjection_->rotation_;
 		worldTransformBase_.rotation_.x = 0;
 		worldTransformBody_.rotation_ = viewProjection_->rotation_;
 		worldTransformBody_.rotation_.x = 0;
 
-		//  弾の速度
-		const float kBulletSpeed = 6.0f;
-		Vector3 velocity(0, 0, kBulletSpeed);
-		// 速度ベクトルを自機の向きに合わせて回転させる
-		Vector3 worldPos;
-		worldPos.x = worldTransformGun_.matWorld_.m[3][0];
-		worldPos.y = worldTransformGun_.matWorld_.m[3][1];
-		worldPos.z = worldTransformGun_.matWorld_.m[3][2];
-
-		velocity = TransformNormal(velocity, worldTransformBase_.matWorld_);
-		// 自機から照準オブジェクトへのベクトル
-		Vector3 worldReticlePos = {
-		    worldTransform3DReticle_.matWorld_.m[3][0], worldTransform3DReticle_.matWorld_.m[3][1],
-		    worldTransform3DReticle_.matWorld_.m[3][2]};
-		velocity = Subtract(worldReticlePos, worldPos);
-		velocity = Normalize(velocity);
-		velocity.x *= kBulletSpeed;
-		velocity.y *= kBulletSpeed;
-		velocity.z *= kBulletSpeed;
-
-		// 弾を生成し、初期化
-		PlayerBullet* newBullet = new PlayerBullet();
-		newBullet->Initialize(modelBullet_, worldPos, velocity);
-
-		// 弾を登録
-		gameScene_->AddPlayerBullet(newBullet);
+		if (shotCoolTime_ >= 4) {
+			isShot_ = false;
+			shotCoolTime_ = 0;
+		}
+		shotCoolTime_++;
 	}
 }
 
@@ -373,7 +418,7 @@ void Player::StepMove() {
 			stepVelocity_.x *= speed;
 			stepVelocity_.z *= speed;
 		}
-		if (stepFrame_ <= 14) {
+		if (stepFrame_ <= 10) {
 			// 移動量
 			worldTransformBase_.translation_ = Add(worldTransformBase_.translation_, stepVelocity_);
 			worldTransformBody_.translation_ = worldTransformBase_.translation_;
@@ -385,6 +430,8 @@ void Player::StepMove() {
 	}
 
 	if (stepFrame_ >= 15) {
+	}
+	if (stepFrame_ >= 75) {
 		stepFrame_ = 0;
 		behaviorRequest_ = Behavior::kRoot;
 	}

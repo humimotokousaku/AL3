@@ -18,6 +18,7 @@ public: // メンバ関数
 
 	// 完了ならtrueを返す
 	bool isDead() const { return isDead_; }
+	void SetIsDead(bool isDead) { isDead_ = isDead; }
 
 	/// <summary>
 	/// 形状を設定

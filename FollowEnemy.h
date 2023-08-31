@@ -1,62 +1,15 @@
 ﻿#pragma once
 #include "../Utility/TimedCall.h"
 #include "Collision/Collider.h"
-#include "Enemy/EnemyBullet.h"
 #include "Model.h"
 #include "Player/Player.h"
 #include "WorldTransform.h"
 #include <functional>
-#include "audio/Audio.h"
+#include <random>
 
-class Enemy; // 前方宣言
 class GameScene;
 
-// 基底クラス
-class BaseEnemyState {
-public:
-	// 純粋仮想関数
-	virtual void Initialize(Enemy* enemy) = 0;
-	virtual void Update(Enemy* enemy) = 0;
-};
-
-// 接近フェーズのクラス
-class EnemyStateApproach : public BaseEnemyState {
-public:
-	~EnemyStateApproach();
-
-	/// <summary>
-	/// 弾を発射してタイマーをリセット
-	/// </summary>
-	void FireAndResetTimer();
-
-	// 初期化
-	void Initialize(Enemy* enemy);
-
-	// 更新処理
-	void Update(Enemy* enemy);
-
-public:
-	Enemy* enemy_;
-	// 発射間隔
-	static const int kFireInterval = 240;
-	// 時限発動
-	std::list<TimedCall*> timedCalls_;
-};
-
-// 離脱フェーズのクラス
-class EnemyStateLeave : public BaseEnemyState {
-public:
-	// 初期化
-	void Initialize(Enemy* enemy);
-
-	// 更新処理
-	void Update(Enemy* enemy);
-
-public:
-	Enemy* enemy_;
-};
-
-class Enemy : public Collider {
+class FollowEnemy : public Collider {
 public: // メンバ関数
 	// 衝突してない場合
 	bool NonCollision() override;
@@ -80,7 +33,7 @@ public: // メンバ関数
 	/// stateの変更
 	/// </summary>
 	/// <param name="pState">state</param>
-	void ChangeState(BaseEnemyState* pState);
+	// void ChangeState(BaseEnemyState* pState);
 
 	/// <summary>
 	/// 移動処理
@@ -93,13 +46,13 @@ public: // メンバ関数
 	/// </summary>
 	void Fire();
 
-	Enemy();
-	~Enemy();
+	FollowEnemy();
+	~FollowEnemy();
 
 	/// <summary>
 	/// 初期化
 	/// </summary>
-	void Initialize(Model* model, Model* modelBullet, const Vector3& pos);
+	void Initialize(Model* model, const Vector3& pos);
 
 	/// <summary>
 	/// 更新処理
@@ -112,19 +65,19 @@ public: // メンバ関数
 	void Draw(ViewProjection& viewProjection);
 
 private:
-	Audio* audio_ = nullptr;
-
 	// 状態遷移
-	BaseEnemyState* state_;
+	// BaseEnemyState* state_;
+	Audio* audio_ = nullptr;
 
 	// ワールド変換データ
 	WorldTransform worldTransform_;
+	WorldTransform hitWorldTransform_;
+
 	// モデル
 	Model* model_ = nullptr;
-	Model* modelBullet_ = nullptr;
 	// テクスチャハンドル
-	uint32_t enemyTexture_ = 0u;
-	//
+	uint32_t followEnemyTexture_ = 0u;
+	// 
 	uint32_t normalTexture_ = 0u;
 	// 攻撃を食らった時の画像
 	uint32_t hitTexture_ = 0u; 
@@ -135,7 +88,7 @@ private:
 	Player* player_ = nullptr;
 
 	bool isHitReaction_;
-	int hitFrame_;
+	float hitFrame_;
 
 	bool isDead_ = false;
 	bool isDecrementHp_;
@@ -143,4 +96,7 @@ private:
 
 	// ゲームシーン
 	GameScene* gameScene_ = nullptr;
+
+	// 速度
+	Vector3 velocity_;
 };

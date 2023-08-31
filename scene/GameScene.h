@@ -15,15 +15,17 @@
 #include "Player/PlayerBullet.h"
 #include "Enemy/Enemy.h"
 #include "Enemy/EnemyBullet.h"
+#include "FollowEnemy.h"
 #include "Skydome/Skydome.h"
 #include "Ground/Ground.h"
+#include "IScene.h"
 #include <memory>
 #include <sstream>
 
 /// <summary>
 /// ゲームシーン
 /// </summary>
-class GameScene {
+class GameScene : public IScene {
 
 public: // メンバ関数
 	/// <summary>
@@ -39,17 +41,22 @@ public: // メンバ関数
 	/// <summary>
 	/// 初期化
 	/// </summary>
-	void Initialize();
+	void Initialize()override;
 
 	/// <summary>
 	/// 毎フレーム処理
 	/// </summary>
-	void Update();
+	void Update()override;
 
 	/// <summary>
 	/// 描画
 	/// </summary>
-	void Draw();
+	void Draw()override;
+
+	/// <summary>
+	/// 解放処理
+	/// </summary>
+	void Finalize() override;
 
 	// 自機を取得
 	Player* GetPlayer() { return player_.get(); }
@@ -57,8 +64,13 @@ public: // メンバ関数
 	const std::list<PlayerBullet*>& GetPlayerBullets() const { return playerBullets_; }
 	// 弾リストを取得
 	const std::list<EnemyBullet*>& GetEnemyBullets() const { return enemyBullets_; }
+	// 追尾敵リストの取得
+	const std::list<FollowEnemy*>& GetFollowEnemys() const { return followEnemys_; }
 	// 壁リストを取得
 	const std::list<Block*>& GetBlock() const { return block_; }
+
+	int GetScene() { return scene_; }
+	void SetScene(int scene) { scene_ = scene; }
 
 	// リストに自弾を登録
 	void AddPlayerBullet(PlayerBullet* playerBullet);
@@ -72,12 +84,16 @@ public: // メンバ関数
 	// 敵の発生
 	void SpawnEnemy(Vector3 pos);
 
+	void SpawnFollowEnemy(Vector3 pos);
+
+	void ResetCSVFile(std::stringstream& stream);
+
 	/// <summary>
 	/// csvの読み込み
 	/// </summary>
 	/// <param name="csvName">ファイル名(パス名も入れる)</param>
 	/// <param name="popCommands"></param>
-	void LoadCsvData(const char* csvName, std::stringstream* popCommands);
+	void LoadCsvData(const char* csvName, std::stringstream& popCommands);
 
 	// csvに書かれている壁の座標と大きさのデータを読む
 	void UpdateBlockPopCommands();
@@ -85,10 +101,40 @@ public: // メンバ関数
 	// csvに書かれている敵の座標と発生する時間のデータを読む
 	void UpdateEnemyPopCommands();
 
+		// csvに書かれている敵の座標と発生する時間のデータを読む
+	void UpdateFollowEnemyPopCommands();
+
 private: // メンバ変数
 	DirectXCommon* dxCommon_ = nullptr;
 	Input* input_ = nullptr;
 	Audio* audio_ = nullptr;
+
+	// 操作説明用の画像
+	Sprite* L_button_;
+	Sprite* R_button_;
+	// 
+	Sprite* startButton_;
+
+	enum GUIDETEXT {
+		ALLKILL,
+		STEP,
+		SHOT
+	};
+	Sprite* guideText_[3];
+
+	enum SCENETEXT {
+		TITLE_TEXT,
+		GAMEOVER_TEXT,
+		CLEAR_TEXT
+	};
+	Sprite* sceneStateText_[3];
+
+	bool isAllKillText_;
+	int guideTextFrame_;
+
+	int clearCount_;
+
+	Sprite* backGround_;
 
 	// csvデータ
 
@@ -96,6 +142,11 @@ private: // メンバ変数
 	std::stringstream blockPopCommands_;
 	// 敵
 	std::stringstream enemyPopCommands_;
+	// 追尾敵
+	std::stringstream followEnemyPopCommands_;
+
+	// 音データ
+	uint32_t damageSound_ = 0;
 
 	// 3Dモデルデータ
 
@@ -119,10 +170,12 @@ private: // メンバ変数
 	std::unique_ptr<Model> modelFighterL_arm_;
 	std::unique_ptr<Model> modelFighterR_arm_;
 	std::unique_ptr<Model> modelFighterGun_;
-	Model* modelBullet_;
+	std::unique_ptr<Model> modelBullet_;
 
 	// 敵
 	std::unique_ptr<Model> modelEnemy_;
+	// 敵弾
+	std::unique_ptr<Model> modelBulletEnemy_;
 
 	// 自キャラ
 	std::unique_ptr<Player> player_;
@@ -132,11 +185,13 @@ private: // メンバ変数
 	// 敵
 	std::list<Enemy*> enemy_;
 	// 敵が発生待機中か
-	bool isWait_ = false;
+	bool isWait_[2] = {false, false};
 	// 敵が発生するまでの時間
-	int32_t waitTime_ = 0;
+	int32_t waitTime_[2] = {0, 0};
 	// 敵弾
 	std::list<EnemyBullet*> enemyBullets_;
+	// 追尾敵
+	std::list<FollowEnemy*> followEnemys_;
 
 	// カメラ
 	std::unique_ptr<FollowCamera> followCamera_;
@@ -148,4 +203,12 @@ private: // メンバ変数
 	WorldTransform worldTransform_;
 	// ビュープロジェクション
 	ViewProjection viewProjection_;
+
+	enum SCENE {
+		TITLE_SCENE,
+		GAME_SCENE,
+		GAMEOVER_SCENE,
+		CLEAR_SCENE
+	};
+	int scene_;
 };

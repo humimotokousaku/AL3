@@ -9,17 +9,26 @@
 #include <cassert>
 #include <stdio.h>
 
-Enemy::Enemy() { state_ = new EnemyStateApproach(); }
+Enemy::Enemy() { 
+	state_ = new EnemyStateApproach(); 
+}
 Enemy::~Enemy() {}
 
 
-void Enemy::Initialize(Model* model, const Vector3& pos) {
+void Enemy::Initialize(Model* model, Model* modelBullet, const Vector3& pos) {
+	audio_ = Audio::GetInstance();
 	// NULLポインタチェック
 	assert(model);
 
 	model_ = model;
+	modelBullet_ = modelBullet;
 	// テクスチャ読み込み
-	enemyTexture_ = TextureManager::Load("black.png");
+	// テクスチャ読み込み
+	//normalTexture_ = TextureManager::Load("enemy.png");
+	//hitTexture_ = TextureManager::Load("white1x1.png");
+	//enemyTexture_ = normalTexture_;
+
+	damageSound_ = audio_->LoadWave("se_moa05.wav");
 
 	// 衝突属性を設定
 	SetCollisionAttribute(kCollisionAttributeEnemy);
@@ -35,6 +44,14 @@ void Enemy::Initialize(Model* model, const Vector3& pos) {
 
 	worldTransform_.scale_ = {4,4,4};
 
+	isHitReaction_ = false;
+	hitFrame_ = 0;
+
+	// 体力
+	hp_ = 10;
+	isDecrementHp_ = false;
+	isDead_ = false;
+
 	// 状態遷移
 	state_->Initialize(this);
 }
@@ -42,6 +59,26 @@ void Enemy::Initialize(Model* model, const Vector3& pos) {
 void Enemy::Update() {
 	// 状態遷移
 	state_->Update(this);
+
+	// hpの減る処理
+	if (isDecrementHp_) {
+		hp_--;
+		isDecrementHp_ = false;
+		isHitReaction_ = true;
+	}
+
+	if (isHitReaction_) {
+		if (hitFrame_ <= 3) {
+			audio_->PlayWave(damageSound_, false, 0.01f);
+		}
+		if (hitFrame_ <= 5) {
+			
+		} else {
+			isHitReaction_ = false;
+			hitFrame_ = 0;
+		}
+		hitFrame_++;
+	}
 
 	// 行列の更新
 	worldTransform_.UpdateMatrix();
@@ -51,12 +88,15 @@ void Enemy::Update() {
 
 void Enemy::Draw(ViewProjection& viewProjection) {
 	// enemy
-	model_->Draw(worldTransform_, viewProjection, enemyTexture_);
+	model_->Draw(worldTransform_, viewProjection);
 }
 
 bool Enemy::NonCollision() { return false; }
 bool Enemy::OnCollision() {
-	isDead_ = true;
+	isDecrementHp_ = true;
+	if (hp_ <= 0) {
+		isDead_ = true;
+	}
 	return true;
 }
 
@@ -77,22 +117,54 @@ void Enemy::ChangeState(BaseEnemyState* pState) {
 }
 
 void Enemy::Move(const Vector3 velocity) {
-	worldTransform_.translation_ = Add(worldTransform_.translation_, velocity);
+	worldTransform_.UpdateMatrix();
+	Vector3 origin{};
+	// 自機から3Dレティクルへの距離
+	const float kDistancePlayerTo3DReticle = 2.0f;
+	// 自機から3Dレティクルへのオフセット(Z+向き)
+	Vector3 offset{1.0f, 0, 0};
+	// 自機のワールド行列の回転を反映する
+	offset = TransformNormal(offset, worldTransform_.matWorld_);
+	offset = Normalize(offset);
+	// ベクトルの長さを整える
+	offset.x *= kDistancePlayerTo3DReticle;
+	offset.y *= kDistancePlayerTo3DReticle;
+	offset.z *= kDistancePlayerTo3DReticle;
+
+	// 3Dレティクルの座標を設定
+	worldTransform_.translation_.x = GetWorldPosition().x + offset.x;
+	origin.y = GetWorldPosition().y + offset.y;
+	worldTransform_.translation_.z = GetWorldPosition().z + offset.z;
+
+	worldTransform_.rotation_.y += 0.01f;
 }
 
 void Enemy::Fire() {
 	assert(player_);
 
 	// 弾の速度(正の数だと敵の後ろから弾が飛ぶ)
-	const float kBulletSpeed = -0.5f;
-	Vector3 velocity{0, 0, kBulletSpeed};
+	const float kBulletSpeed = 3;
+	Vector3 velocity{1, 1, kBulletSpeed};
 
 	// 自キャラのワールド座標を取得する
 	player_->GetWorldPosition();
 
+	velocity = Subtract(
+	    {player_->GetWorldPosition().x, player_->GetWorldPosition().y + 1,
+	     player_->GetWorldPosition().z},
+	    GetWorldPosition());
+
+	// ベクトルの正規化
+	velocity = Normalize(velocity);
+
+	// ベクトルの長さを、速さに合わせる
+	velocity.x *= kBulletSpeed;
+	velocity.y *= kBulletSpeed;
+	velocity.z *= kBulletSpeed;
+
 	// 弾を生成し、初期化
 	EnemyBullet* newBullet = new EnemyBullet();
-	newBullet->Initialize(model_, GetWorldPosition(), velocity);
+	newBullet->Initialize(modelBullet_, GetWorldPosition(), velocity);
 	newBullet->SetPlayer(player_);
 
 	// 弾を登録
@@ -138,12 +210,6 @@ void EnemyStateApproach::Update(Enemy* enemy) {
 	// 範囲forでリストの全要素について回す
 	for (TimedCall* timedCall : timedCalls_) {
 		timedCall->Update();
-	}
-
-	// 既定の位置に到達したら離脱
-	if (enemy->GetEnemyPos().z < -15.0f) {
-		timedCalls_.clear();
-		enemy->ChangeState(new EnemyStateLeave());
 	}
 }
 

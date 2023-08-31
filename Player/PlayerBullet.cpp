@@ -24,8 +24,6 @@ void PlayerBullet::Initialize(Model* model, const Vector3& pos, const Vector3& v
 	assert(model);
 
 	model_ = model;
-	// テクスチャ読み込み
-	bulletTexture_ = TextureManager::Load("red.png");
 
 	// 当たり判定の半径設定
 	SetRadius(1.0f);
@@ -59,21 +57,12 @@ void PlayerBullet::Update() {
 	worldTransform_.UpdateMatrix();
 
 	// 時間経過で死ぬ
-	if (--deathTimer_ <= 0) {
+	if (--deathTimer_ <= 0 || worldTransform_.translation_.y <= -2) {
 		isDead_ = true;
 	}
-	// playerの座標表示
-	ImGui::Begin(" ");
-	// float3スライダー
-	ImGui::Text(
-	    "x%f  y%f   z%f", worldTransform_.translation_.x, worldTransform_.translation_.y,
-	    worldTransform_.translation_.z);
-	ImGui::Text("timer %d", deathTimer_);
-	ImGui::Text("isDead %d", isDead_);
-	ImGui::End();
 }
 
 void PlayerBullet::Draw(const ViewProjection& viewProjection) {
 	// モデルの描画
-	model_->Draw(worldTransform_, viewProjection, bulletTexture_);
+	model_->Draw(worldTransform_, viewProjection);
 }

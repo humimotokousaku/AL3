@@ -11,14 +11,9 @@ void FollowCamera::Update() {
 	if (target_) {
 		// 追従対象からカメラまでのオフセット
 		Vector3 offset = TargetOffset();
-		// カメラの角度から回転行列を計算
-		//Matrix4x4 rotateMatrix = MakeRotateMatrix(viewProjection_.rotation_);
-
-		// オフセットをカメラの回転に合わせて回転
-		//offset = TransformNormal(offset, rotateMatrix);
 
 		// 追従座標の補間
-		interTarget_ = Lerp(interTarget_, target_->translation_, 0.1f);
+		interTarget_ = Lerp(interTarget_, target_->translation_, 0.2f);
 
 		// 座標をコピーしてオフセット分ずらす
 		viewProjection_.translation_ = Add(interTarget_, offset);
@@ -33,7 +28,7 @@ void FollowCamera::Update() {
 		destinationAngleY_ += (float)joyState.Gamepad.sThumbRX / SHRT_MAX * kRadian;
 	} 
 	viewProjection_.rotation_.y =
-	    LerpShortAngle(viewProjection_.rotation_.y, destinationAngleY_, 0.1f);
+	    LerpShortAngle(viewProjection_.rotation_.y, destinationAngleY_, 0.3f);
 
 	if (viewProjection_.rotation_.x <= -0.26f) {
 		viewProjection_.rotation_.x = -0.2599999f;
@@ -42,9 +37,6 @@ void FollowCamera::Update() {
 	}
 	viewProjection_.UpdateViewMatrix();
 	viewProjection_.TransferMatrix();
-	ImGui::Begin("camera");
-	ImGui::Text("view.rotate.x %f", viewProjection_.rotation_.x);
-	ImGui::End();
 }
 
 void FollowCamera::SetTarget(const WorldTransform* target) {
@@ -54,7 +46,7 @@ void FollowCamera::SetTarget(const WorldTransform* target) {
 
 Vector3 FollowCamera::TargetOffset() const {
 	// 追従対象からのオフセット
-	Vector3 offset = {0, 8, -50};
+	Vector3 offset = {0, 8, -40};
 	// 回転行列を合成
 	Matrix4x4 rotateMatrix = MakeRotateMatrix(viewProjection_.rotation_);
 

@@ -18,6 +18,7 @@ public: // メンバ関数
 
 	// 完了ならtrueを返す
 	bool IsDead() const { return isDead_; }
+	void SetIsDead(bool isDead) { isDead_ = isDead; }
 
 	/// <summary>
 	/// 初期化
